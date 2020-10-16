@@ -1,0 +1,120 @@
+@startuml
+
+interface Serializable
+
+class Book {
+    Title : String
+    Author : String
+    ISBN : long
+    PhotoURL : String
+    Status : BookStatus
+    OwnerUsername : String
+    +equals()
+    +hashCode()
+}
+
+class BookFactory <<Factory>>
+{
+    +createBook(String Title, String Author, long ISBN, Object[] Photo) : Book
+    +scanToCreate() : Book
+}
+
+class UserNotifications
+{
+    Notifications : List<Notification>
+    +actNotification(Notification which)
+}
+
+abstract class Notification
+{
+    NotificationText : String
+    +notificationAction()
+}
+
+class UserBooks
+{
+    Books : List<Book>
+    Requests : List<BorrowRequest>
+
+    +deleteBook(Book whichBook)
+    +returnBook(Book whichBook)
+    +addBook()
+}
+
+class BorrowRequest {
+    MyBook : GPSLocation
+    BorrowerUsername : String
+    +accept()
+    +decline()
+}
+
+class BorrowAgreement {
+    MyBook : Book
+    MyLocation : GPSLocation
+    +scanBookToLoan()
+    +scanBookConfirmReturn()
+    +setLocation(GPSLocation myLocation)
+}
+
+class LoanRequest {
+    TheirBook : Book
+    Status : RequestStatus
+    +LoanRequest(Book theirBook)
+}
+
+class LoanAgreement {
+    TheirBook : Book
+    TheirLocation : GPSLocation
+    +scanBookConfirmBorrow()
+    +scanBookToReturn()
+}
+
+enum RequestStatus {
+    ACCEPTED
+    DECLINED
+}
+
+
+class UserProfile {
+    Username : String
+    Email : String
+    Telephone : String
+}
+
+class AppUser {
+    MyProfile : UserProfile
+    MyBooks : UserBooks
+    MyNotifications : UserNotifications
+    +editProfile() : void
+}
+
+enum BookStatus {
+    AVAILABLE
+    REQUESTED
+    ACCEPTED
+    BORROWED
+    LOANED
+}
+
+Serializable <|.. Book
+Serializable <|.. Notification
+AppUser "0...1" o-- "1" UserProfile
+AppUser "1" *-- "1" UserNotifications
+AppUser "1" *-- "1" UserBooks
+Book <-- BookStatus
+UserBooks o-- "n" Book
+UserBooks "1" o-- "0...1" BorrowRequest
+Notification <|-- LoanRequest
+Notification <|-- BorrowRequest
+LoanRequest <-- RequestStatus
+BorrowRequest --> BorrowAgreement : Can become >
+LoanRequest --> LoanAgreement : Can become >
+UserNotifications *-- Notification
+Book <-- BookFactory : Creates
+
+note as N1
+    <b>Note:</b> the private/public statuses of object fields are omitted
+    in this specification for succinctness (i.e. fewer getter/setters).
+end note
+
+@enduml
