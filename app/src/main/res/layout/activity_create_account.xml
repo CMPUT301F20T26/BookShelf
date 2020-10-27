@@ -8,7 +8,7 @@
     tools:context=".CreateAccount">
 
     <TextView
-        android:id="@+id/login_header"
+        android:id="@+id/cerat_account_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.506"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_header" />
+        app:layout_constraintTop_toBottomOf="@+id/cerat_account_header" />
 
     <TextView
         android:id="@+id/message2"
@@ -50,7 +50,7 @@
         app:layout_constraintTop_toBottomOf="@+id/message" />
 
     <EditText
-        android:id="@+id/user_name"
+        android:id="@+id/create_account_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle1"
@@ -58,12 +58,12 @@
         android:gravity="center"
         android:hint="Username"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/user_email"
-        app:layout_constraintEnd_toEndOf="@+id/user_email"
-        app:layout_constraintTop_toBottomOf="@+id/full_name" />
+        app:layout_constraintBottom_toTopOf="@+id/create_account_user_email"
+        app:layout_constraintEnd_toEndOf="@+id/create_account_user_email"
+        app:layout_constraintTop_toBottomOf="@+id/create_account_full_name" />
 
     <EditText
-        android:id="@+id/user_email"
+        android:id="@+id/create_account_user_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle1"
@@ -71,12 +71,12 @@
         android:gravity="center"
         android:hint="Email"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/phone_number"
-        app:layout_constraintEnd_toEndOf="@+id/phone_number"
-        app:layout_constraintTop_toBottomOf="@+id/user_name" />
+        app:layout_constraintBottom_toTopOf="@+id/create_account_phone_number"
+        app:layout_constraintEnd_toEndOf="@+id/create_account_phone_number"
+        app:layout_constraintTop_toBottomOf="@+id/create_account_user_name" />
 
     <EditText
-        android:id="@+id/phone_number"
+        android:id="@+id/create_account_phone_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle1"
@@ -84,12 +84,12 @@
         android:gravity="center"
         android:hint="Phone Number"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/user_pwd"
-        app:layout_constraintEnd_toEndOf="@+id/user_pwd"
-        app:layout_constraintTop_toBottomOf="@+id/user_email" />
+        app:layout_constraintBottom_toTopOf="@+id/create_account_user_pwd"
+        app:layout_constraintEnd_toEndOf="@+id/create_account_user_pwd"
+        app:layout_constraintTop_toBottomOf="@+id/create_account_user_email" />
 
     <EditText
-        android:id="@+id/user_pwd"
+        android:id="@+id/create_account_user_pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle1"
@@ -100,10 +100,10 @@
         app:layout_constraintBottom_toTopOf="@+id/create_account_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phone_number" />
+        app:layout_constraintTop_toBottomOf="@+id/create_account_phone_number" />
 
     <EditText
-        android:id="@+id/full_name"
+        android:id="@+id/create_account_full_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle1"
@@ -111,8 +111,8 @@
         android:gravity="center"
         android:hint="Full Name"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/user_name"
-        app:layout_constraintEnd_toEndOf="@+id/user_name"
+        app:layout_constraintBottom_toTopOf="@+id/create_account_user_name"
+        app:layout_constraintEnd_toEndOf="@+id/create_account_user_name"
         app:layout_constraintTop_toBottomOf="@+id/message2" />
 
     <Button
