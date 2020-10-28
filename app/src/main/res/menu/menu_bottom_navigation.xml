@@ -2,25 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/profilePage"
-        android:title="ProfilePage"
-        android:icon="@drawable/portrait_icon"/>
-
-    <item
-        android:id="@+id/notifications"
-        android:title="NotificationsPage"
+        android:id="@+id/notifications_page"
+        android:title="Notifications"
         android:icon="@drawable/notifications_icon"/>
 
 
     <item
-        android:id="@+id/userBooks"
-        android:title="BooksPage"
+        android:id="@+id/books_page"
+        android:title="My Books"
         android:icon="@drawable/books_icon"/>
 
     <item
-        android:id="@+id/search"
-        android:title="SearchBooks"
+        android:id="@+id/search_page"
+        android:title="Search"
         android:icon="@drawable/search_icon"/>
+
+    <item
+        android:id="@+id/profile_page"
+        android:title="Profile"
+        android:icon="@drawable/portrait_icon"/>
 
 
 </menu>

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class Signin extends AppCompatActivity {
 
     private EditText userEmailEt;
-    private EditText userPassEt;
+    private TextInputLayout userPassLayout;
     private Button logInBtn;
     private TextView createAccountText;
 
@@ -39,7 +40,7 @@ public class Signin extends AppCompatActivity {
         setContentView(R.layout.activity_signin);
 
         userEmailEt = findViewById(R.id.signin_user_email);
-        userPassEt = findViewById(R.id.signin_password);
+        userPassLayout = findViewById(R.id.signin_password);
         logInBtn = findViewById(R.id.signin_button);
         createAccountText = findViewById(R.id.create_account_text);
 
@@ -48,15 +49,21 @@ public class Signin extends AppCompatActivity {
         logInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userAuth.signInWithEmailAndPassword(userEmailEt.getText().toString(), userPassEt.getText().toString())
+                String userEmail = userEmailEt.getText().toString();
+                String userPassword = userPassLayout.getEditText().getText().toString();
+
+                userAuth.signInWithEmailAndPassword(userEmail,userPassword)
                         .addOnCompleteListener(Signin.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     FirebaseUser authenticatedUser = userAuth.getCurrentUser();
+
                                     //Pass authenticated user id into profile page
                                     Intent profilePageIntent = new Intent(getApplicationContext(), UserProfile.class);
                                     profilePageIntent.putExtra("UserID", authenticatedUser.getUid());
+
+                                    Toast.makeText(getApplicationContext(), "Welcome Back", Toast.LENGTH_SHORT).show();
                                     startActivity(profilePageIntent);
                                 }else{
                                     Toast.makeText(getApplicationContext(), "Sign In failed. Please verify email and password", Toast.LENGTH_SHORT).show();

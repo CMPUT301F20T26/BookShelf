@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Create Account"
-        android:textColor="#3F51B5"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView6"
         app:layout_constraintTop_toBottomOf="@+id/signin_button" />
@@ -53,7 +53,7 @@
         android:gravity="center"
         android:text="Welcome Back"
         android:textAlignment="center"
-        android:textColor="#166FFF"
+        android:textColor="@color/colorPrimary"
         android:textSize="40sp"
         app:layout_constraintBottom_toTopOf="@+id/signin_user_email"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,20 +76,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcome_backheader" />
 
-    <EditText
-        android:id="@+id/signin_password"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rectangle3"
-        android:gravity="center"
-        android:hint="Password"
-        android:textAlignment="gravity"
-        android:textSize="30sp"
+        android:id="@+id/signin_password"
         app:layout_constraintBottom_toTopOf="@+id/signin_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.481"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signin_user_email" />
+        app:layout_constraintTop_toBottomOf="@+id/signin_user_email"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleDrawable="@drawable/visibilty_selector"
+        app:passwordToggleTint="@color/colorPrimary"
+        app:hintAnimationEnabled="false"
+        app:hintEnabled="false"
+        >
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:background="@drawable/rectangle3"
+            android:hint="Password"
+            android:textSize="30sp"
+            android:textAlignment="center"
+            android:gravity="center"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/signin_button"
