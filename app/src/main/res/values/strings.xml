@@ -1,3 +1,9 @@
 <resources>
+    <!--  Welcome Screen Resources  -->
     <string name="app_name">BookShelf</string>
+    <string name="app_desc_slogan">Organize, Monitor, Share</string>
+    <string name="welcome_message">Welcome to BookShelf</string>>
+    <string name="app_desciption">A platform for users to record owned books and loan books to other users. </string>
+    <string name="next">Next</string>
+
 </resources>

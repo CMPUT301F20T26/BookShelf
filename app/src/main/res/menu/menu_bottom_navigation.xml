@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/notifications_page"
+        android:title="Notifications"
+        android:icon="@drawable/notifications_icon"/>
+
+
+    <item
+        android:id="@+id/books_page"
+        android:title="My Books"
+        android:icon="@drawable/books_icon"/>
+
+    <item
+        android:id="@+id/search_page"
+        android:title="Search"
+        android:icon="@drawable/search_icon"/>
+
+    <item
+        android:id="@+id/profile_page"
+        android:title="Profile"
+        android:icon="@drawable/portrait_icon"/>
+
+
+</menu>
