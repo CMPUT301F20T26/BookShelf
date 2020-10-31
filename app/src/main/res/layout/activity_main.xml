@@ -11,66 +11,69 @@
         android:id="@+id/app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="128dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="@font/poppins_bold"
         android:gravity="center"
         android:text="@string/app_name"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/app_slogan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.938" />
 
     <TextView
         android:id="@+id/app_slogan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="220dp"
         android:fontFamily="@font/poppins_bold"
         android:gravity="center"
         android:text="@string/app_desc_slogan"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/app_name3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_name" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/app_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:text="@string/app_desciption"
+        android:textAlignment="center"
+        android:textColor="#166FFF "
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/next_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/app_name3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="284dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="@font/poppins_bold"
         android:gravity="center"
         android:text="@string/welcome_message"
         android:textAlignment="center"
         android:textColor="#166FFF "
         android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/app_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_slogan" />
-
-    <TextView
-        android:id="@+id/app_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/app_desciption"
-        android:textAlignment="center"
-        android:textColor="#166FFF "
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_name3" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/next_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="44dp"
         android:background="@drawable/welcome_button"
         android:text="@string/next"
         android:textColor="#166FFF "
@@ -78,7 +81,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_description"
-        app:layout_constraintVertical_bias="0.471" />
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
