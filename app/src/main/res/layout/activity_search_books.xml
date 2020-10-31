@@ -38,17 +38,30 @@
         app:layout_constraintVertical_bias="0" />
 
 
-    <TextView
-        android:id="@+id/uid_search"
-        android:layout_width="365dp"
-        android:layout_height="60dp"
-        android:gravity="center"
-        android:text="uid"
-        android:textAlignment="center"
+    <ListView
+        android:id="@+id/search_results"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:choiceMode="singleChoice"
+        android:listSelector="#999999"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/search_bar">
+
+    </ListView>
+
+<!--    <TextView-->
+<!--        android:id="@+id/uid_search"-->
+<!--        android:layout_width="365dp"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:gravity="center"-->
+<!--        android:text="uid"-->
+<!--        android:textAlignment="center"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
 
 
