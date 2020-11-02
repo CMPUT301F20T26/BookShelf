@@ -29,7 +29,7 @@ public class CreateAccount extends AppCompatActivity {
 
     private EditText userFullNameEt;
     private EditText userNameEt;
-    private EditText user_emailEt;
+    private EditText userEmailEt;
     private EditText userPhoneEt;
     private EditText userPasswordEt;
     private Button createAccountBtn;
@@ -48,13 +48,13 @@ public class CreateAccount extends AppCompatActivity {
 
         userFullNameEt = findViewById(R.id.create_account_full_name);
         userNameEt = findViewById(R.id.create_account_user_name);
-        user_emailEt = findViewById(R.id.create_account_user_email);
+        userEmailEt = findViewById(R.id.create_account_user_email);
         userPhoneEt = findViewById(R.id.create_account_phone_number);
         userPasswordEt = findViewById(R.id.create_account_user_pwd);
         signInText = findViewById(R.id.sign_in_text);
         createAccountBtn = findViewById(R.id.create_account_btn);
 
-        //Initialize firebase authetication instance
+        //Initialize firebase authentication instance
         userAuth = FirebaseAuth.getInstance();
 
         //Creating a password based user account
@@ -65,7 +65,13 @@ public class CreateAccount extends AppCompatActivity {
                 //TODO: Add phoneNumber verification
                 //TODO: Add userName Verification
                 //TODO: Add Is empty checks
-                userAuth.createUserWithEmailAndPassword(user_emailEt.getText().toString(), userPasswordEt.getText().toString())
+                final String userEmail = userEmailEt.getText().toString();
+                String userPassword = userPasswordEt.getText().toString();
+                final String userFullName = userFullNameEt.getText().toString();
+                final String userName = userNameEt.getText().toString();
+                final String userPhone = userPhoneEt.getText().toString();
+
+                userAuth.createUserWithEmailAndPassword(userEmail, userPassword)
                         .addOnCompleteListener(CreateAccount.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -74,10 +80,10 @@ public class CreateAccount extends AppCompatActivity {
 
                                     //Add user data to cloud database
                                     Map<String, String> user = new HashMap<>();
-                                    user.put("fullname", userFullNameEt.getText().toString());
-                                    user.put("username", userNameEt.getText().toString());
-                                    user.put("email", user_emailEt.getText().toString());
-                                    user.put("phone", userPhoneEt.getText().toString());
+                                    user.put("fullname", userFullName);
+                                    user.put("username", userName);
+                                    user.put("email", userEmail);
+                                    user.put("phone", userPhone);
 
                                     //Add user to database using userID in authentication
                                     db.collection("users").document(authenticatedUser.getUid()).set(user);
