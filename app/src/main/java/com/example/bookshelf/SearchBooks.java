@@ -63,16 +63,6 @@ public class SearchBooks extends AppCompatActivity {
         });
 
 
-
-
-
-
-
-
-
-
-
-
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
