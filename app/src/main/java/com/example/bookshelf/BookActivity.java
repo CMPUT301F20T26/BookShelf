@@ -46,17 +46,27 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
 
         final Button request = findViewById(R.id.request_button);
 
-        // set onClick to create a fragment (yes/no)
         request.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new MakeRequestFragment().show(getSupportFragmentManager(), "CONFIRM");
             }
         });
+
+
         // create intent to move to user profile
+        owner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // function that generates intent and starts activity
+            }
+        });
 
     }
 
+    /**
+     * sets book as requested in users profile, sends request notification to owner of the book
+     */
     public void onOkPressed(){
         //do nothing, for now
     }
