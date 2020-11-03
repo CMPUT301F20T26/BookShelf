@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,12 +21,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 public class SearchBooks extends AppCompatActivity {
-    TextView uidTv;
-    ListView searchResults;
-    EditText searchBar;
-    Button searchButton;
-    ArrayAdapter<String> bookAdapter;
-    ArrayList<String> resultList; // using string dummy values until book objects can be used
+
+    public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
+    private TextView uidTv;
+    private ListView searchResults;
+    private EditText searchBar;
+    private Button searchButton;
+    private ArrayAdapter<String> bookAdapter;
+    private ArrayList<String> resultList; // using string dummy values until book objects can be used
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +51,14 @@ public class SearchBooks extends AppCompatActivity {
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                bookAdapter.clear();
-                String check = searchBar.getText().toString();
-                Pattern pattern = Pattern.compile(check, Pattern.CASE_INSENSITIVE);
-                for(int i = 0; i < books.length; i++){
-                    Matcher matcher = pattern.matcher(books[i]);
-                    if(matcher.find()){
-                        bookAdapter.add(books[i]);
-                    }
-                }
+                matchBook(books);
+            }
+        });
 
-
+        searchResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openBookDescription(view);
             }
         });
 
@@ -101,5 +101,37 @@ public class SearchBooks extends AppCompatActivity {
             }
         });
         //__________________________________________________________________________________________
+    }
+
+    /**
+     * Takes an array of strings and matches it against a user string. Matches are added to the
+     * custom list and displayed on screen as "results".
+     *
+     * @param booklist array of books to be matched against the user input.
+     */
+    public void matchBook(String[] booklist) {
+        bookAdapter.clear();
+        String check = searchBar.getText().toString();
+        Pattern pattern = Pattern.compile(check, Pattern.CASE_INSENSITIVE);
+        for(int i = 0; i < booklist.length; i++){
+            Matcher matcher = pattern.matcher(booklist[i]);
+            if(matcher.find() && !check.isEmpty()){
+                bookAdapter.add(booklist[i]);
+            }
+        }
+    }
+
+    /**
+     * Starts a new activity showing the details of the book that was clicked on.
+     *
+     * @param view TextView holding the info of the selected book.
+     */
+    public void openBookDescription(View view) {
+        Intent intent = new Intent(this, BookActivity.class);
+        TextView textView = (TextView) view;
+        String message = textView.getText().toString();
+        // we want the message to be the book ID corresponding to the selected book
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
     }
 }
