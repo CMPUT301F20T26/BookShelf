@@ -5,5 +5,7 @@
     <string name="welcome_message">Welcome to BookShelf</string>>
     <string name="app_desciption">A platform for users to record owned books and loan books to other users. </string>
     <string name="next">Next</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
