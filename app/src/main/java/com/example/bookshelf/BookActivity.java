@@ -4,13 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
-public class BookActivity extends AppCompatActivity {
+public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
     private ImageView displayPic;
     private TextView title;
     private TextView description;
@@ -46,8 +47,17 @@ public class BookActivity extends AppCompatActivity {
         final Button request = findViewById(R.id.request_button);
 
         // set onClick to create a fragment (yes/no)
-
+        request.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new MakeRequestFragment().show(getSupportFragmentManager(), "CONFIRM");
+            }
+        });
         // create intent to move to user profile
 
+    }
+
+    public void onOkPressed(){
+        //do nothing, for now
     }
 }
