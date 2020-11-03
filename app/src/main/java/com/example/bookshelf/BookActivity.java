@@ -12,6 +12,7 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
+    public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
     private TextView title;
     private TextView description;
@@ -39,7 +40,6 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         ISBN = findViewById(R.id.isbn_text);
         owner = findViewById(R.id.owner_text);
         status = findViewById(R.id.status_text);
-
         title.setText(message);
 
 
@@ -59,6 +59,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
             @Override
             public void onClick(View v) {
                 // function that generates intent and starts activity
+                openUserProfile();
             }
         });
 
@@ -69,5 +70,11 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
      */
     public void onOkPressed(){
         //do nothing, for now
+    }
+
+    public void openUserProfile(){
+        Intent intent = new Intent(this, UserActivity.class);
+        // doesn't really do anything, this is just here to open a blank user profile for now.
+        startActivity(intent);
     }
 }

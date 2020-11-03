@@ -13,9 +13,14 @@
                   android:parentActivityName=".SearchBooks">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".SearchBooks" />
         </activity>
-        <activity android:name=".UserActivity" />
+        <activity android:name=".UserActivity"
+                  android:parentActivityName=".BookActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".BookActivity" />
+        </activity>
         <activity android:name=".UserBooks" />
         <activity android:name=".UserNotifications" />
         <activity android:name=".SearchBooks" />
