@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <EditText
+            android:id="@+id/Title_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="textPersonName"
+            android:layout_marginBottom="20dp"
+            android:maxLength="50"/>
+
+        <EditText
+            android:id="@+id/Author_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Author"
+            android:layout_marginBottom="20dp"
+            android:inputType="textPersonName"
+            android:maxLength="40"/>
+        <EditText
+            android:id="@+id/ISBN_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ISBN"
+            android:layout_marginBottom="20dp"
+            android:inputType="text|number"
+            android:maxLength="13"/>
+
+        <EditText
+            android:id="@+id/Description_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:layout_marginBottom="20dp"
+            android:inputType="textPersonName"
+            android:maxLength="250"/>
+
+        <Button
+            android:id="@+id/Pictureadd_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/add_picture" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
