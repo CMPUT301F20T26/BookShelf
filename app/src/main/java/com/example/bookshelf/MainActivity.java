@@ -40,10 +40,7 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(getApplicationContext(), UserProfile.class);
             i.putExtra("UserID", user.getUid());
             startActivity(i);
-        }else {
-            Toast.makeText(getApplicationContext(), "NO USER CURRENTLY SIGNED IN ON THIS DEVICE", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 

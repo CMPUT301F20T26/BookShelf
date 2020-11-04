@@ -10,10 +10,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,11 +34,14 @@ public class UserProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
+        final String userId = getIntent().getStringExtra("UserID");
+        uidTv = findViewById(R.id.uid_profile);
+        uidTv.setText(userId);
+
         //Database instance initialization
         db = FirebaseFirestore.getInstance();
 
-
-        //Signout Button listener
+        //Sign out Button listener
         signoutBtn = findViewById(R.id.signoutbtn);
         signoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,10 +53,6 @@ public class UserProfile extends AppCompatActivity {
                 startActivity(signInIntent);
             }
         });
-
-        final String userId = getIntent().getStringExtra("UserID");
-        uidTv = findViewById(R.id.uid_profile);
-        uidTv.setText(userId);
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
