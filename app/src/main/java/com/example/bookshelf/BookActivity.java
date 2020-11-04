@@ -72,6 +72,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         //do nothing, for now
     }
 
+
     public void openUserProfile(){
         Intent intent = new Intent(this, UserActivity.class);
         // doesn't really do anything, this is just here to open a blank user profile for now.
