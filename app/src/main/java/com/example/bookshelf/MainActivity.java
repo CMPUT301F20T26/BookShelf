@@ -11,13 +11,20 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Welcome page activity that facilitates user persistence
+ */
 public class MainActivity extends AppCompatActivity {
     //Current user
     FirebaseUser user;
 
-    //Layout items
+    //Layout variables
     private Button nextButton;
 
+    /**
+     * On create lifecycle method for creating the activity
+     * @param savedInstanceState current instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent createAccountIntnet = new Intent(getApplicationContext(), CreateAccount.class);
-                startActivity(createAccountIntnet);
+                Intent createAccountIntenet = new Intent(getApplicationContext(), CreateAccount.class);
+                startActivity(createAccountIntenet);
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             }
         });
