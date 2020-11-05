@@ -6,12 +6,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.io.Serializable;
+import java.util.HashMap;
 
 public class UserProfile extends AppCompatActivity {
     TextView uidTv;
+    Button signoutBtn;
+
+    //Database instance
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +37,22 @@ public class UserProfile extends AppCompatActivity {
         final String userId = getIntent().getStringExtra("UserID");
         uidTv = findViewById(R.id.uid_profile);
         uidTv.setText(userId);
+
+        //Database instance initialization
+        db = FirebaseFirestore.getInstance();
+
+        //Sign out Button listener
+        signoutBtn = findViewById(R.id.signoutbtn);
+        signoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth authenticatedUser = FirebaseAuth.getInstance();
+                authenticatedUser.signOut();
+
+                Intent signInIntent = new Intent(getApplicationContext(), Signin.class);
+                startActivity(signInIntent);
+            }
+        });
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
@@ -57,9 +89,12 @@ public class UserProfile extends AppCompatActivity {
                         return true;
                 }
                 return false;
+
             }
         });
         //__________________________________________________________________________________________
+
+
     }
 
 }
