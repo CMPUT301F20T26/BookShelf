@@ -2,6 +2,7 @@ package com.example.bookshelf;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,27 +18,30 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Signin activity for registered users to gain access to the application
+ */
 public class SignInActivity extends AppCompatActivity {
 
+    //Layout variables
     private EditText userEmailEt;
     private TextInputLayout userPassLayout;
     private Button logInBtn;
     private TextView createAccountText;
 
+    //Firebase authentication setup
     private FirebaseAuth userAuth;
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = userAuth.getCurrentUser();
-    }
-
+    /**
+     * On create lifecycle method for creating the activity
+     * @param savedInstanceState current instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
 
+        //Layout assignments
         userEmailEt = findViewById(R.id.signin_user_email);
         userPassLayout = findViewById(R.id.signin_password);
         logInBtn = findViewById(R.id.signin_button);
@@ -76,8 +80,8 @@ public class SignInActivity extends AppCompatActivity {
         createAccountText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent createAccontIntent = new Intent(getApplicationContext(), CreateAccountActivity.class);
-                startActivity(createAccontIntent);
+                Intent createAccountIntent = new Intent(getApplicationContext(), CreateAccountActivity.class);
+                startActivity(createAccountIntent);
             }
         });
 

@@ -22,8 +22,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * Create Account activity for users to create credentials to sign into the app.
+ */
 public class CreateAccountActivity extends AppCompatActivity {
 
+    //Global layout variables
     private EditText userFullNameEt;
     private EditText usernameEt;
     private EditText userEmailEt;
@@ -38,12 +42,17 @@ public class CreateAccountActivity extends AppCompatActivity {
     //Firebase Cloud Firestore
     FirebaseFirestore db;
 
-    //User Hashmap
-
+    /**
+     * User hashmap for creating necessary fields in the db
+     * @param fullname Full name of the new user
+     * @param username chosen username of the new user
+     * @param phone chosen phone number of the user
+     * @param email chosen email of the user
+     * @return a hashmap of necessary fields required to properly create a user
+     */
     private HashMap<String, Object> userData(String fullname, String username, String phone , String email){
 
         HashMap<String, Object> user = new HashMap<String, Object>();
-
         user.put("email", email);
         user.put("fullname", fullname);
         user.put("notifications", new ArrayList<String>());
@@ -56,11 +65,16 @@ public class CreateAccountActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * On create lifecycle method for creating the activity
+     * @param savedInstanceState current instance
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
+        //Layout assignments
         userFullNameEt = findViewById(R.id.create_account_full_name);
         usernameEt = findViewById(R.id.create_account_user_name);
         userEmailEt = findViewById(R.id.create_account_user_email);
@@ -72,7 +86,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         //Initialize firebase authentication instance
         userAuth = FirebaseAuth.getInstance();
 
-        //Initalize firbase database
+        //Initialize firebase database
         db = FirebaseFirestore.getInstance();
 
         //Creating a password based user account
@@ -88,7 +102,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                 final String phone = userPhoneEt.getText().toString();
 
                 //USER ENTRY CHECKS before account creation
-                String numbers   = ".*[0-9].*";
+                String numbers = ".*[0-9].*";
                 String lettersLowercase = ".*[a-z].*";
                 String lettersUppercase = ".*[A-Z].*";
 
