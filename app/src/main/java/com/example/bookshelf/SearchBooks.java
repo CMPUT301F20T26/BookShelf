@@ -13,10 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -29,6 +37,7 @@ public class SearchBooks extends AppCompatActivity {
     private Button searchButton;
     private ArrayAdapter<String> bookAdapter;
     private ArrayList<String> resultList; // using string dummy values until book objects can be used
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +47,7 @@ public class SearchBooks extends AppCompatActivity {
         final String userId = getIntent().getStringExtra("UserID");
 //        uidTv = findViewById(R.id.uid_search);
 //        uidTv.setText(userId);
+        db = FirebaseFirestore.getInstance();
 
         searchBar = findViewById(R.id.search_bar);
         searchButton = findViewById(R.id.search_button);
@@ -47,18 +57,33 @@ public class SearchBooks extends AppCompatActivity {
         bookAdapter = new ArrayAdapter<>(this, R.layout.content, resultList);
         searchResults.setAdapter(bookAdapter);
 
-        final String []books ={"A Song of Ice and Fire", "Swan Song", "Frankenstein", "Monster", "Monsters Inc."};
+        final HashMap<String, String> idName = new HashMap<String, String>();
+        final ArrayList<String> idList = new ArrayList<String>();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                matchBook(books);
+                idName.clear();
+                bookAdapter.clear();
+                db.collection("books")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        idName.put(document.getId(), document.getData().get("title").toString());
+                                        matchBook(idName, idList, document.getId());
+                                    }
+                                }
+                            }
+                        });
             }
         });
 
         searchResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openBookDescription(view);
+                openBookDescription(idList.get(position));
             }
         });
 
@@ -104,34 +129,34 @@ public class SearchBooks extends AppCompatActivity {
     }
 
     /**
-     * Takes an array of strings and matches it against a user string. Matches are added to the
+     * Takes a string and matches it against a user string. Matches are added to the
      * custom list and displayed on screen as "results".
      *
-     * @param booklist array of books to be matched against the user input.
+     * @param pair
+     * @param id
      */
-    public void matchBook(String[] booklist) {
-        bookAdapter.clear();
+    public void matchBook(HashMap<String, String> pair, ArrayList<String> idList, String id) {
+        String book = pair.get(id);
         String check = searchBar.getText().toString();
         Pattern pattern = Pattern.compile(check, Pattern.CASE_INSENSITIVE);
-        for(int i = 0; i < booklist.length; i++){
-            Matcher matcher = pattern.matcher(booklist[i]);
+        Matcher matcher = pattern.matcher(book);
             if(matcher.find() && !check.isEmpty()){
-                bookAdapter.add(booklist[i]);
+                bookAdapter.add(book);
+                idList.add(id);
+            } else {
+                pair.remove(id);
             }
-        }
     }
 
     /**
      * Starts a new activity showing the details of the book that was clicked on.
      *
-     * @param view TextView holding the info of the selected book.
+     * @param id
      */
-    public void openBookDescription(View view) {
+    public void openBookDescription(String id) {
         Intent intent = new Intent(this, BookActivity.class);
-        TextView textView = (TextView) view;
-        String message = textView.getText().toString();
         // we want the message to be the book ID corresponding to the selected book
-        intent.putExtra(EXTRA_MESSAGE, message);
+        intent.putExtra(EXTRA_MESSAGE, id);
         startActivity(intent);
     }
 }

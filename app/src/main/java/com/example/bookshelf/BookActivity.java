@@ -1,5 +1,6 @@
 package com.example.bookshelf;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,7 +10,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
@@ -20,12 +31,15 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     private TextView ISBN;
     private TextView owner;
     private TextView status;
+    private FirebaseFirestore db;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
+
+        db = FirebaseFirestore.getInstance();
 
         //intent should provide bookID, use to access object and set fields
         //right now it only contains a string of the book's title
@@ -40,9 +54,26 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         ISBN = findViewById(R.id.isbn_text);
         owner = findViewById(R.id.owner_text);
         status = findViewById(R.id.status_text);
-        title.setText(message);
 
+        db.collection("books")
+                .document(message)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            title.setText(document.getData().get("title").toString());
+                            author.setText(document.getData().get("author").toString());
+                            ISBN.setText(document.getData().get("isbn").toString());
+                            owner.setText(document.getData().get("ownerUsername").toString());
+                            status.setText(document.getData().get("status").toString());
+                        }
+                    }
+                });
 
+        final HashMap<String, String> userId;
+        userId = new HashMap<String, String>();
 
         final Button request = findViewById(R.id.request_button);
 
@@ -53,13 +84,28 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
             }
         });
 
-
         // create intent to move to user profile
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                userId.clear();
+                String username = owner.getText().toString();
                 // function that generates intent and starts activity
-                openUserProfile();
+                db.collection("users").whereEqualTo("username", username).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        userId.put(document.getData().get("username").toString(), document.getId());
+                                    }
+                                }
+                            }
+                        });
+
+                if(userId.containsKey(username)){
+                    openUserProfile(userId.get(username));
+                }
             }
         });
 
@@ -73,9 +119,10 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     }
 
 
-    public void openUserProfile(){
+    public void openUserProfile(String id){
         Intent intent = new Intent(this, UserActivity.class);
-        // doesn't really do anything, this is just here to open a blank user profile for now.
+        // we want the message to be the book ID corresponding to the selected book
+        intent.putExtra(EXTRA_MESSAGE, id);
         startActivity(intent);
     }
 }
