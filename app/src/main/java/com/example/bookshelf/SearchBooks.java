@@ -57,7 +57,7 @@ public class SearchBooks extends AppCompatActivity {
         bookAdapter = new ArrayAdapter<>(this, R.layout.content, resultList);
         searchResults.setAdapter(bookAdapter);
 
-        final HashMap<String, String> idName = new HashMap<String, String>();
+        final HashMap<String, String> idName = new HashMap<String, String>(); //dumb naming convention, but its a hashmap of id and book name pairs
         final ArrayList<String> idList = new ArrayList<String>();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -132,8 +132,9 @@ public class SearchBooks extends AppCompatActivity {
      * Takes a string and matches it against a user string. Matches are added to the
      * custom list and displayed on screen as "results".
      *
-     * @param pair
-     * @param id
+     * @param pair id-name pairs
+     * @param idList list of book ids
+     * @param id id to be matched
      */
     public void matchBook(HashMap<String, String> pair, ArrayList<String> idList, String id) {
         String book = pair.get(id);
@@ -151,7 +152,7 @@ public class SearchBooks extends AppCompatActivity {
     /**
      * Starts a new activity showing the details of the book that was clicked on.
      *
-     * @param id
+     * @param id book id to be passed to BookActivity
      */
     public void openBookDescription(String id) {
         Intent intent = new Intent(this, BookActivity.class);
