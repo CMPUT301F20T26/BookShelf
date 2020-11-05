@@ -2,7 +2,6 @@ package com.example.bookshelf;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +17,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class Signin extends AppCompatActivity {
+public class SignInActivity extends AppCompatActivity {
 
     private EditText userEmailEt;
     private TextInputLayout userPassLayout;
@@ -53,14 +52,14 @@ public class Signin extends AppCompatActivity {
                 String userPassword = userPassLayout.getEditText().getText().toString();
 
                 userAuth.signInWithEmailAndPassword(userEmail,userPassword)
-                        .addOnCompleteListener(Signin.this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(SignInActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     FirebaseUser authenticatedUser = userAuth.getCurrentUser();
 
                                     //Pass authenticated user id into profile page
-                                    Intent profilePageIntent = new Intent(getApplicationContext(), UserProfile.class);
+                                    Intent profilePageIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                                     profilePageIntent.putExtra("UserID", authenticatedUser.getUid());
 
                                     Toast.makeText(getApplicationContext(), "Welcome Back", Toast.LENGTH_SHORT).show();
@@ -77,7 +76,7 @@ public class Signin extends AppCompatActivity {
         createAccountText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent createAccontIntent = new Intent(getApplicationContext(), CreateAccount.class);
+                Intent createAccontIntent = new Intent(getApplicationContext(), CreateAccountActivity.class);
                 startActivity(createAccontIntent);
             }
         });

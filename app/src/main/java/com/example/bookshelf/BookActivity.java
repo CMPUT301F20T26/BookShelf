@@ -17,9 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
@@ -45,7 +42,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         //right now it only contains a string of the book's title
 
         Intent intent = getIntent();
-        String message = intent.getStringExtra(SearchBooks.EXTRA_MESSAGE);
+        String message = intent.getStringExtra(SearchBooksActivity.EXTRA_MESSAGE);
 
         displayPic = findViewById(R.id.imageView);
         title = findViewById(R.id.title_text);

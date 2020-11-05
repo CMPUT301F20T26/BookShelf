@@ -21,9 +21,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-public class CreateAccount extends AppCompatActivity {
+public class CreateAccountActivity extends AppCompatActivity {
 
     private EditText userFullNameEt;
     private EditText usernameEt;
@@ -115,7 +114,7 @@ public class CreateAccount extends AppCompatActivity {
                                                         //No user currently has this username
                                                         //Create user
                                                         userAuth.createUserWithEmailAndPassword(email, password)
-                                                                .addOnCompleteListener(CreateAccount.this, new OnCompleteListener<AuthResult>() {
+                                                                .addOnCompleteListener(CreateAccountActivity.this, new OnCompleteListener<AuthResult>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                                                         if (task.isSuccessful()) {
@@ -126,7 +125,7 @@ public class CreateAccount extends AppCompatActivity {
 
                                                                             //Start Profile Page activity
                                                                             //Pass authenticated user id into profile page
-                                                                            Intent profilePageIntent = new Intent(getApplicationContext(), UserProfile.class);
+                                                                            Intent profilePageIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                                                                             profilePageIntent.putExtra("UserID", authenticatedUser.getUid());
 
                                                                             startActivity(profilePageIntent);
@@ -167,7 +166,7 @@ public class CreateAccount extends AppCompatActivity {
         signInText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent signInIntent = new Intent(getApplicationContext(), Signin.class);
+                Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
                 startActivity(signInIntent);
             }
         });

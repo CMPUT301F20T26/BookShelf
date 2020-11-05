@@ -10,19 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
-public class UserProfile extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
     TextView uidTv;
     Button signoutBtn;
 
@@ -49,7 +41,7 @@ public class UserProfile extends AppCompatActivity {
                 FirebaseAuth authenticatedUser = FirebaseAuth.getInstance();
                 authenticatedUser.signOut();
 
-                Intent signInIntent = new Intent(getApplicationContext(), Signin.class);
+                Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
                 startActivity(signInIntent);
             }
         });
@@ -70,19 +62,19 @@ public class UserProfile extends AppCompatActivity {
                     case R.id.profile_page:
                         return true;
                     case R.id.notifications_page:
-                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotifications.class);
+                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
                         notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.books_page:
-                        Intent booksIntent = new Intent(getApplicationContext(), UserBooks.class);
+                        Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
                         booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.search_page:
-                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooks.class);
+                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
                         searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class UserNotifications extends AppCompatActivity {
+public class UserNotificationsActivity extends AppCompatActivity {
 
     TextView uidTv;
 
@@ -37,7 +37,7 @@ public class UserNotifications extends AppCompatActivity {
                 //Pass User's UID into activities on menu click
                 switch (menuItem.getItemId()){
                     case R.id.profile_page:
-                        Intent profileIntent = new Intent(getApplicationContext(), UserProfile.class);
+                        Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                         profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
@@ -45,13 +45,13 @@ public class UserNotifications extends AppCompatActivity {
                     case R.id.notifications_page:
                         return true;
                     case R.id.books_page:
-                        Intent booksIntent = new Intent(getApplicationContext(), UserBooks.class);
+                        Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
                         booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.search_page:
-                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooks.class);
+                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
                         searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
