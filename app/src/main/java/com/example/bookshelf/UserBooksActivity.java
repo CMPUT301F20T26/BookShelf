@@ -4,9 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,8 +13,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserBooks extends AppCompatActivity implements AddBookFragment.DialogListener {
+public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
     TextView uidTv;
     ListView bookList;
     ArrayAdapter<Book> bookAdapter;
@@ -137,13 +133,13 @@ public class UserBooks extends AppCompatActivity implements AddBookFragment.Dial
                 //Pass User's UID into activities on menu click
                 switch (menuItem.getItemId()) {
                     case R.id.profile_page:
-                        Intent profileIntent = new Intent(getApplicationContext(), UserProfile.class);
+                        Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                         profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.notifications_page:
-                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotifications.class);
+                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
                         notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
@@ -151,7 +147,7 @@ public class UserBooks extends AppCompatActivity implements AddBookFragment.Dial
                     case R.id.books_page:
                         return true;
                     case R.id.search_page:
-                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooks.class);
+                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
                         searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);

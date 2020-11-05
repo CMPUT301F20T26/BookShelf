@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class SearchBooks extends AppCompatActivity {
+public class SearchBooksActivity extends AppCompatActivity {
 
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private TextView uidTv;
@@ -102,19 +101,19 @@ public class SearchBooks extends AppCompatActivity {
                 //Pass User's UID into activities on menu click
                 switch (menuItem.getItemId()){
                     case R.id.profile_page:
-                        Intent profileIntent = new Intent(getApplicationContext(), UserProfile.class);
+                        Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                         profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.notifications_page:
-                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotifications.class);
+                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
                         notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.books_page:
-                        Intent booksIntent = new Intent(getApplicationContext(), UserBooks.class);
+                        Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
                         booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);

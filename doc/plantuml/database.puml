@@ -1,0 +1,34 @@
+@startuml
+
+folder "books (collection)" {
+file "book (doc)" {
+artifact title
+artifact author
+artifact description
+artifact isbn
+artifact ownerUsername
+artifact photoUrl
+artifact status
+}
+}
+
+folder "users (collection)" {
+file "userID (doc)"{
+artifact username
+artifact email
+artifact fullname
+artifact notifications
+artifact ownedbooks
+artifact phone
+artifact picture
+}
+}
+
+
+package "Other Groups" {
+FTP - [Second Component]
+
+[First Component] --> FTP
+}
+
+@enduml
