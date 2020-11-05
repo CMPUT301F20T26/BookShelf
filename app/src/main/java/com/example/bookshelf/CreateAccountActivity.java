@@ -25,7 +25,7 @@ import java.util.HashMap;
 /**
  * Create Account activity for users to create credentials to sign into the app.
  */
-public class CreateAccount extends AppCompatActivity {
+public class CreateAccountActivity extends AppCompatActivity {
 
     //Global layout variables
     private EditText userFullNameEt;
