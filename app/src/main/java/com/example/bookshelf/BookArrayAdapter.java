@@ -14,12 +14,12 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-    public class CustomList extends ArrayAdapter<Book> {
+    public class BookArrayAdapter extends ArrayAdapter<Book> {
 
         private ArrayList<Book> books;
         private Context context;
 
-        public CustomList(Context context, ArrayList<Book> books){
+        public BookArrayAdapter(Context context, ArrayList<Book> books){
             super(context,0, books);
             this.books = books;
             this.context = context;

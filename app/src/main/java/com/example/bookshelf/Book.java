@@ -16,10 +16,20 @@ public class Book implements Serializable {
     private String ownerUsername;
     private String description;
 
+    /**
+     * Gets book id.
+     *
+     * @return the book id
+     */
     public String getBookID() {
         return BookID;
     }
 
+    /**
+     * Sets book id.
+     *
+     * @param bookID the book id
+     */
     public void setBookID(String bookID) {
         BookID = bookID;
     }
@@ -116,6 +126,9 @@ public class Book implements Serializable {
     }
 
 
+    /**
+     * Instantiates a new Book.
+     */
     public Book() {}
 
 

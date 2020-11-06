@@ -21,6 +21,18 @@ title __BOOKSHELF.APP's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.BookArrayAdapter {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.BookFactory {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.BuildConfig {
     }
   }
@@ -28,12 +40,6 @@ title __BOOKSHELF.APP's Class Diagram__\n
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.CreateAccountActivity {
-    }
-  }
-  
-
-  namespace com.example.bookshelf {
-    class com.example.bookshelf.CustomList {
     }
   }
   
@@ -92,8 +98,9 @@ title __BOOKSHELF.APP's Class Diagram__\n
   com.example.bookshelf.Book o-- com.example.bookshelf.Book.BookStatus : Status
   com.example.bookshelf.BookActivity .up.|> com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener
   com.example.bookshelf.BookActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.BookArrayAdapter -up-|> android.widget.ArrayAdapter
+  com.example.bookshelf.BookFactory o-- com.example.bookshelf.Book : thisBook
   com.example.bookshelf.CreateAccountActivity -up-|> androidx.appcompat.app.AppCompatActivity
-  com.example.bookshelf.CustomList -up-|> android.widget.ArrayAdapter
   com.example.bookshelf.MainActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.MakeRequestFragment -up-|> androidx.fragment.app.DialogFragment
   com.example.bookshelf.MakeRequestFragment o-- com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener : listener
@@ -102,7 +109,7 @@ title __BOOKSHELF.APP's Class Diagram__\n
   com.example.bookshelf.UserActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserBooksActivity .up.|> com.example.bookshelf.AddBookFragment.DialogListener
   com.example.bookshelf.UserBooksActivity -up-|> androidx.appcompat.app.AppCompatActivity
-  com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.CustomList : customList
+  com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.BookArrayAdapter : bookArrayAdapter
   com.example.bookshelf.UserNotificationsActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserProfileActivity -up-|> androidx.appcompat.app.AppCompatActivity
 
