@@ -2,6 +2,7 @@ package com.example.bookshelf;
 
 import android.app.Activity;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -28,8 +29,8 @@ public class CreateAccountTest {
     private Solo solo;
 
     @Rule
-    public ActivityTestRule<CreateAccount> rule =
-            new ActivityTestRule<CreateAccount>(CreateAccount.class,
+    public ActivityTestRule<CreateAccountActivity> rule =
+            new ActivityTestRule<CreateAccountActivity>(CreateAccountActivity.class,
                     true, true);
 
 
@@ -57,7 +58,7 @@ public class CreateAccountTest {
      */
     @Test
     public void checkNewUserInDatabase(){
-        solo.assertCurrentActivity("Wrong Activity", CreateAccount.class);
+        solo.assertCurrentActivity("Wrong Activity", CreateAccountActivity.class);
 
         //Test inputs
         String testFullname = "firstname lastname";
@@ -75,7 +76,7 @@ public class CreateAccountTest {
         solo.clickOnButton("Create Account");
 
         //Wait for profile page activity to open
-        solo.waitForActivity(UserProfile.class);
+        solo.waitForActivity(UserProfileActivity.class);
 
         //Initialize firebase instance
         final FirebaseFirestore db = FirebaseFirestore.getInstance();

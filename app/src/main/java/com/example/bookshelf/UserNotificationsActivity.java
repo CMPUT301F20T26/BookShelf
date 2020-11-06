@@ -9,17 +9,23 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class UserNotificationsActivity extends AppCompatActivity {
 
+    //Layout variables
     TextView uidTv;
+
+    //Firebase Authentication instance
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_notifications);
 
-        final String userId = getIntent().getStringExtra("UserID");
+        final String userId = user.getUid();
         uidTv = findViewById(R.id.uid_notifications);
         uidTv.setText(userId);
 
@@ -38,7 +44,6 @@ public class UserNotificationsActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()){
                     case R.id.profile_page:
                         Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                        profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
                         return true;
@@ -46,13 +51,11 @@ public class UserNotificationsActivity extends AppCompatActivity {
                         return true;
                     case R.id.books_page:
                         Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
-                        booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.search_page:
                         Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
-                        searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;

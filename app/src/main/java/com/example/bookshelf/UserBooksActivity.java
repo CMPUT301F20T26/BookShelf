@@ -14,6 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -31,14 +33,15 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     CustomList customList;
     private List<Book> Books;
 
+    //Firebase Authentication instance
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_books);
 
-        final String userId = getIntent().getStringExtra("UserID");
-        //uidTv = findViewById(R.id.uid_userBooks);
-        //uidTv.setText(userId);
+        final String userId = user.getUid();
         Button addBookButton;
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
@@ -134,13 +137,11 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 switch (menuItem.getItemId()) {
                     case R.id.profile_page:
                         Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                        profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.notifications_page:
                         Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
-                        notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
                         return true;
@@ -148,7 +149,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         return true;
                     case R.id.search_page:
                         Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
-                        searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;

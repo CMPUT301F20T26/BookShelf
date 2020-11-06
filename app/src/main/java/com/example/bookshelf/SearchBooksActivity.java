@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -38,12 +40,15 @@ public class SearchBooksActivity extends AppCompatActivity {
     private ArrayList<String> resultList; // using string dummy values until book objects can be used
     private FirebaseFirestore db;
 
+    //Firebase Authentication instance
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_books);
 
-        final String userId = getIntent().getStringExtra("UserID");
+        final String userId = user.getUid();
 //        uidTv = findViewById(R.id.uid_search);
 //        uidTv.setText(userId);
         db = FirebaseFirestore.getInstance();
@@ -102,19 +107,16 @@ public class SearchBooksActivity extends AppCompatActivity {
                 switch (menuItem.getItemId()){
                     case R.id.profile_page:
                         Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                        profileIntent.putExtra("UserID", userId);
                         startActivity(profileIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.notifications_page:
                         Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
-                        notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.books_page:
                         Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
-                        booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);
                         return true;

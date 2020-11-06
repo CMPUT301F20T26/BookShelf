@@ -8,30 +8,69 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * User profile activity
+ */
 public class UserProfileActivity extends AppCompatActivity {
-    TextView uidTv;
+
+    //Layout Variables
     Button signoutBtn;
+    ImageView profilePicImageV;
+    TextView usernameTv;
+    TextView fullnameTv;
+    TextView emailTv;
+    TextView phoneTv;
+    FloatingActionButton editBtn;
 
     //Database instance
     FirebaseFirestore db;
+
+    //Firebase Authentication instance
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
-        final String userId = getIntent().getStringExtra("UserID");
-        uidTv = findViewById(R.id.uid_profile);
-        uidTv.setText(userId);
+        final String userId = user.getUid();
+
+        //Layout Assignments
+        usernameTv = findViewById(R.id.profile_username);
+        fullnameTv = findViewById(R.id.profile_fullname);
+        emailTv = findViewById(R.id.profile_email);
+        phoneTv = findViewById(R.id.profile_phone);
 
         //Database instance initialization
         db = FirebaseFirestore.getInstance();
+
+        //Fill Data
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+
+                            usernameTv.setText(documentSnapshot.getData().get("username").toString());
+                            fullnameTv.setText(documentSnapshot.getData().get("fullname").toString());
+                            emailTv.setText(documentSnapshot.getData().get("email").toString());
+                            phoneTv.setText(documentSnapshot.getData().get("phone").toString());
+                        }
+                    }
+                });
 
         //Sign out Button listener
         signoutBtn = findViewById(R.id.signoutbtn);
@@ -63,19 +102,16 @@ public class UserProfileActivity extends AppCompatActivity {
                         return true;
                     case R.id.notifications_page:
                         Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
-                        notificationIntent.putExtra("UserID", userId);
                         startActivity(notificationIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.books_page:
                         Intent booksIntent = new Intent(getApplicationContext(), UserBooksActivity.class);
-                        booksIntent.putExtra("UserID", userId);
                         startActivity(booksIntent);
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.search_page:
                         Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
-                        searchIntent.putExtra("UserID", userId);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;
