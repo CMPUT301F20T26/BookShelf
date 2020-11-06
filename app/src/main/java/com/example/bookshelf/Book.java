@@ -15,10 +15,26 @@ public class Book implements Serializable {
     private BookStatus Status;
     private String ownerUsername;
     private String description;
+
     /**
-     * The Id number.
+     * Gets book id.
+     *
+     * @return the book id
      */
-    int id_number = ThreadLocalRandom.current().nextInt();
+    public String getBookID() {
+        return BookID;
+    }
+
+    /**
+     * Sets book id.
+     *
+     * @param bookID the book id
+     */
+    public void setBookID(String bookID) {
+        BookID = bookID;
+    }
+
+    private String BookID;
 
     /**
      * The enum Book status.
@@ -108,6 +124,13 @@ public class Book implements Serializable {
         this.ISBN = ISBN;
         this.Status = BookStatus.Available;
     }
+
+
+    /**
+     * Instantiates a new Book.
+     */
+    public Book() {}
+
 
     /**
      * Gets title.
@@ -240,17 +263,12 @@ public class Book implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return Title.equals(book.Title) &&
-                Author.equals(book.Author) &&
-                ISBN.equals(book.ISBN) &&
-                ownerUsername.equals(book.ownerUsername) &&
-                (id_number==book.id_number)&&
-                Objects.equals(description, book.description);
+        return BookID.equals(book.BookID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Title, ISBN, id_number);
+        return Objects.hash(BookID);
     }
 }
 
