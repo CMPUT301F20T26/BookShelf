@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -69,8 +70,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                     }
                 });
 
-        final HashMap<String, String> userId;
-        userId = new HashMap<String, String>();
+        final HashMap<String, String> userId = new HashMap<String, String>();
 
         final Button request = findViewById(R.id.request_button);
 
@@ -88,24 +88,26 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                userId.clear();
-                String username = owner.getText().toString();
+//                userId.clear();
+                final String username = owner.getText().toString();
+
                 // function that generates intent and starts activity
                 db.collection("users").whereEqualTo("username", username).get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
+                                if(task.isSuccessful()){
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         userId.put(document.getData().get("username").toString(), document.getId());
+                                    }
+
+                                    if(userId.containsKey(username)){
+                                        openUserProfile(userId.get(username));
                                     }
                                 }
                             }
                         });
 
-                if(userId.containsKey(username)){
-                    openUserProfile(userId.get(username));
-                }
             }
         });
 

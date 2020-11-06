@@ -1,5 +1,6 @@
 package com.example.bookshelf;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,6 +8,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
@@ -25,7 +29,7 @@ public class UserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user);
 
         Intent intent = getIntent();
-        String message = intent.getStringExtra(BookActivity.EXTRA_MESSAGE);
+        String userid = intent.getStringExtra(BookActivity.EXTRA_MESSAGE);
 
         db = FirebaseFirestore.getInstance();
 
@@ -35,10 +39,20 @@ public class UserActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         cellphone = findViewById(R.id.cellphone);
 
-        name.setText(message);
+        db.collection("users").document(userid).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
 
-
-
+                            name.setText(documentSnapshot.getData().get("username").toString());
+                            fullName.setText(documentSnapshot.getData().get("fullname").toString());
+                            email.setText(documentSnapshot.getData().get("email").toString());
+                            cellphone.setText(documentSnapshot.getData().get("phone").toString());
+                        }
+                    }
+                });
 
     }
 }
