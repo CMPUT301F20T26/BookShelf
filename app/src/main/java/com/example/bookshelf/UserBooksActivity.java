@@ -80,6 +80,9 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                     new AddBookFragment().show(getSupportFragmentManager(), "ADD_BOOK");
                 }
         });
+
+        // I am grabbing the username, from the user database and saving it in the user_name,
+        // I checked whether its grabbing it by sending it to the log
         db.collection("users").document(userId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -89,6 +92,9 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             user_name = documentSnapshot.getData().get("username").toString();
                             //Log.d("Error",String.valueOf(user_name));
                         }}});
+        // Here I want to compare the user_name and user of the book before adding it to the datalist
+        // so I print the books that belong to me
+        // Problem: user_name is null before I enter this step
         collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
