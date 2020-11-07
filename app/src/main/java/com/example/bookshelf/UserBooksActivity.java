@@ -90,37 +90,43 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         if(task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
                             user_name = documentSnapshot.getData().get("username").toString();
-                            //Log.d("Error",String.valueOf(user_name));
+                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
+                                        FirebaseFirestoreException error) {
+                                    bookDataList.clear();
+                                    if(error!= null){
+                                        Log.d("Error",error.getMessage());
+                                    }
+                                    else {
+                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                            //Log.d("Error",String.valueOf(user_name));
+
+                                            String user = String.valueOf(doc.getData().get("ownerUsername"));
+                                            Log.d("Error", String.valueOf(user_name.equals(user)));
+                                            Log.d("Error",String.valueOf(user));
+                                            if(user_name.equals(user)) {
+                                                String title = (String) doc.getData().get("title");
+                                                String author = (String) doc.getData().get("author");
+                                                String des = (String) doc.getData().get("description");
+                                                String isbn = (String) doc.getData().get("isbn");
+                                                isbn = isbn.replace("-", "");
+                                                Long isbn1 = Long.parseLong(isbn);
+                                                bookDataList.add(new Book(title, author, des, isbn1, user));
+                                            }
+                                        }
+
+                                    }
+
+                                    bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
+                                }
+                            });
+
                         }}});
         // Here I want to compare the user_name and user of the book before adding it to the datalist
         // so I print the books that belong to me
         // Problem: user_name is null before I enter this step
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                    FirebaseFirestoreException error) {
-                bookDataList.clear();
-                if(error!= null){
-                    Log.d("Error",error.getMessage());
-                }
-                else {
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String user = String.valueOf(doc.getData().get("ownerUsername"));
-                        Log.d("Error", String.valueOf(user_name));
-                        String title = (String) doc.getData().get("title");
-                        String author = (String) doc.getData().get("author");
-                        String des = (String) doc.getData().get("description");
-                        String isbn = (String) doc.getData().get("isbn");
-                        isbn = isbn.replace("-", "");
-                        Long isbn1 = Long.parseLong(isbn);
-                        bookDataList.add(new Book(title, author, des, isbn1, user));
-                    }
 
-                    }
-
-                bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
-            }
-        });
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
