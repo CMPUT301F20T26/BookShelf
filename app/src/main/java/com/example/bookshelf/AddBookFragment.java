@@ -14,7 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -98,23 +103,45 @@ public class AddBookFragment extends DialogFragment {
                         }
                         Book addBook;
                         Long isbn_add = Long.parseLong(isbn.getText().toString());
+
+                        //Firebase Authentication instance
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        final String[] owner = new String[1];
+                        db.collection("users").document(user.getUid()).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = task.getResult();
+                                            owner[0] = documentSnapshot.getData().get("username").toString();
+                                        }
+                                    }
+                                });
                         // using the right constructor for gear
                         if(des_new.isEmpty()){
-                            addBook = new Book(title_new,author_new,isbn_add);
+                            addBook = new Book(title_new,author_new,isbn_add, owner[0]);
                             Map<String, Object> book = new HashMap<>();
-                            book.put("title", title_new);
                             book.put("author", author_new);
+                            book.put("description", "");
                             book.put("isbn", isbn_new);
+                            book.put("ownerUsername", owner[0]);
+                            book.put("photoUrl","");
+                            book.put("status",addBook.getStatus());
+                            book.put("title", title_new);
                             collectionReference
                                     .document(isbn_new)
                                     .set(book);}
                         else{
-                            addBook = new Book(title_new,author_new,des_new,isbn_add);
+                            addBook = new Book(title_new,author_new,des_new,isbn_add, owner[0]);
                             Map<String, Object> book = new HashMap<>();
-                            book.put("title", title_new);
+
                             book.put("author", author_new);
-                            book.put("isbn", isbn_new);
                             book.put("description", des_new);
+                            book.put("isbn", isbn_new);
+                            book.put("ownerUsername", owner[0]);
+                            book.put("photoUrl","");
+                            book.put("status",addBook.getStatus());
+                            book.put("title", title_new);
                             collectionReference
                                     .document(isbn_new)
                                     .set(book);}
