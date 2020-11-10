@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The type Add book fragment.
+ */
 public class AddBookFragment extends DialogFragment {
     private EditText title;
     private EditText author;
@@ -34,10 +37,35 @@ public class AddBookFragment extends DialogFragment {
     private DialogListener listener;
 
 
+    /**
+     * The interface Dialog listener.
+     */
     public interface DialogListener{
+        /**
+         * Add book.
+         *
+         * @param book the book
+         */
         void add_Book(Book book);
+
+        /**
+         * Edit book.
+         *
+         * @param book   the book
+         * @param title  the title
+         * @param author the author
+         * @param isbn   the isbn
+         * @param des    the des
+         */
         void edit_Book(Book book, String title, String author, Long isbn, String des);
         }
+
+    /**
+     * New instance add book fragment.
+     *
+     * @param book the book
+     * @return the add book fragment
+     */
     static AddBookFragment newInstance(Book book){
         Bundle args = new Bundle();
         args.putSerializable("book", book);

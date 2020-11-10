@@ -39,7 +39,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookDataList;
     int pos;
-    CustomList customList;
+    BookArrayAdapter bookArrayAdapter;
     private List<Book> Books;
     String user_name;
 
@@ -56,7 +56,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
         bookDataList = new ArrayList<>();
-        bookAdapter = new CustomList(this,bookDataList);
+        bookAdapter = new BookArrayAdapter(this,bookDataList);
         final FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
 
