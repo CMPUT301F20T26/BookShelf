@@ -35,6 +35,7 @@ public class AddBookFragment extends DialogFragment {
     private EditText isbn;
     private EditText description;
     private DialogListener listener;
+    String owner;
 
 
     /**
@@ -120,6 +121,14 @@ public class AddBookFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        db.collection("users").document(user.getUid()).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = task.getResult();
+                                            owner = documentSnapshot.getData().get("username").toString();
                         String title_new = title.getText().toString();
                         String author_new = author.getText().toString();
                         String isbn_new = isbn.getText().toString();
@@ -133,26 +142,16 @@ public class AddBookFragment extends DialogFragment {
                         Long isbn_add = Long.parseLong(isbn.getText().toString());
 
                         //Firebase Authentication instance
-                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        final String[] owner = new String[1];
-                        db.collection("users").document(user.getUid()).get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if(task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
-                                            owner[0] = documentSnapshot.getData().get("username").toString();
-                                        }
-                                    }
-                                });
+
+
                         // using the right constructor for gear
                         if(des_new.isEmpty()){
-                            addBook = new Book(title_new,author_new,isbn_add, owner[0]);
+                            addBook = new Book(title_new,author_new,isbn_add, owner);
                             Map<String, Object> book = new HashMap<>();
                             book.put("author", author_new);
                             book.put("description", "");
                             book.put("isbn", isbn_new);
-                            book.put("ownerUsername", owner[0]);
+                            book.put("ownerUsername", owner);
                             book.put("photoUrl","");
                             book.put("status",addBook.getStatus());
                             book.put("title", title_new);
@@ -160,19 +159,20 @@ public class AddBookFragment extends DialogFragment {
                                     .document(isbn_new)
                                     .set(book);}
                         else{
-                            addBook = new Book(title_new,author_new,des_new,isbn_add, owner[0]);
+                            addBook = new Book(title_new,author_new,des_new,isbn_add, owner);
                             Map<String, Object> book = new HashMap<>();
 
                             book.put("author", author_new);
                             book.put("description", des_new);
                             book.put("isbn", isbn_new);
-                            book.put("ownerUsername", owner[0]);
+                            book.put("ownerUsername", owner);
                             book.put("photoUrl","");
                             book.put("status",addBook.getStatus());
                             book.put("title", title_new);
                             collectionReference
                                     .document(isbn_new)
                                     .set(book);}
+
                         // check if gear is to be edited or added
                         if (getArguments()!=null){
                             listener.edit_Book(argBook, title_new,author_new,isbn_add,des_new);
@@ -180,7 +180,11 @@ public class AddBookFragment extends DialogFragment {
                         else{
                             listener.add_Book(addBook);
                         }
+                                        }
+                                    }
+                                });
                     }}).create();
+
 
     }
 }
