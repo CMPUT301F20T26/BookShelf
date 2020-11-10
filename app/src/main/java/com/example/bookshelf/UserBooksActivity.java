@@ -1,10 +1,12 @@
 package com.example.bookshelf;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,11 +15,18 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +41,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     int pos;
     BookArrayAdapter bookArrayAdapter;
     private List<Book> Books;
+    String user_name;
 
     //Firebase Authentication instance
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -48,18 +58,21 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
         final FirebaseFirestore db;
+        db = FirebaseFirestore.getInstance();
+
+
 
         bookList.setAdapter(bookAdapter);
         String titl = "Twiligt";
         String auth = "Twiligt";
         String desc = "Twiligt";
         Long isb = (long) 124684641;
-        Book bookadd = new Book(titl, auth, desc, isb);
+        Book bookadd = new Book(titl, auth, desc, isb,"me");
         bookAdapter.add(bookadd);
         bookAdapter.add(bookadd);
         bookAdapter.add(bookadd);
         bookAdapter.add(bookadd);
-        db = FirebaseFirestore.getInstance();
+
         final CollectionReference collectionReference = db.collection("books");
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,6 +81,51 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 }
         });
 
+        // I am grabbing the username, from the user database and saving it in the user_name,
+        // I checked whether its grabbing it by sending it to the log
+        db.collection("users").document(userId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            user_name = documentSnapshot.getData().get("username").toString();
+                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
+                                        FirebaseFirestoreException error) {
+                                    bookDataList.clear();
+                                    if(error!= null){
+                                        Log.d("Error",error.getMessage());
+                                    }
+                                    else {
+                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                            //Log.d("Error",String.valueOf(user_name));
+
+                                            String user = String.valueOf(doc.getData().get("ownerUsername"));
+                                            Log.d("Error", String.valueOf(user_name.equals(user)));
+                                            Log.d("Error",String.valueOf(user));
+                                            if(user_name.equals(user)) {
+                                                String title = (String) doc.getData().get("title");
+                                                String author = (String) doc.getData().get("author");
+                                                String des = (String) doc.getData().get("description");
+                                                String isbn = (String) doc.getData().get("isbn");
+                                                isbn = isbn.replace("-", "");
+                                                Long isbn1 = Long.parseLong(isbn);
+                                                bookDataList.add(new Book(title, author, des, isbn1, user));
+                                            }
+                                        }
+
+                                    }
+
+                                    bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
+                                }
+                            });
+
+                        }}});
+        // Here I want to compare the user_name and user of the book before adding it to the datalist
+        // so I print the books that belong to me
+        // Problem: user_name is null before I enter this step
 
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

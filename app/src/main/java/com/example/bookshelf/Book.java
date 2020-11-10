@@ -1,5 +1,13 @@
 package com.example.bookshelf;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,6 +44,7 @@ public class Book implements Serializable {
 
     private String BookID;
 
+
     /**
      * The enum Book status.
      */
@@ -70,13 +79,14 @@ public class Book implements Serializable {
      * @param photoURL    url to book cover
      * @param description short  description
      */
-    public Book(String title, String author, Long ISBN, String photoURL, String description) {
+    public Book(String title, String author, Long ISBN, String photoURL, String description, String ownerUsername) {
         this.Title = title;
         this.Author = author;
         this.ISBN = ISBN;
         this.Status = BookStatus.Available;
         this.photoURL = photoURL;
         this.description = description;
+        this.ownerUsername = ownerUsername;
     }
 
     /**
@@ -87,12 +97,13 @@ public class Book implements Serializable {
      * @param ISBN     the isbn
      * @param photoURL url to book cover
      */
-    public Book(String title, String author, Long ISBN, String photoURL) {
+    public Book(String title, String author, Long ISBN, String photoURL, String ownerUsername) {
         Title = title;
         Author = author;
         this.ISBN = ISBN;
         this.photoURL = photoURL;
         this.Status = BookStatus.Available;
+        this.ownerUsername = ownerUsername;
     }
 
     /**
@@ -102,11 +113,12 @@ public class Book implements Serializable {
      * @param author the author
      * @param ISBN   the isbn
      */
-    public Book(String title, String author, Long ISBN) {
+    public Book(String title, String author, Long ISBN, String ownerUsername) {
         this.Title = title;
         this.Author = author;
         this.ISBN = ISBN;
         this.Status = BookStatus.Available;
+        this.ownerUsername = ownerUsername;
     }
 
     /**
@@ -117,12 +129,13 @@ public class Book implements Serializable {
      * @param description the description
      * @param ISBN        the isbn
      */
-    public Book(String title, String author, String description, Long ISBN) {
+    public Book(String title, String author, String description, Long ISBN, String ownerUsername) {
         Title = title;
         Author = author;
         this.description = description;
         this.ISBN = ISBN;
         this.Status = BookStatus.Available;
+        this.ownerUsername = ownerUsername;
     }
 
 
