@@ -22,5 +22,10 @@
         android:title="Profile"
         android:icon="@drawable/portrait_icon"/>
 
+    <item
+        android:id="@+id/maps_page"
+        android:title="Maps"
+        android:icon="@drawable/maps_icon"/>
+
 
 </menu>
