@@ -97,6 +97,9 @@ public class AddBookFragment extends DialogFragment {
         final FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
         final CollectionReference collectionReference = db.collection("books");
+
+        BookFactory bookFactory = new BookFactory(collectionReference);
+
         /**
          * If the object is to be edited then initialize add fields to Gear's existing fields
          */

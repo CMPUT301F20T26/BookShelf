@@ -1,6 +1,8 @@
 package com.example.bookshelf;
 
 
+import com.google.firebase.firestore.CollectionReference;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,28 +88,39 @@ public class BookFactory {
      * The Book map.
      */
     Map<String, Object> bookMap;
+    CollectionReference bookCollectionReference;
 
     /**
      * Instantiates a new Book factory.
+     *
+     * @param bookReference the firebase book collection reference
      */
-    BookFactory()
+    BookFactory(CollectionReference bookReference)
     {
         thisBook = new Book();
         bookMap = new HashMap<>();
+        bookCollectionReference = bookReference;
     }
 
     /**
      * Builds the book, which determines the book ID.
-     * This method should be used to push new books to firebase.
+     * This method should be used when pushing new books to firebase.
      *
      * @return the book
      */
     Book build(){
+        // get time of book creation
+        // this is used to calculate the unique book ID
         long now = new Date().getTime();
         String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        // add id to book and bookmap
         thisBook.setBookID(id);
         bookMap.put("bookID", id);
-        // TODO : push to firebase here
+        // push to firebase
+        bookCollectionReference
+                .document(id)
+                .set(thisBook);
+        // return built book
         return thisBook;
     }
 
