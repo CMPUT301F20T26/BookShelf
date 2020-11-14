@@ -37,7 +37,7 @@ public class SearchBooksActivity extends AppCompatActivity {
     private ListView searchResults;
     private EditText searchBar;
     private Button searchButton;
-    private ArrayAdapter<String> bookAdapter;
+    private BookArrayAdapter bookAdapter;
     private ArrayList<String> resultList; // using string dummy values until book objects can be used
     private FirebaseFirestore db;
 
@@ -58,11 +58,11 @@ public class SearchBooksActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.search_button);
         searchResults = findViewById(R.id.search_results);
 
-        resultList = new ArrayList<>();
-        bookAdapter = new ArrayAdapter<>(this, R.layout.content, resultList);
+        final ArrayList<Book> bookList = new ArrayList<Book>();
+        bookAdapter = new BookArrayAdapter(this, bookList);
         searchResults.setAdapter(bookAdapter);
 
-        final ArrayList<Book> bookList = new ArrayList<Book>();
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -155,12 +155,10 @@ public class SearchBooksActivity extends AppCompatActivity {
         Pattern pattern = Pattern.compile(check, Pattern.CASE_INSENSITIVE);
         Matcher titleMatcher = pattern.matcher(book.getTitle());
         Matcher userMatcher = pattern.matcher(book.getOwnerUsername());
-        Matcher descMatcher = pattern.matcher(book.getDescription());
 
         if (!check.isEmpty()) {
-            if (titleMatcher.find() || userMatcher.find() || descMatcher.find()) {
-                bookAdapter.add(book.getTitle());
-                bookList.add(book);
+            if (titleMatcher.find() || userMatcher.find()) {
+                bookAdapter.add(book);
             }
         }
     }
