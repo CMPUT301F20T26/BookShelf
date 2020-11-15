@@ -25,6 +25,7 @@ public class Book implements Serializable {
     private String description;
 
 
+
     /**
      * Gets book id.
      *
