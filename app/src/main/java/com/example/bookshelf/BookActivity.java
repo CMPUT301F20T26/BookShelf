@@ -91,6 +91,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                             ISBN.setText(document.getData().get("isbn").toString());
                             owner.setText(document.getData().get("ownerUsername").toString());
                             status.setText(document.getData().get("status").toString());
+                            description.setText(document.getData().get("description").toString());
 
                         }
                     }
@@ -107,10 +108,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
             }
         });
 
-        //something in here just isn't working and it's driving me insane.
 
-        //General idea is look through users collection for given username, then store all results in a hashmap where the keys are the usernames and the values are the ids.
-        //then we just check to make sure the hashmap contains the required key and pass the id to openUserProfile.
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
