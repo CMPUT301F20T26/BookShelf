@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,15 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
@@ -34,12 +29,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     private TextView ISBN;
     private TextView owner;
     private TextView status;
-
-    //Database Instance definition
     private FirebaseFirestore db;
-
-    //Firebase Storage instance
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
 
 
     @Override
@@ -48,7 +38,6 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         setContentView(R.layout.activity_book);
 
         db = FirebaseFirestore.getInstance();
-        final StorageReference storageReference  = storage.getReference();
 
         //intent should provide bookID, use to access object and set fields
         //right now it only contains a string of the book's title
@@ -71,28 +60,12 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            //Book Document
                             DocumentSnapshot document = task.getResult();
-
-                            //Getting book cover image
-                            String picUrl = "Book Images/" + document.getData().get("coverImage");
-                            storageReference.child(picUrl).getDownloadUrl().addOnSuccessListener(
-                                    new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            Picasso.get().load(uri).into(displayPic);
-                                        }
-                                    }
-                            );
-
-                            //Filling book values
                             title.setText(document.getData().get("title").toString());
                             author.setText(document.getData().get("author").toString());
                             ISBN.setText(document.getData().get("isbn").toString());
                             owner.setText(document.getData().get("ownerUsername").toString());
                             status.setText(document.getData().get("status").toString());
-                            description.setText(document.getData().get("description").toString());
-
                         }
                     }
                 });
@@ -108,7 +81,10 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
             }
         });
 
+        //something in here just isn't working and it's driving me insane.
 
+        //General idea is look through users collection for given username, then store all results in a hashmap where the keys are the usernames and the values are the ids.
+        //then we just check to make sure the hashmap contains the required key and pass the id to openUserProfile.
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -131,6 +107,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                 }
                             }
                         });
+
             }
         });
 

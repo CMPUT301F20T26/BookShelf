@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,7 +36,7 @@ public class SearchBooksActivity extends AppCompatActivity {
     private ListView searchResults;
     private EditText searchBar;
     private Button searchButton;
-    private BookArrayAdapter bookAdapter;
+    private ArrayAdapter<String> bookAdapter;
     private ArrayList<String> resultList; // using string dummy values until book objects can be used
     private FirebaseFirestore db;
 
@@ -58,15 +57,16 @@ public class SearchBooksActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.search_button);
         searchResults = findViewById(R.id.search_results);
 
-        final ArrayList<Book> bookList = new ArrayList<Book>();
-        bookAdapter = new BookArrayAdapter(this, bookList);
+        resultList = new ArrayList<>();
+        bookAdapter = new ArrayAdapter<>(this, R.layout.content, resultList);
         searchResults.setAdapter(bookAdapter);
 
-
+        final HashMap<String, String> idName = new HashMap<String, String>(); //dumb naming convention, but its a hashmap of id and book name pairs
+        final ArrayList<String> idList = new ArrayList<String>();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                bookList.clear();
+                idName.clear();
                 bookAdapter.clear();
                 db.collection("books")
                         .get()
@@ -75,17 +75,8 @@ public class SearchBooksActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
-                                        Long isbn = Long.parseLong(isbnString);
-                                        Book book = new Book(document.getData().get("title").toString(),
-                                                             document.getData().get("author").toString(),
-                                                             isbn,
-                                                             document.getData().get("description").toString(),
-                                                             document.getData().get("ownerUsername").toString());
-                                        book.setBookID(document.getId());
-
-
-                                        matchBook(book, bookList);
+                                        idName.put(document.getId(), document.getData().get("title").toString());
+                                        matchBook(idName, idList, document.getId());
                                     }
                                 }
                             }
@@ -96,7 +87,7 @@ public class SearchBooksActivity extends AppCompatActivity {
         searchResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openBookDescription(bookList.get(position).getBookID());
+                openBookDescription(idList.get(position));
             }
         });
 
@@ -131,11 +122,6 @@ public class SearchBooksActivity extends AppCompatActivity {
                         return true;
                     case R.id.search_page:
                         return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
                 }
                 return false;
             }
@@ -147,20 +133,21 @@ public class SearchBooksActivity extends AppCompatActivity {
      * Takes a string and matches it against a user string. Matches are added to the
      * custom list and displayed on screen as "results".
      *
-     * @param book Book object containing fields
-     * @param bookList list of books that matches should be added to
+     * @param pair id-name pairs
+     * @param idList list of book ids
+     * @param id id to be matched
      */
-    public void matchBook(Book book, ArrayList<Book> bookList) {
+    public void matchBook(HashMap<String, String> pair, ArrayList<String> idList, String id) {
+        String book = pair.get(id);
         String check = searchBar.getText().toString();
         Pattern pattern = Pattern.compile(check, Pattern.CASE_INSENSITIVE);
-        Matcher titleMatcher = pattern.matcher(book.getTitle());
-        Matcher userMatcher = pattern.matcher(book.getOwnerUsername());
-
-        if (!check.isEmpty()) {
-            if (titleMatcher.find() || userMatcher.find()) {
+        Matcher matcher = pattern.matcher(book);
+            if(matcher.find() && !check.isEmpty()){
                 bookAdapter.add(book);
+                idList.add(id);
+            } else {
+                pair.remove(id);
             }
-        }
     }
 
     /**

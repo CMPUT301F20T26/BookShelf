@@ -210,11 +210,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
                 }
                 return false;
             }
