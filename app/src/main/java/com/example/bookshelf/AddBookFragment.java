@@ -59,7 +59,7 @@ public class AddBookFragment extends DialogFragment {
          * @param des    the des
          */
         void edit_Book(Book book, String title, String author, Long isbn, String des);
-    }
+        }
 
     /**
      * New instance add book fragment.
@@ -129,57 +129,57 @@ public class AddBookFragment extends DialogFragment {
                                         if(task.isSuccessful()) {
                                             DocumentSnapshot documentSnapshot = task.getResult();
                                             owner = documentSnapshot.getData().get("username").toString();
-                                            String title_new = title.getText().toString();
-                                            String author_new = author.getText().toString();
-                                            String isbn_new = isbn.getText().toString();
-                                            String des_new = description.getText().toString();
-                                            if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
-                                                Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
-                                                toast.show();
-                                                return;
-                                            }
-                                            Book addBook;
-                                            Long isbn_add = Long.parseLong(isbn.getText().toString());
+                        String title_new = title.getText().toString();
+                        String author_new = author.getText().toString();
+                        String isbn_new = isbn.getText().toString();
+                        String des_new = description.getText().toString();
+                        if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
+                            Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
+                            toast.show();
+                            return;
+                        }
+                        Book addBook;
+                        Long isbn_add = Long.parseLong(isbn.getText().toString());
 
-                                            //Firebase Authentication instance
+                        //Firebase Authentication instance
 
 
-                                            // using the right constructor for gear
-                                            if(des_new.isEmpty()){
-                                                addBook = new Book(title_new,author_new,isbn_add, owner);
-                                                Map<String, Object> book = new HashMap<>();
-                                                book.put("author", author_new);
-                                                book.put("description", "");
-                                                book.put("isbn", isbn_new);
-                                                book.put("ownerUsername", owner);
-                                                book.put("photoUrl","");
-                                                book.put("status",addBook.getStatus());
-                                                book.put("title", title_new);
-                                                collectionReference
-                                                        .document(isbn_new)
-                                                        .set(book);}
-                                            else{
-                                                addBook = new Book(title_new,author_new,des_new,isbn_add, owner);
-                                                Map<String, Object> book = new HashMap<>();
+                        // using the right constructor for gear
+                        if(des_new.isEmpty()){
+                            addBook = new Book(title_new,author_new,isbn_add, owner);
+                            Map<String, Object> book = new HashMap<>();
+                            book.put("author", author_new);
+                            book.put("description", "");
+                            book.put("isbn", isbn_new);
+                            book.put("ownerUsername", owner);
+                            book.put("photoUrl","");
+                            book.put("status",addBook.getStatus());
+                            book.put("title", title_new);
+                            collectionReference
+                                    .document(isbn_new)
+                                    .set(book);}
+                        else{
+                            addBook = new Book(title_new,author_new,des_new,isbn_add, owner);
+                            Map<String, Object> book = new HashMap<>();
 
-                                                book.put("author", author_new);
-                                                book.put("description", des_new);
-                                                book.put("isbn", isbn_new);
-                                                book.put("ownerUsername", owner);
-                                                book.put("photoUrl","");
-                                                book.put("status",addBook.getStatus());
-                                                book.put("title", title_new);
-                                                collectionReference
-                                                        .document(isbn_new)
-                                                        .set(book);}
+                            book.put("author", author_new);
+                            book.put("description", des_new);
+                            book.put("isbn", isbn_new);
+                            book.put("ownerUsername", owner);
+                            book.put("photoUrl","");
+                            book.put("status",addBook.getStatus());
+                            book.put("title", title_new);
+                            collectionReference
+                                    .document(isbn_new)
+                                    .set(book);}
 
-                                            // check if gear is to be edited or added
-                                            if (getArguments()!=null){
-                                                listener.edit_Book(argBook, title_new,author_new,isbn_add,des_new);
-                                            }
-                                            else{
-                                                listener.add_Book(addBook);
-                                            }
+                        // check if gear is to be edited or added
+                        if (getArguments()!=null){
+                            listener.edit_Book(argBook, title_new,author_new,isbn_add,des_new);
+                        }
+                        else{
+                            listener.add_Book(addBook);
+                        }
                                         }
                                     }
                                 });
