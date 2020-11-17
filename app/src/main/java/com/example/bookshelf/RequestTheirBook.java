@@ -17,9 +17,14 @@ public class RequestTheirBook extends UserNotification {
      * @param theirBook their book
      * @return the loan request
      */
-    static RequestTheirBook makeNew(Book theirBook){
+    static RequestTheirBook requestNew(Book theirBook){
         // creates new notification, which should appear in both users' notification lists
         // RequestStatus pending
+        FirebaseHelper helper;
+        RequestTheirBook rq = new RequestTheirBook();
+        rq.theirBook = theirBook;
+        rq.bookID = theirBook.getBookID();
+        rq.status = RequestStatus.PENDING;
         return null;
     }
 

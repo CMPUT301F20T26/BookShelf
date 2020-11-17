@@ -17,5 +17,7 @@ public abstract class UserNotification {
     String meetUpLocation;
     String owner;
     String requester;
+    String bookID;
+
 
 }

@@ -1,8 +1,12 @@
 package com.example.bookshelf;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -10,6 +14,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Map;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * The type Firebase helper.
@@ -48,7 +54,7 @@ public class FirebaseHelper {
     }
 
     /**
-     * Add a new document to a collection.
+     * Add a new document to a collection, specifying the document ID.
      *
      * @param collectionPath the collection path
      * @param newDocID       the new doc id
@@ -57,6 +63,31 @@ public class FirebaseHelper {
     void add(String collectionPath, String newDocID, Map<String, Object> obj) {
         db.collection(collectionPath).document(newDocID).set(obj);
         // TODO: listeners
+    }
+
+    /**
+     * Add a new document to a collection, returning the document ID.
+     *
+     * @param collectionPath the collection path
+     * @param obj            the document's data
+     */
+    String add(String collectionPath, Map<String, Object> obj) {
+        final String[] docID = new String[1];
+        db.collection(collectionPath).add(obj).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                docID[0] = documentReference.getId();
+                Log.d(TAG, "DocumentSnapshot written with ID: " + docID[0]);
+
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
+        return  docID[0];
     }
 
     /**
