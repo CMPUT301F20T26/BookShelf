@@ -151,7 +151,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     /**
      * Takes the user id and passes it to UserActivity
      *
-     * @param id String to be passed
+     * @param id book id to be passed
      */
     public void openUserProfile(String id){
         Intent intent = new Intent(this, UserActivity.class);
