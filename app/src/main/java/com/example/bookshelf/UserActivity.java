@@ -15,6 +15,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
+
+/**
+ * This activity displays a user's profile and contact info who is the owner of some selected book.
+ */
+
 public class UserActivity extends AppCompatActivity {
     private ImageView profilePic;
     private TextView fullName;

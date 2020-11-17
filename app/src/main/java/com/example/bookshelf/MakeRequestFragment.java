@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+/**
+ * This fragment acts to receive confirmation from the user to make a request on a particular book.
+ */
 
 public class MakeRequestFragment extends DialogFragment {
     private TextView confirmText;
