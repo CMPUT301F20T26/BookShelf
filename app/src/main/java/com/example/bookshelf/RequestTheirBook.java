@@ -1,11 +1,11 @@
 package com.example.bookshelf;
 
 /**
- * The type Loan request.
+ * The type RequestTheirBook
  *
- * A loan request is when you ask to borrow another user's book.
+ * The app user asks to borrow another user's book.
  */
-public class LoanRequest extends UserNotification {
+public class RequestTheirBook extends UserNotification {
     /**
      * Their book.
      */
@@ -17,7 +17,7 @@ public class LoanRequest extends UserNotification {
      * @param theirBook their book
      * @return the loan request
      */
-    static LoanRequest makeNew(Book theirBook){
+    static RequestTheirBook makeNew(Book theirBook){
         // creates new notification, which should appear in both users' notification lists
         // RequestStatus pending
         return null;

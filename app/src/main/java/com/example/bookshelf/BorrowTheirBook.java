@@ -1,11 +1,11 @@
 package com.example.bookshelf;
 
 /**
- * The type Loan agreement.
+ * The type BorrowTheirBook.
  *
- * A loan agreement is when another user agrees to loan you their book.
+ * Another user agrees to loan you their book.
  */
-public class LoanAgreement extends UserNotification {
+public class BorrowTheirBook extends UserNotification {
     /**
      * Their book.
      */

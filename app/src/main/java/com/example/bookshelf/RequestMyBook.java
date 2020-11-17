@@ -1,11 +1,11 @@
 package com.example.bookshelf;
 
 /**
- * The type Borrow request.
+ * The type RequestMyBook
  *
- * A borrow request is when another user requests to borrow the app user's book.
+ * Another user requests to borrow the app user's book.
  */
-public class BorrowRequest extends UserNotification {
+public class RequestMyBook extends UserNotification {
     /**
      * The book.
      */
