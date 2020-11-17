@@ -11,5 +11,11 @@ public abstract class UserNotification {
      * The Notification text.
      */
     String NotificationText;
-    // TODO: function handle to notification action
+    RequestStatus status;
+    String NotificationID;
+    String date;
+    String meetUpLocation;
+    String owner;
+    String requester;
+
 }

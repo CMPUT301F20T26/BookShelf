@@ -11,17 +11,23 @@ public class BorrowRequest extends UserNotification {
      */
     Book myBook;
     /**
-     * The requester's username.
+     * The borrower's username.
      */
     String theirUsername;
 
     /**
      * Accept the borrow request.
      */
-    void accept() {};
+    void accept() {
+        // request -> agreement
+        // set GPS location
+        // notify borrower
+    };
 
     /**
      * Decline the borrow request.
      */
-    void decline() {};
+    void decline() {
+        // delete notification in firebase
+    };
 }
