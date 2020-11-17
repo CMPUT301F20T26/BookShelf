@@ -1,18 +1,13 @@
 package com.example.bookshelf;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 
@@ -59,8 +54,34 @@ public class FirebaseHelper {
      * @param newDocID       the new doc id
      * @param obj            the document's data
      */
-    void add(String collectionPath, String newDocID, Map<String, Object> obj){
+    void add(String collectionPath, String newDocID, Map<String, Object> obj) {
         db.collection(collectionPath).document(newDocID).set(obj);
         // TODO: listeners
+    }
+
+    /**
+     * Edit a firebase document field.
+     *
+     * @param collectionPath the collection path
+     * @param docID          the doc id
+     * @param fieldID        the field id
+     * @param data           the data
+     */
+    void edit(String collectionPath, String docID, String fieldID, Object[] data) {
+        DocumentReference doc = db.collection(collectionPath).document(docID); // TODO: doc not found
+        doc.update(fieldID, data);
+    }
+
+    /**
+     * Append values to an array field in a firebase document.
+     *
+     * @param collectionPath the collection path
+     * @param docID          the doc id
+     * @param fieldID        the field id
+     * @param data           the data
+     */
+    void append(String collectionPath, String docID, String fieldID, Object[] data) {
+        DocumentReference doc = db.collection(collectionPath).document(docID); // TODO: doc not found
+        doc.update(fieldID, FieldValue.arrayUnion(data));
     }
 }
