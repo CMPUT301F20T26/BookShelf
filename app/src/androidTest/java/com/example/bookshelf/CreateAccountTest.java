@@ -85,7 +85,7 @@ public class CreateAccountTest {
         final FirebaseUser testuser = FirebaseAuth.getInstance().getCurrentUser();
 
         //Asset user in database and current user isn't empty
-        //Then delete user created from the database
+        //Then delete user created from the database and the user authentication
         db.collection("users").whereEqualTo("username", testusername).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -97,6 +97,8 @@ public class CreateAccountTest {
                                 String docId = document.getId();
                                 db.collection("users").document(docId).delete();
                                 testuser.delete();
+                                FirebaseAuth authenticatedUser = FirebaseAuth.getInstance();
+                                authenticatedUser.signOut();
                             }
                         }
                     }
