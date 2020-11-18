@@ -173,6 +173,31 @@ public class BookFactory {
         // return built book
         return thisBook;
     }
+    Book edit(int pos){
+        // get time of book creation
+        // this is used to calculate the unique book ID
+        // push to firebase
+        bookCollectionReference
+                .document()
+                .update(thisBook);
+        // return built book
+        return thisBook;
+    }
+    void delete(){
+        // get time of book creation
+        // this is used to calculate the unique book ID
+        long now = new Date().getTime();
+        String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        // add id to book and bookMap
+        thisBook.setBookID(id);
+        bookMap.put("bookID", id);
+        // push to firebase
+        bookCollectionReference
+                .document(id)
+                .set(thisBook);
+        // return built book
+        return thisBook;
+    }
 
 
     /*

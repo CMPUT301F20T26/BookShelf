@@ -30,17 +30,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
     TextView uidTv;
     ListView bookList;
-    ArrayAdapter<Book> bookAdapter;
+    //ArrayAdapter<Book> bookAdapter;
     ArrayList<Book> bookDataList;
     int pos;
-    BookArrayAdapter bookArrayAdapter;
-    private List<Book> Books;
+    BookArrayAdapter bookAdapter;
     String user_name;
 
     //Firebase Authentication instance
@@ -60,19 +60,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         final FirebaseFirestore db;
         db = FirebaseFirestore.getInstance();
 
-
-
-        bookList.setAdapter(bookAdapter);
-        String titl = "Twiligt";
-        String auth = "Twiligt";
-        String desc = "Twiligt";
-        Long isb = (long) 124684641;
-        Book bookadd = new Book(titl, auth, desc, isb,"me");
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-
         final CollectionReference collectionReference = db.collection("books");
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +70,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
         // I am grabbing the username, from the user database and saving it in the user_name,
         // I checked whether its grabbing it by sending it to the log
-        db.collection("users").document(userId).get()
+        /***db.collection("users").document(userId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -122,7 +109,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                                 }
                             });
 
-                        }}});
+                        }}});***/
         // Here I want to compare the user_name and user of the book before adding it to the datalist
         // so I print the books that belong to me
         // Problem: user_name is null before I enter this step
@@ -140,7 +127,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                     @Override
                     public void onClick(View view) {
                         if (pos < bookList.getCount() && pos >= 0) {
-                            if (pos < bookList.getCount() && pos >= 0) {
                                 String rem_isbn = (bookDataList.get(pos)).getISBN().toString();
                                 collectionReference
                                         .document(rem_isbn)
@@ -148,7 +134,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             bookDataList.remove(pos);
                             bookAdapter.notifyDataSetChanged();
                             pos = -1;
-                        }
                     }
                 }});
 
@@ -223,16 +208,16 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
     }
     @Override
-    public void add_Book(Book book) {
-        bookAdapter.add(book);
+    public Hashtable<String, Object> add_Book() {
+        //bookAdapter.add(book);
+        Hashtable<String, Object> addbook = new Hashtable<String, Object>;
+        return addbook;
     }
 
     @Override
-    public void edit_Book(Book book, String title, String author, Long isbn, String des) {
-        book.setTitle(title);
-        book.setAuthor(author);
-        book.setISBN(isbn);
-        book.setDescription(des);
-        bookAdapter.notifyDataSetChanged();
+    public Hashtable<String, Object> edit_Book(Book book) {
+        //
+        Hashtable<String, Object> editbook = new Hashtable<String, Object>;
+        return editbook;
     }
 }
