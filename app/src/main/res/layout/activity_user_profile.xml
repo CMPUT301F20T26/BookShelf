@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toTopOf="@+id/profile_phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_fullname" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_username" />
 
     <TextView
         android:id="@+id/profile_phone"
@@ -80,7 +80,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/profile_username"
+        android:id="@+id/profile_fullname"
         android:layout_width="170dp"
         android:layout_height="60dp"
         android:layout_marginStart="36dp"
@@ -96,7 +96,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/profile_fullname"
+        android:id="@+id/profile_username"
         android:layout_width="361dp"
         android:layout_height="58dp"
         android:gravity="center"
@@ -110,7 +110,7 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_pict" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/profile_edit"
+        android:id="@+id/profile_edit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"

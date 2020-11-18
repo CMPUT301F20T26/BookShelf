@@ -23,7 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 /**
  * User profile activity
  */
-public class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity implements EditProfileFragment.OnFragmentInteractionListener {
 
     //Layout Variables
     Button signoutBtn;
@@ -52,6 +52,7 @@ public class UserProfileActivity extends AppCompatActivity {
         fullnameTv = findViewById(R.id.profile_fullname);
         emailTv = findViewById(R.id.profile_email);
         phoneTv = findViewById(R.id.profile_phone);
+        editBtn = findViewById(R.id.profile_edit_btn);
 
         //Database instance initialization
         db = FirebaseFirestore.getInstance();
@@ -68,6 +69,9 @@ public class UserProfileActivity extends AppCompatActivity {
                             fullnameTv.setText(documentSnapshot.getData().get("fullname").toString());
                             emailTv.setText(documentSnapshot.getData().get("email").toString());
                             phoneTv.setText(documentSnapshot.getData().get("phone").toString());
+
+                            //User Object Creation.
+                            UserInfo userInfo = documentSnapshot.toObject(UserInfo.class);
                         }
                     }
                 });
@@ -82,6 +86,17 @@ public class UserProfileActivity extends AppCompatActivity {
 
                 Intent signInIntent = new Intent(getApplicationContext(), SignInActivity.class);
                 startActivity(signInIntent);
+            }
+        });
+
+        //Edit Profile Button Listener set up
+        editBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String fullname = fullnameTv.getText().toString();
+                String email = emailTv.getText().toString();
+                String phone = phoneTv.getText().toString();
+                new EditProfileFragment().show(getSupportFragmentManager(), "EDIT");
             }
         });
 
@@ -127,7 +142,10 @@ public class UserProfileActivity extends AppCompatActivity {
         });
         //__________________________________________________________________________________________
 
-
     }
 
+    @Override
+    public void onOkPressed(String fullname, String email, String phone) {
+
+    }
 }
