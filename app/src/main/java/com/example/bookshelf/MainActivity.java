@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,7 +14,9 @@ import com.google.firebase.auth.FirebaseUser;
  * Welcome page activity that facilitates user persistence
  */
 public class MainActivity extends AppCompatActivity {
-    //Current user
+    /**
+     * The User.
+     */
     FirebaseUser user;
 
     //Layout variables
@@ -49,6 +50,4 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }
     }
-
-
 }
