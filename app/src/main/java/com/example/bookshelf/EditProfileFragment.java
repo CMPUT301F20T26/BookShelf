@@ -14,32 +14,41 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-
+/**
+ * Edit Profile fragment for editing user information.
+ */
 public class EditProfileFragment extends DialogFragment {
     //Layout Variables
     private EditText fullnameEt;
-    private EditText emailEt;
     private EditText phoneEt;
     private OnFragmentInteractionListener listener;
 
     //User class instantiation
-    private User userInfo;
+    private UserInfo userInfo;
+
+    /**
+     * Instantiates a new Edit profile fragment with a UserInfo Object
+     * @param user the user
+     */
     public EditProfileFragment(UserInfo user){
         this.userInfo = user;
     }
 
+    /**
+     * The interface On fragment interaction listener.
+     */
     public interface OnFragmentInteractionListener {
-        void onOkPressed(String fullname, String email, String phone);
+        /**
+         * On ok pressed.
+         * @param userInfo the user info
+         */
+        void onOkPressed(UserInfo userInfo);
     }
 
+    /**
+     * Attaching the context to the fragment.
+     * @param context
+     */
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
@@ -51,20 +60,27 @@ public class EditProfileFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Create Dialog box.
+     * @param savedInstanceState
+     * @return
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        //Setting the view
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.edit_profile_fragment, null);
 
+        //Assigning Layout variables
         fullnameEt = view.findViewById(R.id.et_fullname);
-        emailEt = view.findViewById(R.id.et_phone);
-        phoneEt = view.findViewById(R.id.et_email);
+        phoneEt = view.findViewById(R.id.et_phone);
 
+        //Build Dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
-        fullnameEt.setText(this.userInfo.getFullname());
-        emailEt.setText(this.userInfo.getEmail());
-        phoneEt.setText(this.userInfo.getPhone());
+        //Setting layout text so user knows where to edit.
+        fullnameEt.setText(userInfo.getFullname());
+        phoneEt.setText(userInfo.getPhone());
 
         return builder
                 .setView(view)
@@ -75,11 +91,15 @@ public class EditProfileFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         //on ok pressed we want to go back to profile page after updating firebase
                         String editedFullname = fullnameEt.getText().toString();
-                        String editedEmail = emailEt.getText().toString();
                         String editedPhone = phoneEt.getText().toString();
                         //TODO: Add some checks for data here.
 
-                        listener.onOkPressed(this.userInfo);
+                        //Set user info data
+                        userInfo.setFullname(editedFullname);
+                        userInfo.setPhone(editedPhone);
+
+                        //Call on Pressed on UserProfileActivity
+                        listener.onOkPressed(userInfo);
                     }
                 }).create();
     }

@@ -39,31 +39,14 @@ public class CreateAccountActivity extends AppCompatActivity {
     //Firebase Authentication
     private FirebaseAuth userAuth;
 
-    //Firebase Cloud Firestore
-    FirebaseFirestore db;
+    //User information
+    private UserInfo userInfo;
 
     /**
-     * User hashmap for creating necessary fields in the db
-     * @param fullname Full name of the new user
-     * @param username chosen username of the new user
-     * @param phone chosen phone number of the user
-     * @param email chosen email of the user
-     * @return a hashmap of necessary fields required to properly create a user
+     * The Database
      */
-    private HashMap<String, Object> userData(String fullname, String username, String phone , String email){
-
-        HashMap<String, Object> user = new HashMap<String, Object>();
-        user.put("email", email);
-        user.put("fullname", fullname);
-        user.put("notifications", new ArrayList<String>());
-        user.put("ownedBooks", new ArrayList<String>());
-        user.put("phone", phone);
-        user.put("picture", "");
-        user.put("username", username);
-
-        return user;
-    }
-
+    //Firebase Cloud Firestore
+    private FirebaseFirestore db;
 
     /**
      * On create lifecycle method for creating the activity
@@ -134,8 +117,10 @@ public class CreateAccountActivity extends AppCompatActivity {
                                                                         if (task.isSuccessful()) {
                                                                             FirebaseUser authenticatedUser = userAuth.getCurrentUser();
 
+                                                                            userInfo = new UserInfo(email, fullname, phone, username);
+
                                                                             //Add user to database using userID in authentication
-                                                                            db.collection("users").document(authenticatedUser.getUid()).set(userData(fullname, username, phone, email));
+                                                                            db.collection("users").document(authenticatedUser.getUid()).set(userInfo.getUserMap());
 
                                                                             //Start Profile Page activity
                                                                             //Pass authenticated user id into profile page
