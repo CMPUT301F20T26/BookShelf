@@ -12,6 +12,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 
@@ -114,5 +116,28 @@ public class FirebaseHelper {
     void append(String collectionPath, String docID, String fieldID, Object[] data) {
         DocumentReference doc = db.collection(collectionPath).document(docID); // TODO: doc not found
         doc.update(fieldID, FieldValue.arrayUnion(data));
+    }
+
+
+    /**
+     * Gets user id from username.
+     *
+     * @param username the username
+     * @return the user id
+     */
+    String getUserID(String username) {
+        final String[] uid = new String[1];
+        db.collection("users").whereEqualTo("username", username).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                uid[0] = document.getId();
+                            }
+                        }
+                    }
+                });
+        return uid[0];
     }
 }
