@@ -41,13 +41,13 @@ import java.util.ArrayList;
             TextView title = view.findViewById(R.id.TitleView);
             TextView author = view.findViewById(R.id.AuthorView);
             TextView description = view.findViewById(R.id.DescriptionView);
-            TextView status = view.findViewById(R.id.StatusView);
+            //TextView status = view.findViewById(R.id.StatusView);
             TextView user = view.findViewById(R.id.UserView);
 
             title.setText(book.getTitle());
             author.setText(book.getAuthor());
             description.setText(book.getDescription());
-            status.setText(book.getStatus().toString());
+            //status.setText(book.getStatus().toString());
             user.setText(book.getOwnerUsername());
 
             return view;

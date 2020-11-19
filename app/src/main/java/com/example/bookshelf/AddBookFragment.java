@@ -47,14 +47,7 @@ public class AddBookFragment extends DialogFragment {
         /**
          * Add book.
          */
-        Hashtable<String, Object> add_Book();
-
-        /**
-         * Edit book.
-         *
-         * @param book   the book
-         */
-        Hashtable<String, Object> edit_Book(Book book);
+        void onOkPressed(String author,String des,String isbn,String title);
     }
 
     /**
@@ -123,13 +116,8 @@ public class AddBookFragment extends DialogFragment {
                             toast.show();
                             return;
                         }
-                        Book addBook;
-                        Long isbn_add = Long.parseLong(isbn.getText().toString());
-                        book_details.put("author", author_new);
-                        book_details.put("description", des_new);
-                        book_details.put("isbn", isbn_new);
-                        book_details.put("photoUrl","");
-                        book_details.put("title", title_new);}
+                        listener.onOkPressed(author_new, des_new, isbn_new, title_new);
+                    }
 
                         //TODO: return book_details (have no clue)
 

@@ -34,14 +34,15 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
-    TextView uidTv;
-    ListView bookList;
-    //ArrayAdapter<Book> bookAdapter;
-    ArrayList<Book> bookDataList;
+public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener, BookFactory.bookListener {
+    //Global Variable to keep track of books
     int pos;
-    BookArrayAdapter bookAdapter;
-    String user_name;
+    ArrayAdapter<Book> bookAdapter;
+    ListView bookList;
+    ArrayList<Book> bookDataList;
+    BookFactory bookFactory;
+    private FirebaseFirestore db;
+
 
     //Firebase Authentication instance
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -49,18 +50,40 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_books);
+        setContentView(R.layout.activity_user_books);  //Opening content view
 
-        final String userId = user.getUid();
+        //Initialize variables
         Button addBookButton;
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
-        final FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
+        bookFactory = new BookFactory("books");
+        bookList.setAdapter(bookAdapter);
 
-        final CollectionReference collectionReference = db.collection("books");
+        /*FirebaseHelper firebaseHelper = new FirebaseHelper();
+        DocumentSnapshot o_books=firebaseHelper.get("users",user.getUid());
+        List<String> ownedBooks = (List<String>) o_books.getData().get("ownedBooks");*/
+        final DocumentSnapshot[] result = new DocumentSnapshot[1];
+        db = FirebaseFirestore.getInstance();
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
+                            for (int i = 0; i < ownedBooks.size(); i++) {
+                                bookFactory.get(ownedBooks.get(i));
+
+                                //bookFactory.give();
+                               // System.out.println((bookFactory.ret(ownedBooks.get(i))));
+                                //bookAdapter.add(bookFactory.get(ownedBooks.get(i)));
+                                //bookAdapter.notifyDataSetChanged();
+                            }
+                        }}});
+
+        // Add button to add a book, opens a fragment, and adds a book
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,51 +91,8 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 }
         });
 
-        // I am grabbing the username, from the user database and saving it in the user_name,
-        // I checked whether its grabbing it by sending it to the log
-        /***db.collection("users").document(userId).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            user_name = documentSnapshot.getData().get("username").toString();
-                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                                        FirebaseFirestoreException error) {
-                                    bookDataList.clear();
-                                    if(error!= null){
-                                        Log.d("Error",error.getMessage());
-                                    }
-                                    else {
-                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                                            //Log.d("Error",String.valueOf(user_name));
 
-                                            String user = String.valueOf(doc.getData().get("ownerUsername"));
-                                            Log.d("Error", String.valueOf(user_name.equals(user)));
-                                            Log.d("Error",String.valueOf(user));
-                                            if(user_name.equals(user)) {
-                                                String title = (String) doc.getData().get("title");
-                                                String author = (String) doc.getData().get("author");
-                                                String des = (String) doc.getData().get("description");
-                                                String isbn = (String) doc.getData().get("isbn");
-                                                isbn = isbn.replace("-", "");
-                                                Long isbn1 = Long.parseLong(isbn);
-                                                bookDataList.add(new Book(title, author, des, isbn1, user));
-                                            }
-                                        }
 
-                                    }
-
-                                    bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
-                                }
-                            });
-
-                        }}});***/
-        // Here I want to compare the user_name and user of the book before adding it to the datalist
-        // so I print the books that belong to me
-        // Problem: user_name is null before I enter this step
 
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -121,7 +101,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 System.out.println(pos);
 
                 // when delete button pressed remove the selected item from GearAdapter
-                Button deleteButton = findViewById(R.id.delete);
+                /*Button deleteButton = findViewById(R.id.delete);
                 deleteButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -135,10 +115,10 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             bookAdapter.notifyDataSetChanged();
                             pos = -1;
                     }
-                }});
+                }});*/
 
                 // when edit button clicked go to AddGearFragment to edit
-                Button editButton = findViewById(R.id.edit);
+                /*Button editButton = findViewById(R.id.edit);
                 editButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -158,7 +138,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             pos = -1;
                         }
                     }
-                });
+                });*/
             }
         });
 
@@ -208,16 +188,25 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
     }
     @Override
-    public Hashtable<String, Object> add_Book() {
-        //bookAdapter.add(book);
-        Hashtable<String, Object> addbook = new Hashtable<String, Object>;
-        return addbook;
+    public void onOkPressed(String author,String des,String isbn,String title) {
+        bookFactory.Author(author);
+        bookFactory.Description(des);
+        bookFactory.ISBN(Long.parseLong(isbn));
+        bookFactory.Title(title);
+        bookFactory.Status(Book.BookStatus.Available);
+        FirebaseHelper firebaseHelper = new FirebaseHelper();
+        DocumentSnapshot owner=firebaseHelper.get("users",user.getUid());
+        //Log.d("Error",owner.toString());
+//        String user_name = owner.getData().get("username").toString();
+//        bookFactory.OwnerUsername(user_name);
+        bookAdapter.add(bookFactory.build());
+        bookAdapter.notifyDataSetChanged();
+        bookFactory.New();
     }
 
     @Override
-    public Hashtable<String, Object> edit_Book(Book book) {
-        //
-        Hashtable<String, Object> editbook = new Hashtable<String, Object>;
-        return editbook;
+    public void getBook(Book book) {
+        bookAdapter.add(book);
+        bookAdapter.notifyDataSetChanged();
     }
 }

@@ -1,13 +1,18 @@
 package com.example.bookshelf;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +22,16 @@ import java.util.Objects;
  * BookFactory - For creating new books.
  */
 public class BookFactory {
+    private final FirebaseFirestore db;
+    final ArrayList<Book> temp = new ArrayList<Book>();
+    private BookFactory.bookListener listener;
+    public interface bookListener{
+        /**
+         * Add book.
+         */
+        void getBook(Book book);
+    }
+
 
     /**
      * Title.
@@ -68,7 +83,7 @@ public class BookFactory {
      * @param status the status
      */
     public BookFactory Status(Book.BookStatus status) {
-        thisBook.setStatus(status);
+        thisBook.setStatus(status.toString());
         bookMap.put("status", status);
         return this;
     }
@@ -105,13 +120,14 @@ public class BookFactory {
     /**
      * Instantiates a new Book factory.
      *
-     * @param bookReference the firebase book collection reference
+     * @param collectionPath the firebase book collection reference
      */
-    BookFactory(CollectionReference bookReference)
+    BookFactory(String collectionPath)
     {
         thisBook = new Book();
         bookMap = new HashMap<>();
-        bookCollectionReference = bookReference;
+        db = FirebaseFirestore.getInstance();
+        bookCollectionReference=db.collection(collectionPath);
     }
 
     /**
@@ -130,7 +146,7 @@ public class BookFactory {
      * @param bookID the book id
      * @return the book
      */
-    Book get(final String bookID){
+    void get(final String bookID){
         final Book res = new Book();
         bookCollectionReference.document(bookID).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -140,18 +156,23 @@ public class BookFactory {
                             DocumentSnapshot bookDoc = task.getResult();
                             res.setBookID(bookID);
                             res.setTitle(bookDoc.get("title").toString());
-                            res.setOwnerUsername(bookDoc.get("owner").toString());
-                            res.setTitle(bookDoc.get("title").toString());
-                            // TODO : rest of fields here
+                            res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
+                            String isbn = (String) bookDoc.getData().get("isbn");
+                            isbn = isbn.replace("-", "");
+                            Long isbn1 = Long.parseLong(isbn);
+                            res.setISBN(isbn1);
+                            res.setStatus(bookDoc.getData().get("status").toString());
+                            res.setDescription(bookDoc.get("description").toString());
+                            res.setPhotoURL(bookDoc.get("coverImage").toString());
+                            listener.getBook(res);
+                            // TODO: res is null for some reason
                         }
                         else {
-                            // TODO: throw exception
+                            Log.d("Error","Book not found");
                         }
                     }
                 });
-        return res;
     }
-
     /**
      * Builds the book, which determines the book ID.
      * This method should be used when pushing new books to firebase.
@@ -161,19 +182,19 @@ public class BookFactory {
     Book build(){
         // get time of book creation
         // this is used to calculate the unique book ID
-        long now = new Date().getTime();
-        String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        //long now = new Date().getTime();
+        //String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
         // add id to book and bookMap
-        thisBook.setBookID(id);
-        bookMap.put("bookID", id);
+        //thisBook.setBookID(id);
+        //bookMap.put("bookID", id);
         // push to firebase
         bookCollectionReference
-                .document(id)
+                .document()
                 .set(thisBook);
         // return built book
         return thisBook;
     }
-    Book edit(int pos){
+    /*Book edit(int pos){
         // get time of book creation
         // this is used to calculate the unique book ID
         // push to firebase
@@ -182,21 +203,21 @@ public class BookFactory {
                 .update(thisBook);
         // return built book
         return thisBook;
-    }
-    void delete(){
+    }*/
+    void delete(String id){
         // get time of book creation
         // this is used to calculate the unique book ID
-        long now = new Date().getTime();
-        String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        //long now = new Date().getTime();
+        //String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
         // add id to book and bookMap
-        thisBook.setBookID(id);
-        bookMap.put("bookID", id);
+        //thisBook.setBookID(id);
+        //bookMap.put("bookID", id);
         // push to firebase
         bookCollectionReference
                 .document(id)
-                .set(thisBook);
+                .delete();
         // return built book
-        return thisBook;
+        //return thisBook;
     }
 
 

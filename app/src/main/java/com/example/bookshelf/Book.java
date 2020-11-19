@@ -1,5 +1,7 @@
 package com.example.bookshelf;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -233,8 +235,24 @@ public class Book implements Serializable {
      *
      * @param status the status
      */
-    public void setStatus(BookStatus status) {
-        Status = status;
+    public void setStatus(String status) {
+        if(status.equals("Available")){
+            Status = BookStatus.Available;
+        }
+        else if(status.equals("Requested")){
+            Status = BookStatus.Requested;
+        }
+        else if(status.equals("Accepted")){
+            Status = BookStatus.Accepted;
+        }
+        else if(status.equals("Borrowed")){
+            Status = BookStatus.Borrowed;
+        }else if(status.equals("Loaned")){
+            Status = BookStatus.Loaned;
+        }
+        else{
+            Log.d("Error","Invalid Status");
+        }
     }
 
     /**
