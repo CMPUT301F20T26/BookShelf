@@ -20,12 +20,15 @@ public class RequestTheirBook extends UserNotification {
     static RequestTheirBook requestNew(Book theirBook){
         // creates new notification, which should appear in both users' notification lists
         // RequestStatus pending
-        FirebaseHelper helper;
+        FirebaseHelper helper = new FirebaseHelper();
         RequestTheirBook rq = new RequestTheirBook();
         rq.theirBook = theirBook;
         rq.bookID = theirBook.getBookID();
         rq.status = RequestStatus.PENDING;
+
+        String ID = helper.add("notifications", rq.asMap());
         return null;
     }
+
 
 }
