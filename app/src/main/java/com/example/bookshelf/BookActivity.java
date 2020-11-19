@@ -34,6 +34,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     private TextView ISBN;
     private TextView owner;
     private TextView status;
+    private String bookId;
 
     //Database Instance definition
     private FirebaseFirestore db;
@@ -55,6 +56,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
 
         Intent intent = getIntent();
         String message = intent.getStringExtra(SearchBooksActivity.EXTRA_MESSAGE);
+        bookId = message;
 
         displayPic = findViewById(R.id.imageView);
         title = findViewById(R.id.title_text);
@@ -140,7 +142,9 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
      * sets book as requested in users profile, sends request notification to owner of the book
      */
     public void onOkPressed(){
-        //do nothing, for now
+        BookFactory newFactory = new BookFactory(db.collection("books"));
+        Book requestBook = newFactory.get(bookId);
+        RequestTheirBook.requestNew(requestBook);
     }
 
     /**
