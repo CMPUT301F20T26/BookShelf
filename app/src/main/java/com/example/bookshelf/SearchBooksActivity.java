@@ -30,15 +30,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * This activity is for search for books that are not currently borrowed or accepted, by their titles or by the user names of those who own them.
+ */
+
 public class SearchBooksActivity extends AppCompatActivity {
 
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
-    private TextView uidTv;
     private ListView searchResults;
     private EditText searchBar;
     private Button searchButton;
     private BookArrayAdapter bookAdapter;
-    private ArrayList<String> resultList; // using string dummy values until book objects can be used
     private FirebaseFirestore db;
 
     //Firebase Authentication instance
@@ -49,9 +51,6 @@ public class SearchBooksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_books);
 
-        final String userId = user.getUid();
-//        uidTv = findViewById(R.id.uid_search);
-//        uidTv.setText(userId);
         db = FirebaseFirestore.getInstance();
 
         searchBar = findViewById(R.id.search_bar);
