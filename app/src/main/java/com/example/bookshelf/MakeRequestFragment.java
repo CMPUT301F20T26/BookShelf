@@ -59,7 +59,7 @@ public class MakeRequestFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //on ok pressed we want to set status to requested and update in firebase, notifying owner
-                        listener.onOkPressed();
+                        listener.onOkPressed(); // TODO: implement request creation
                     }
                 }).create();
     }

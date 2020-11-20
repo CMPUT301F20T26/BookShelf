@@ -61,7 +61,7 @@ public class SearchBooksActivity extends AppCompatActivity {
         bookAdapter = new BookArrayAdapter(this, bookList);
         searchResults.setAdapter(bookAdapter);
 
-
+        // TODO: not including accept/borrow, my books
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
