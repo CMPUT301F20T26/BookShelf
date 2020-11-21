@@ -1,6 +1,7 @@
 package com.example.bookshelf;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,33 +24,71 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class GetLocationTest {
     private Solo solo;
 
     @Rule
-    public ActivityTestRule<RequestDetailsActivity> rule =
-            new ActivityTestRule<RequestDetailsActivity>(RequestDetailsActivity.class,
+    public ActivityTestRule<CreateAccountActivity> rule =
+            new ActivityTestRule<CreateAccountActivity>(CreateAccountActivity.class,
                     true, true);
+
+    // Rule for exception testing
+    @Rule
+    public ExpectedException exception= ExpectedException.none();
 
 
     /**
      * Runs before all tests to create instance of solo
+     *
      * @throws Exception
      */
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         solo = new Solo(InstrumentationRegistry.getInstrumentation(), rule.getActivity());
     }
 
+
     /**
-     * Runs after all tests are finished to ensure all opened activities are closed and finished
+     * Helper function to delete the user that was just created after testing is finished. Will be
+     * called in Tear Down function
      * @throws Exception
      */
-    @After
-    public void tearDown() throws Exception {
-        solo.finishOpenedActivities();
+    public void deleteUser() throws Exception {
+        String testFullname = "firstname lastname";
+        String testusername = "username";
+        final String testEmail = "firstname.lastname@gmail.com";
+        String testPhone = "7803403052";
+        final String testPassword = "password123";
+
+        //Initialize firebase instance
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        //Initialize Firebase authentication instance
+        final FirebaseUser testuser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //Asset user in database and current user isn't empty
+        //Then delete user created from the database and the user authentication
+        db.collection("users").whereEqualTo("username", testusername).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Assert.assertNotNull(testuser);
+                            Assert.assertFalse(task.getResult().getDocuments().isEmpty());
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String docId = document.getId();
+                                db.collection("users").document(docId).delete();
+                                testuser.delete();
+                                FirebaseAuth authenticatedUser = FirebaseAuth.getInstance();
+                                authenticatedUser.signOut();
+                            }
+                        }
+                    }
+                });
     }
+
 
     /**
      * Gets the current activity
@@ -64,7 +103,30 @@ public class GetLocationTest {
      * Test to confirm the location put in to the map fragment is correct
      */
     @Test
-    public void checkRequestDetails() {
+    public void checkRequestDetails() throws Exception {
+        solo.assertCurrentActivity("Wrong Activity", CreateAccountActivity.class);
+
+        //Test inputs
+        String testFullname = "firstname lastname";
+        String testusername = "username";
+        final String testEmail = "firstname.lastname@gmail.com";
+        String testPhone = "7803403052";
+        final String testPassword = "password123";
+
+        //Enter valid field inputs
+        solo.enterText((EditText) solo.getView(R.id.create_account_full_name), testFullname);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_name), testusername);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_email), testEmail);
+        solo.enterText((EditText) solo.getView(R.id.create_account_phone_number), testPhone);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_pwd), testPassword);
+        solo.clickOnButton("Create Account");
+
+        //Wait for profile page activity to open
+        solo.waitForActivity(UserProfileActivity.class);
+
+        View maps = solo.getView(R.id.maps_page);
+        solo.clickOnView(maps);
+        solo.waitForActivity(RequestDetailsActivity.class);
         solo.assertCurrentActivity("Wrong Activity", RequestDetailsActivity.class);
 
         String lat = "53.528329";
@@ -80,6 +142,7 @@ public class GetLocationTest {
         Assert.assertEquals(Lat.getText().toString(), lat);
         Assert.assertEquals(Lng.getText().toString(), lng);
 
+        deleteUser();
     }
 
 }
