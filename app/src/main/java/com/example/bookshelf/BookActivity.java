@@ -42,6 +42,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     //Firebase Storage instance
     private FirebaseStorage storage = FirebaseStorage.getInstance();
 
+    private Book currentBook;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,13 +89,16 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                     }
                             );
 
+                            BookFactory currentFactory = new BookFactory(db.collection("books"));
+                            currentBook = currentFactory.get(document, document.getId());
+
                             //Filling book values
-                            title.setText(document.getData().get("title").toString());
-                            author.setText(document.getData().get("author").toString());
-                            ISBN.setText(document.getData().get("isbn").toString());
-                            owner.setText(document.getData().get("ownerUsername").toString());
-                            status.setText(document.getData().get("status").toString());
-                            description.setText(document.getData().get("description").toString());
+                            title.setText(currentBook.getTitle());
+                            author.setText(currentBook.getAuthor());
+                            ISBN.setText(currentBook.getISBN().toString());
+                            owner.setText(currentBook.getOwnerUsername());
+                            status.setText(currentBook.getStatus().toString());
+                            description.setText(currentBook.getDescription());
 
                         }
                     }
@@ -114,10 +119,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                userId.clear();
                 final String username = owner.getText().toString();
 
-                // function that generates intent and starts activity
                 db.collection("users").whereEqualTo("username", username).get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -142,9 +145,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
      * sets book as requested in users profile, sends request notification to owner of the book
      */
     public void onOkPressed(){
-        BookFactory newFactory = new BookFactory(db.collection("books"));
-        Book requestBook = newFactory.get(bookId);
-        RequestTheirBook.requestNew(requestBook);
+
+//        RequestTheirBook.requestNew(currentBook);
     }
 
     /**

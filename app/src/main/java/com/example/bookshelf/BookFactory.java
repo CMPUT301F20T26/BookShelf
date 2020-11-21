@@ -130,25 +130,37 @@ public class BookFactory {
      * @param bookID the book id
      * @return the book
      */
-    Book get(final String bookID){
+    Book get(final DocumentSnapshot bookDoc, final String bookID){
         final Book res = new Book();
-        bookCollectionReference.document(bookID).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot bookDoc = task.getResult();
-                            res.setBookID(bookID);
-                            res.setTitle(bookDoc.get("title").toString());
-                            res.setOwnerUsername(bookDoc.get("owner").toString());
-                            res.setTitle(bookDoc.get("title").toString());
-                            // TODO : rest of fields here
-                        }
-                        else {
-                            // TODO: throw exception
-                        }
-                    }
-                });
+        final String isbnString;
+        Long isbn = 0L;
+                res.setBookID(bookID);
+            if(bookDoc.get("isbn") != null) {
+                isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
+                isbn = Long.parseLong(isbnString);
+                res.setBookID(bookID);
+            }
+            if(bookDoc.get("title") != null) {
+                res.setTitle(bookDoc.get("title").toString());
+            }
+            if(bookDoc.get("ownerUsername") != null) {
+                res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
+            }
+            if(bookDoc.get("author") != null) {
+                res.setAuthor(bookDoc.get("author").toString());
+                res.setISBN(isbn);
+            }
+            if(bookDoc.get("coverImage") != null) {
+                res.setPhotoURL(bookDoc.get("coverImage").toString());
+            }
+            if(bookDoc.get("description") != null) {
+                res.setDescription(bookDoc.get("description").toString());
+            }
+
+            switch(bookDoc.get("status").toString()) {
+                case "Available": res.setStatus(Book.BookStatus.Available);
+            }
+
         return res;
     }
 
