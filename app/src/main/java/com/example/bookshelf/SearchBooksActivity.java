@@ -74,17 +74,18 @@ public class SearchBooksActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
-                                        Long isbn = Long.parseLong(isbnString);
-                                        Book book = new Book(document.getData().get("title").toString(),
-                                                             document.getData().get("author").toString(),
-                                                             isbn,
-                                                             document.getData().get("description").toString(),
-                                                             document.getData().get("ownerUsername").toString());
-                                        book.setBookID(document.getId());
+//                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
+//                                        Long isbn = Long.parseLong(isbnString);
+//                                        Book book = new Book(document.getData().get("title").toString(),
+//                                                             document.getData().get("author").toString(),
+//                                                             isbn,
+//                                                             document.getData().get("description").toString(),
+//                                                             document.getData().get("ownerUsername").toString());
+//                                        book.setBookID(document.getId());
 
-
-                                        matchBook(book, bookList);
+                                        BookFactory searchFactory = new BookFactory(db.collection("books"));
+                                        Book findBook = searchFactory.get(document, document.getId());
+                                        matchBook(findBook, bookList);
                                     }
                                 }
                             }
