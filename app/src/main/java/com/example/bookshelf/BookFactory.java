@@ -18,6 +18,8 @@ import java.util.Objects;
  */
 public class BookFactory {
 
+    // TODO: use FireBaseHelper
+
     /**
      * Title.
      *
@@ -131,6 +133,7 @@ public class BookFactory {
      * @return the book
      */
     Book get(final DocumentSnapshot bookDoc, final String bookID){
+
         final Book res = new Book();
         final String isbnString;
         Long isbn = 0L;
@@ -171,6 +174,7 @@ public class BookFactory {
      * @return the book
      */
     Book build(){
+
         // get time of book creation
         // this is used to calculate the unique book ID
         long now = new Date().getTime();

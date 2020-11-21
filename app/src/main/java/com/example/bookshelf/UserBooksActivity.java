@@ -61,7 +61,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         db = FirebaseFirestore.getInstance();
 
 
-
+        // TODO: clean up test code, integraet with bookfactory
         bookList.setAdapter(bookAdapter);
         String titl = "Twiligt";
         String auth = "Twiligt";

@@ -33,10 +33,14 @@ public class BorrowMyBook extends UserNotification {
     /**
      * Scan book to loan.
      */
-    void scanBookToLoan() {};
+    void scanBookToLoan() {
+        // TODO: implement scanBookToLoan
+    };
 
     /**
      * Scan book to confirm return.
      */
-    void scanBookConfirmReturn() {};
+    void scanBookConfirmReturn() {
+        // TODO: implement scanBookToConfirmReturn
+    };
 }

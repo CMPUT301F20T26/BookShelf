@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:orientation="horizontal"
-        android:background="@drawable/rectangle4"
+        android:background="@drawable/login_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -21,19 +21,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
-        <ImageView
-            android:id="@+id/profile_picture"
-            android:layout_width="194dp"
-            android:layout_height="177dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:background="@drawable/rectangle3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/full_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
 
-        </ImageView>
 
         <TextView
             android:id="@+id/full_name"
@@ -46,8 +34,8 @@
             android:gravity="center"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/profile_picture"
-            app:layout_constraintTop_toTopOf="@id/profile_picture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/owner_of"
             tools:layout_editor_absoluteY="61dp">
 
@@ -64,8 +52,8 @@
             android:gravity="center"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/profile_picture"
-            app:layout_constraintBottom_toBottomOf="@id/profile_picture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/profile_background"
             app:layout_constraintTop_toBottomOf="@id/full_name"
             tools:layout_editor_absoluteY="162dp">
 

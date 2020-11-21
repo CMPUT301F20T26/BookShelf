@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+/**
+ * This fragment acts to receive confirmation from the user to make a request on a particular book.
+ */
 
 public class MakeRequestFragment extends DialogFragment {
     private TextView confirmText;
@@ -56,7 +59,7 @@ public class MakeRequestFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //on ok pressed we want to set status to requested and update in firebase, notifying owner
-                        listener.onOkPressed();
+                        listener.onOkPressed(); // TODO: implement request creation
                     }
                 }).create();
     }

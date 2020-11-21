@@ -25,6 +25,11 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+
+/**
+ * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
+ */
+
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
@@ -152,7 +157,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     /**
      * Takes the user id and passes it to UserActivity
      *
-     * @param id String to be passed
+     * @param id book id to be passed
      */
     public void openUserProfile(String id){
         Intent intent = new Intent(this, UserActivity.class);
