@@ -8,8 +8,10 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -148,14 +150,20 @@ public class BookFactory {
      */
     void get(final String bookID){
         final Book res = new Book();
-        bookCollectionReference.document(bookID).get()
+        DocumentReference ref = bookCollectionReference.document(bookID);
+        //DocumentSnapshot bookdoc =
+        res.setBookID(ref.getId());
+        
+        final DocumentSnapshot[] result = new DocumentSnapshot[1];
+        db.collection("books").document(bookID).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
+                        if(task.isSuccessful()){
                             DocumentSnapshot bookDoc = task.getResult();
-                            res.setBookID(bookID);
+                            // adding all fields of book to the book object
                             res.setTitle(bookDoc.get("title").toString());
+                            res.setAuthor(bookDoc.get("author").toString());
                             res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
                             String isbn = (String) bookDoc.getData().get("isbn");
                             isbn = isbn.replace("-", "");
@@ -164,7 +172,8 @@ public class BookFactory {
                             res.setStatus(bookDoc.getData().get("status").toString());
                             res.setDescription(bookDoc.get("description").toString());
                             res.setPhotoURL(bookDoc.get("coverImage").toString());
-                            listener.getBook(res);
+                            //listener.getBook(res);
+                            //System.out.println(res.getTitle());
                             // TODO: res is null for some reason
                         }
                         else {
@@ -173,6 +182,7 @@ public class BookFactory {
                     }
                 });
     }
+
     /**
      * Builds the book, which determines the book ID.
      * This method should be used when pushing new books to firebase.
@@ -180,44 +190,23 @@ public class BookFactory {
      * @return the book
      */
     Book build(){
-        // get time of book creation
-        // this is used to calculate the unique book ID
-        //long now = new Date().getTime();
-        //String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
-        // add id to book and bookMap
-        //thisBook.setBookID(id);
-        //bookMap.put("bookID", id);
-        // push to firebase
         bookCollectionReference
                 .document()
                 .set(thisBook);
-        // return built book
         return thisBook;
     }
-    /*Book edit(int pos){
-        // get time of book creation
-        // this is used to calculate the unique book ID
+    /*Book edit(String id){
         // push to firebase
         bookCollectionReference
-                .document()
-                .update(thisBook);
+                .document(id)
+                .update();
         // return built book
         return thisBook;
     }*/
     void delete(String id){
-        // get time of book creation
-        // this is used to calculate the unique book ID
-        //long now = new Date().getTime();
-        //String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
-        // add id to book and bookMap
-        //thisBook.setBookID(id);
-        //bookMap.put("bookID", id);
-        // push to firebase
         bookCollectionReference
                 .document(id)
                 .delete();
-        // return built book
-        //return thisBook;
     }
 
 

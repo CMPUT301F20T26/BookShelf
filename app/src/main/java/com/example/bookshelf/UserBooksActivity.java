@@ -1,42 +1,34 @@
 package com.example.bookshelf;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener, BookFactory.bookListener {
     //Global Variable to keep track of books
     int pos;
+    public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     ArrayAdapter<Book> bookAdapter;
     ListView bookList;
     ArrayList<Book> bookDataList;
@@ -93,7 +85,13 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
 
 
-
+        bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                openBookDescription(bookDataList.get(position).getBookID());
+                return false;
+            }
+        });
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -118,7 +116,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 }});*/
 
                 // when edit button clicked go to AddGearFragment to edit
-                /*Button editButton = findViewById(R.id.edit);
+                Button editButton = findViewById(R.id.edit);
                 editButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -132,13 +130,13 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             book.put("author", dbadd.getAuthor());
                             book.put("isbn", dbadd.getISBN().toString());
                             book.put("description", dbadd.getDescription());
-                            collectionReference
-                                    .document(dbadd.getISBN().toString())
-                                    .update(book);
+                            bookDataList.remove(pos);
+                            bookAdapter.notifyDataSetChanged();
                             pos = -1;
+
                         }
                     }
-                });*/
+                });
             }
         });
 
@@ -199,7 +197,8 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         //Log.d("Error",owner.toString());
 //        String user_name = owner.getData().get("username").toString();
 //        bookFactory.OwnerUsername(user_name);
-        bookAdapter.add(bookFactory.build());
+        Book newadd = bookFactory.build();
+        bookDataList.add(newadd);
         bookAdapter.notifyDataSetChanged();
         bookFactory.New();
     }
@@ -208,5 +207,11 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     public void getBook(Book book) {
         bookAdapter.add(book);
         bookAdapter.notifyDataSetChanged();
+    }
+    public void openBookDescription(String id) {
+        Intent intent = new Intent(this, BookActivity.class);
+        // we want the message to be the book ID corresponding to the selected book
+        intent.putExtra(EXTRA_MESSAGE, id);
+        startActivity(intent);
     }
 }
