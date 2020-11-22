@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.bookshelf"
-        minSdkVersion 22
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -47,6 +47,9 @@ dependencies {
 
     // Google Maps & Geolocation
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
+    // random string gen
+    implementation 'org.apache.commons:commons-text:1.6'
 
     // Testing
     testImplementation 'junit:junit:4.13.1'
