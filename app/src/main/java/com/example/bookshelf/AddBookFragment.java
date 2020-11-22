@@ -98,7 +98,7 @@ public class AddBookFragment extends DialogFragment {
         else {
             argBook = null;
         }
-
+        // TODO: integrate with BookFactory
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)

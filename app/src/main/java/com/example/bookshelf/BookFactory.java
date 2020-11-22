@@ -35,6 +35,8 @@ public class BookFactory {
     }
 
 
+    // TODO: use FireBaseHelper
+
     /**
      * Title.
      *
@@ -148,39 +150,40 @@ public class BookFactory {
      * @param bookID the book id
      * @return the book
      */
-    void get(final String bookID){
+    Book get(final DocumentSnapshot bookDoc, final String bookID){
+
         final Book res = new Book();
-        DocumentReference ref = bookCollectionReference.document(bookID);
-        //DocumentSnapshot bookdoc =
-        res.setBookID(ref.getId());
-        
-        final DocumentSnapshot[] result = new DocumentSnapshot[1];
-        db.collection("books").document(bookID).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot bookDoc = task.getResult();
-                            // adding all fields of book to the book object
-                            res.setTitle(bookDoc.get("title").toString());
-                            res.setAuthor(bookDoc.get("author").toString());
-                            res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
-                            String isbn = (String) bookDoc.getData().get("isbn");
-                            isbn = isbn.replace("-", "");
-                            Long isbn1 = Long.parseLong(isbn);
-                            res.setISBN(isbn1);
-                            res.setStatus(bookDoc.getData().get("status").toString());
-                            res.setDescription(bookDoc.get("description").toString());
-                            res.setPhotoURL(bookDoc.get("coverImage").toString());
-                            //listener.getBook(res);
-                            //System.out.println(res.getTitle());
-                            // TODO: res is null for some reason
-                        }
-                        else {
-                            Log.d("Error","Book not found");
-                        }
-                    }
-                });
+        final String isbnString;
+        Long isbn = 0L;
+                res.setBookID(bookID);
+            if(bookDoc.get("isbn") != null) {
+                isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
+                isbn = Long.parseLong(isbnString);
+                res.setBookID(bookID);
+            }
+            if(bookDoc.get("title") != null) {
+                res.setTitle(bookDoc.get("title").toString());
+            }
+            if(bookDoc.get("ownerUsername") != null) {
+                res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
+            }
+            if(bookDoc.get("author") != null) {
+                res.setAuthor(bookDoc.get("author").toString());
+                res.setISBN(isbn);
+            }
+            if(bookDoc.get("coverImage") != null) {
+                res.setPhotoURL(bookDoc.get("coverImage").toString());
+            }
+            if(bookDoc.get("description") != null) {
+                res.setDescription(bookDoc.get("description").toString());
+            }
+
+            switch(bookDoc.get("status").toString()) {
+                case "Available": res.setStatus(Book.BookStatus.Available);
+            }
+
+        return res;
+
     }
 
     /**
@@ -195,14 +198,7 @@ public class BookFactory {
                 .set(thisBook);
         return thisBook;
     }
-    /*Book edit(String id){
-        // push to firebase
-        bookCollectionReference
-                .document(id)
-                .update();
-        // return built book
-        return thisBook;
-    }*/
+
     void delete(String id){
         bookCollectionReference
                 .document(id)

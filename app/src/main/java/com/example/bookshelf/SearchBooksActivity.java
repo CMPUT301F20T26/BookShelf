@@ -30,15 +30,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * This activity is for search for books that are not currently borrowed or accepted, by their titles or by the user names of those who own them.
+ */
+
 public class SearchBooksActivity extends AppCompatActivity {
 
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
-    private TextView uidTv;
     private ListView searchResults;
     private EditText searchBar;
     private Button searchButton;
     private BookArrayAdapter bookAdapter;
-    private ArrayList<String> resultList; // using string dummy values until book objects can be used
     private FirebaseFirestore db;
 
     //Firebase Authentication instance
@@ -49,9 +51,6 @@ public class SearchBooksActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_books);
 
-        final String userId = user.getUid();
-//        uidTv = findViewById(R.id.uid_search);
-//        uidTv.setText(userId);
         db = FirebaseFirestore.getInstance();
 
         searchBar = findViewById(R.id.search_bar);
@@ -62,7 +61,7 @@ public class SearchBooksActivity extends AppCompatActivity {
         bookAdapter = new BookArrayAdapter(this, bookList);
         searchResults.setAdapter(bookAdapter);
 
-
+        // TODO: not including accept/borrow, my books
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -75,17 +74,18 @@ public class SearchBooksActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
-                                        Long isbn = Long.parseLong(isbnString);
-                                        Book book = new Book(document.getData().get("title").toString(),
-                                                             document.getData().get("author").toString(),
-                                                             isbn,
-                                                             document.getData().get("description").toString(),
-                                                             document.getData().get("ownerUsername").toString());
-                                        book.setBookID(document.getId());
+//                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
+//                                        Long isbn = Long.parseLong(isbnString);
+//                                        Book book = new Book(document.getData().get("title").toString(),
+//                                                             document.getData().get("author").toString(),
+//                                                             isbn,
+//                                                             document.getData().get("description").toString(),
+//                                                             document.getData().get("ownerUsername").toString());
+//                                        book.setBookID(document.getId());
 
-
-                                        matchBook(book, bookList);
+                                        BookFactory searchFactory = new BookFactory(db.collection("books"));
+                                        Book findBook = searchFactory.get(document, document.getId());
+                                        matchBook(findBook, bookList);
                                     }
                                 }
                             }

@@ -8,6 +8,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -140,4 +142,18 @@ public class FirebaseHelper {
                 });
         return uid[0];
     }
+
+
+    /**
+     * Gets app user id.
+     *
+     * @return the app user id
+     */
+    String getAppUserID() {
+        FirebaseAuth userAuth = FirebaseAuth.getInstance();
+        FirebaseUser authenticatedUser = userAuth.getCurrentUser();
+        return authenticatedUser.getUid();
+    }
+
+
 }

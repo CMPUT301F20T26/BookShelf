@@ -53,6 +53,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         bookFactory = new BookFactory("books");
         bookList.setAdapter(bookAdapter);
 
+
         /*FirebaseHelper firebaseHelper = new FirebaseHelper();
         DocumentSnapshot o_books=firebaseHelper.get("users",user.getUid());
         List<String> ownedBooks = (List<String>) o_books.getData().get("ownedBooks");*/
@@ -76,6 +77,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         }}});
 
         // Add button to add a book, opens a fragment, and adds a book
+
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -202,12 +204,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         bookAdapter.notifyDataSetChanged();
         bookFactory.New();
     }
-
-    @Override
-    public void getBook(Book book) {
-        bookAdapter.add(book);
-        bookAdapter.notifyDataSetChanged();
-    }
+    
     public void openBookDescription(String id) {
         Intent intent = new Intent(this, BookActivity.class);
         // we want the message to be the book ID corresponding to the selected book

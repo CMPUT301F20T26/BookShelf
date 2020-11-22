@@ -15,6 +15,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.w3c.dom.Text;
 
+
+/**
+ * This activity displays a user's profile and contact info who is the owner of some selected book.
+ */
+
 public class UserActivity extends AppCompatActivity {
     private ImageView profilePic;
     private TextView fullName;
@@ -33,7 +38,6 @@ public class UserActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        profilePic = findViewById(R.id.profile_picture);
         fullName = findViewById(R.id.full_name);
         name = findViewById(R.id.name);
         email = findViewById(R.id.email);
@@ -45,14 +49,23 @@ public class UserActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
-
-                            name.setText(documentSnapshot.getData().get("username").toString());
-                            fullName.setText(documentSnapshot.getData().get("fullname").toString());
-                            email.setText(documentSnapshot.getData().get("email").toString());
-                            cellphone.setText(documentSnapshot.getData().get("phone").toString());
+                            setProfile(documentSnapshot);
                         }
                     }
                 });
 
+    }
+
+    /**
+     * This takes the documentSnapshot as an argument and sets its attributes to the layout file
+     * meant to represent the user's profile.
+     *
+     * @param documentSnapshot user profile to be displayed
+     */
+    public void setProfile(DocumentSnapshot documentSnapshot){
+        name.setText(documentSnapshot.getData().get("username").toString());
+        fullName.setText(documentSnapshot.getData().get("fullname").toString());
+        email.setText(documentSnapshot.getData().get("email").toString());
+        cellphone.setText(documentSnapshot.getData().get("phone").toString());
     }
 }

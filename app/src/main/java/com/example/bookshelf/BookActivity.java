@@ -25,6 +25,11 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
+
+/**
+ * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
+ */
+
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
@@ -34,12 +39,15 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     private TextView ISBN;
     private TextView owner;
     private TextView status;
+    private String bookId;
 
     //Database Instance definition
     private FirebaseFirestore db;
 
     //Firebase Storage instance
     private FirebaseStorage storage = FirebaseStorage.getInstance();
+
+    private Book currentBook;
 
 
     @Override
@@ -55,6 +63,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
 
         Intent intent = getIntent();
         String message = intent.getStringExtra(SearchBooksActivity.EXTRA_MESSAGE);
+        bookId = message;
 
         displayPic = findViewById(R.id.imageView);
         title = findViewById(R.id.title_text);
@@ -85,13 +94,16 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                     }
                             );
 
+                            BookFactory currentFactory = new BookFactory(db.collection("books"));
+                            currentBook = currentFactory.get(document, document.getId());
+
                             //Filling book values
-                            title.setText(document.getData().get("title").toString());
-                            author.setText(document.getData().get("author").toString());
-                            ISBN.setText(document.getData().get("isbn").toString());
-                            owner.setText(document.getData().get("ownerUsername").toString());
-                            status.setText(document.getData().get("status").toString());
-                            description.setText(document.getData().get("description").toString());
+                            title.setText(currentBook.getTitle());
+                            author.setText(currentBook.getAuthor());
+                            ISBN.setText(currentBook.getISBN().toString());
+                            owner.setText(currentBook.getOwnerUsername());
+                            status.setText(currentBook.getStatus().toString());
+                            description.setText(currentBook.getDescription());
 
                         }
                     }
@@ -112,10 +124,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                userId.clear();
                 final String username = owner.getText().toString();
 
-                // function that generates intent and starts activity
                 db.collection("users").whereEqualTo("username", username).get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -140,13 +150,14 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
      * sets book as requested in users profile, sends request notification to owner of the book
      */
     public void onOkPressed(){
-        //do nothing, for now
+
+//        RequestTheirBook.requestNew(currentBook);
     }
 
     /**
      * Takes the user id and passes it to UserActivity
      *
-     * @param id String to be passed
+     * @param id book id to be passed
      */
     public void openUserProfile(String id){
         Intent intent = new Intent(this, UserActivity.class);

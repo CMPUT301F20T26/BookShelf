@@ -40,7 +40,7 @@ public class RequestDetailsActivity extends AppCompatActivity {
 
                 // put the LatLng item into an intent to be used by the map fragment activity
                 Intent viewLocation = new Intent(getApplicationContext(), ViewLocationActivity.class);
-                viewLocation.putExtra("LATITUDE AND LONGITUDE", location);
+                viewLocation.putExtra("LATITUDE AND LONGITUDE", location); // TODO: choose lat/lon from map
                 startActivity(viewLocation);
                 overridePendingTransition(0, 0);
             }
