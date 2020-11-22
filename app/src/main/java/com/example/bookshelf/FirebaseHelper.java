@@ -109,6 +109,16 @@ public class FirebaseHelper {
         doc.update(fieldID, FieldValue.arrayUnion(data));
     }
 
+    /**
+     * Delete document.
+     *
+     * @param collectionPath the collection path
+     * @param docID          the doc id
+     */
+    void deleteDocument(String collectionPath, String docID){
+        db.collection(collectionPath).document(docID).delete();
+    }
+
 
     /**
      * Gets user id String from username, passing the result through an IHelper listener.
