@@ -5,20 +5,25 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class ViewLocationActivity extends FragmentActivity implements OnMapReadyCallback {
+public class ViewLocationActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap map; // map item to be used by API
-    LatLng location; // LatLng type used by the maps API to specify a location
+    LatLng location = new LatLng(53.528333, -113.528917); // LatLng type used by the maps API to specify a location
+    boolean needsInit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +31,17 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
         setContentView(R.layout.map_fragment);
 
         // Getting the LatLng location that was passed via intent
-        location = getIntent().getParcelableExtra("LATITUDE AND LONGITUDE");
+        //location = getIntent().getParcelableExtra("LATITUDE AND LONGITUDE");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        if (savedInstanceState == null) {
+            needsInit=true;
+        }
+
+        mapFragment.setRetainInstance(true);
         mapFragment.getMapAsync(this);
 
         //BOTTOM NAVIGATION_________________________________________________________________________
@@ -72,8 +83,47 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
                 return false;
             }
         });
+
+
         //__________________________________________________________________________________________
     }
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
+
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+        LatLng position=marker.getPosition();
+
+        Log.d(getClass().getSimpleName(), String.format("Drag from %f:%f",
+                position.latitude,
+                position.longitude));
+    }
+
+        @Override
+        public void onMarkerDrag(Marker marker) {
+            LatLng position=marker.getPosition();
+
+            Log.d(getClass().getSimpleName(),
+                    String.format("Dragging to %f:%f", position.latitude,
+                            position.longitude));
+        }
+
+        @Override
+        public void onMarkerDragEnd(Marker marker) {
+            LatLng finalpos=marker.getPosition();
+
+            Log.d(getClass().getSimpleName(), String.format("Dragged to %f:%f",
+                    finalpos.latitude,
+                    finalpos.longitude));
+
+            marker.setTitle("Requested location: " + finalpos.latitude + ", " + finalpos.longitude);
+        }
+
 
     /**
      * Manipulates the map once available.
@@ -87,8 +137,18 @@ public class ViewLocationActivity extends FragmentActivity implements OnMapReady
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        if (needsInit) {
+            CameraUpdate center=
+                    CameraUpdateFactory.newLatLngZoom(location, 15);
 
-        map.addMarker(new MarkerOptions().position(location).title("Requested Location"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(location));
+            map.moveCamera(center);
+            Marker marker = map.addMarker(new MarkerOptions().position(location).draggable(true));
+            LatLng pos = marker.getPosition();
+            marker.setTitle("Requested location: " + pos.latitude + ", " + pos.longitude);
+
+            map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+            map.setOnInfoWindowClickListener((GoogleMap.OnInfoWindowClickListener) this);
+            map.setOnMarkerDragListener(this);
+        }
     }
 }
