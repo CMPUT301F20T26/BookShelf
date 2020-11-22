@@ -1,7 +1,5 @@
 package com.example.bookshelf;
 
-import android.content.res.ObbInfo;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,19 +18,26 @@ public abstract class UserNotification {
     String NotificationID;
     String date;
     String meetUpLocation;
-    String owner;
-    String requester;
+    String ownerID;
+    String requesterID;
     String bookID;
 
     Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("status", status);
-        map.put("owner", owner);
-        map.put("requester", requester);
+        map.put("status", status.name());
+        map.put("ownerID", ownerID);
+        map.put("requesterID", requesterID);
         map.put("meetUpLocation", meetUpLocation);
         map.put("date", date);
         map.put("bookID", bookID);
         return map;
+    }
+
+    UserNotification()
+    {
+        status = RequestStatus.PENDING;
+        ownerID = "";
+        requesterID = "";
     }
 
 }
