@@ -110,6 +110,19 @@ public class FirebaseHelper {
     }
 
     /**
+     * Remove values from an array field in a firebase document.
+     *
+     * @param collectionPath the collection path
+     * @param docID          the doc id
+     * @param fieldID        the field id
+     * @param data           the data
+     */
+    void removeArrayItem(String collectionPath, String docID, String fieldID, Object[] data) {
+        DocumentReference doc = db.collection(collectionPath).document(docID); // TODO: doc not found
+        doc.update(fieldID, FieldValue.arrayRemove(data));
+    }
+
+    /**
      * Delete document.
      *
      * @param collectionPath the collection path

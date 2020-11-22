@@ -6,8 +6,16 @@ import java.util.Map;
 /**
  * The abstract type User notification.
  *
- * All Requests and Agreements are UserNotifications. This abstract type contains all the
- * information needed to display a request or agreement in the notifications view.
+ * All Requests and Borrows are UserNotifications. This abstract type contains all the
+ * information needed to display a request or borrow in the notifications view.
+ *
+ * There are four classes which extend UserNotification:
+ *  - BorrowMyBook
+ *  - BorrowTheirBook
+ *  - RequestMyBook
+ *  - RequestTheirBook
+ * These are the four categories of notifications that the app user will see. Each of the four
+ * classes contains additional fields and methods for interacting with the notification.
  */
 public abstract class UserNotification {
     /**
@@ -38,6 +46,10 @@ public abstract class UserNotification {
         status = RequestStatus.PENDING;
         ownerID = "";
         requesterID = "";
+    }
+
+    void updateStatus(RequestStatus newStatus){
+        this.status = newStatus;
     }
 
 }
