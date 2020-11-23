@@ -3,7 +3,6 @@ package com.example.bookshelf;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.bookshelf.RequestStatus;
 
 /**
  * The abstract type User notification.
