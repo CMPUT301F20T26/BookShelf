@@ -151,7 +151,7 @@ public class BookActivity extends AppCompatActivity{ //implements MakeRequestFra
      */
     public void onOkPressed(){
 
-//        RequestTheirBook.requestNew(currentBook);
+        RequestTheirBook.requestNew(currentBook);
     }
 
     /**

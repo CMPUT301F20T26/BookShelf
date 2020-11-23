@@ -73,11 +73,12 @@ public class BookFactory {
     /**
      * Photo url.
      *
-     * @param photoURL the photo url
+     * @param coverImage the photo url
      */
-    public BookFactory PhotoURL(String photoURL) {
-        thisBook.setPhotoURL(photoURL);
-        bookMap.put("coverImage", photoURL);
+
+    public BookFactory CoverImage(String coverImage) {
+        thisBook.setCoverImage(coverImage);
+        bookMap.put("coverImage", coverImage);
         return this;
     }
 
@@ -132,6 +133,9 @@ public class BookFactory {
         bookMap = new HashMap<>();
         db = FirebaseFirestore.getInstance();
         bookCollectionReference=db.collection(collectionPath);
+        bookMap.put("description", "");
+        bookMap.put("coverImage", "");
+
     }
 
     /**
@@ -171,13 +175,14 @@ public class BookFactory {
                 res.setISBN(isbn);
             }
             if(bookDoc.get("coverImage") != null) {
-                res.setPhotoURL(bookDoc.get("coverImage").toString());
+                res.setCoverImage(bookDoc.get("coverImage").toString());
             }
             if(bookDoc.get("description") != null) {
                 res.setDescription(bookDoc.get("description").toString());
             }
             if(bookDoc.get("status") != null){
             res.setStatus(bookDoc.get("status").toString());}
+
 
         return res;
 
@@ -190,9 +195,13 @@ public class BookFactory {
      * @return the book
      */
     Book build(){
-        bookCollectionReference
-                .document()
-                .set(thisBook);
+        FirebaseHelper helper = new FirebaseHelper();
+        // get time of book creation
+        // this is used to calculate the unique book ID
+        String id = helper.add("books", bookMap);
+        // add id to book and bookMap
+        thisBook.setBookID(id);
+        // return built book
         return thisBook;
     }
     Book edit(String id){

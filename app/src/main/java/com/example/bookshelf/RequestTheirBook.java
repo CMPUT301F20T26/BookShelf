@@ -1,5 +1,7 @@
 package com.example.bookshelf;
 
+import java.time.Instant;
+
 /**
  * The type RequestTheirBook
  *
@@ -15,36 +17,54 @@ public class RequestTheirBook extends UserNotification {
      * Make new loan request.
      *
      * @param theirBook their book
-     * @return the loan request
      */
-    static RequestTheirBook requestNew(Book theirBook){
+    static void requestNew(Book theirBook){
+        final FirebaseHelper helper = new FirebaseHelper();
+        final RequestTheirBook rq = new RequestTheirBook(); // new blank object just for ease
+        String myId = helper.getAppUserID();                // get current user id
 
-        // creates new notification, which should appear in both users' notification lists
-        // RequestStatus pending
-        FirebaseHelper helper = new FirebaseHelper();
-
-        String theirID = helper.getUserID(theirBook.getOwnerUsername());
-        String myId = helper.getAppUserID();
-
-        RequestTheirBook rq = new RequestTheirBook();
+        // populating the RequestTheirBook object fields initially:
         rq.theirBook = theirBook;
-        //rq.bookID = theirBook.getBookID();
-        //rq.status = RequestStatus.PENDING;
-        //rq.owner = theirID;
-        //rq.requester = myId;
+        rq.bookID = theirBook.getBookID();
+        rq.status = RequestStatus.PENDING;
+        rq.requesterID = myId;
+        rq.date = Instant.now().toString();
 
         // create new notification, store the ID as notifID
-        String[] notifID = new String[1];
-        //notifID[0] = helper.add("notifications", rq.asMap());
+        final String[] notifID = new String[1];
+        notifID[0] = helper.add("notifications", rq.asMap());
 
-        // add notifID to rq object
-        //rq.NotificationID = notifID[0];
+        // add notifID to RequestTheirBook object
+        rq.NotificationID = notifID[0];
 
-        // apppend notifID to both the requester (app user) and book owner notifications lists
-        helper.append("users",theirID, "notifications", notifID);
+
+        /*
+            Since we need to add the notification to the book owner's notification list, we need to
+            look up the book owner's user ID, which requires a firebase call.
+
+            So we set up this IHelper "listener" which will do that upon success of the getUserID()
+            call (the last line of code in this method)
+        */
+        FirebaseHelper.IHelper listener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                String ownerID = (String) o;
+                rq.ownerID = ownerID;
+                helper.append("users",ownerID, "notifications", notifID);
+                helper.edit("notifications", notifID[0], "ownerID", ownerID);
+            }
+
+            @Override
+            public void onFailure(Object o) {
+
+            }
+        };
+
+        // append notifID to requester notification list (i.e. the app user)
         helper.append("users", myId, "notifications", notifID);
 
-        return null;
+        // finally, getUserID() of the book owner. the callback 'listener' will then
+        helper.getUserID(theirBook.getOwnerUsername(), listener);
     }
 
 

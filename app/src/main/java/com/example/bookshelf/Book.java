@@ -217,7 +217,7 @@ public class Book implements Serializable {
      *
      * @param photoURL the photo url
      */
-    public void setPhotoURL(String photoURL) {
+    public void setCoverImage(String photoURL) {
         this.photoURL = photoURL;
     }
 
