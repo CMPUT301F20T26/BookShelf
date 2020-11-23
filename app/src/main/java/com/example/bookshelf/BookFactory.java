@@ -56,11 +56,11 @@ public class BookFactory {
     /**
      * Photo url.
      *
-     * @param photoURL the photo url
+     * @param coverImage the photo url
      */
-    public BookFactory PhotoURL(String photoURL) {
-        thisBook.setPhotoURL(photoURL);
-        bookMap.put("photoURL", photoURL);
+    public BookFactory CoverImage(String coverImage) {
+        thisBook.setCoverImage(coverImage);
+        bookMap.put("coverImage", coverImage);
         return this;
     }
 
@@ -113,6 +113,8 @@ public class BookFactory {
     {
         thisBook = new Book();
         bookMap = new HashMap<>();
+        bookMap.put("description", "");
+        bookMap.put("coverImage", "");
         bookCollectionReference = bookReference;
     }
 
@@ -154,14 +156,13 @@ public class BookFactory {
                 res.setISBN(isbn);
             }
             if(bookDoc.get("coverImage") != null) {
-                res.setPhotoURL(bookDoc.get("coverImage").toString());
+                res.setCoverImage(bookDoc.get("coverImage").toString());
             }
             if(bookDoc.get("description") != null) {
                 res.setDescription(bookDoc.get("description").toString());
             }
-
-            switch(bookDoc.get("status").toString()) {
-                case "Available": res.setStatus(Book.BookStatus.Available);
+            if(bookDoc.get("description") != null) {
+                res.setStatus(Book.BookStatus.valueOf(bookDoc.get("status").toString()));
             }
 
         return res;
@@ -174,18 +175,12 @@ public class BookFactory {
      * @return the book
      */
     Book build(){
-
+        FirebaseHelper helper = new FirebaseHelper();
         // get time of book creation
         // this is used to calculate the unique book ID
-        long now = new Date().getTime();
-        String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        String id = helper.add("books", bookMap);
         // add id to book and bookMap
         thisBook.setBookID(id);
-        bookMap.put("bookID", id);
-        // push to firebase
-        bookCollectionReference
-                .document(id)
-                .set(thisBook);
         // return built book
         return thisBook;
     }
