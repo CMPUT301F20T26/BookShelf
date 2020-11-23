@@ -50,10 +50,10 @@ title __BOOKSHELF's Class Diagram__\n
         + hashCode()
         + setAuthor()
         + setBookID()
+        + setCoverImage()
         + setDescription()
         + setISBN()
         + setOwnerUsername()
-        + setPhotoURL()
         + setStatus()
         + setTitle()
     }
@@ -76,11 +76,13 @@ title __BOOKSHELF's Class Diagram__\n
         {static} + EXTRA_MESSAGE : String
         - ISBN : TextView
         - author : TextView
+        - bookId : String
         - db : FirebaseFirestore
         - description : TextView
         - displayPic : ImageView
         - owner : TextView
         - status : TextView
+        - storage : FirebaseStorage
         - title : TextView
         + onOkPressed()
         + openUserProfile()
@@ -101,24 +103,46 @@ title __BOOKSHELF's Class Diagram__\n
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.BookFactory {
+        ~ bookCollectionReference : CollectionReference
         ~ bookMap : Map<String, Object>
         + Author()
+        + CoverImage()
         + Description()
         + ISBN()
         + OwnerUsername()
-        + PhotoURL()
         + Status()
         + Title()
         ~ BookFactory()
+        ~ New()
         ~ build()
+        ~ get()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.BorrowMyBook {
+        ~ theirUsername : String
+        ~ BorrowMyBook()
+        ~ scanBookConfirmReturn()
+        ~ scanBookToLoan()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.BorrowTheirBook {
+        ~ theirLocation : String
+        ~ scanToBorrow()
+        ~ scanToReturn()
     }
   }
   
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.CreateAccountActivity {
-        ~ db : FirebaseFirestore
         - createAccountBtn : Button
+        - db : FirebaseFirestore
         - signInText : TextView
         - userAuth : FirebaseAuth
         - userEmailEt : EditText
@@ -127,7 +151,48 @@ title __BOOKSHELF's Class Diagram__\n
         - userPhoneEt : EditText
         - usernameEt : EditText
         # onCreate()
-        - userData()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.EditProfileFragment {
+        - fullnameEt : EditText
+        - phoneEt : EditText
+        + EditProfileFragment()
+        + onAttach()
+        + onCreateDialog()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    interface com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener {
+        {abstract} + onOkPressed()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.FirebaseHelper {
+        - db : FirebaseFirestore
+        ~ FirebaseHelper()
+        ~ add()
+        ~ append()
+        ~ deleteDocument()
+        ~ edit()
+        ~ get()
+        ~ getAppUserID()
+        ~ getUserID()
+        ~ removeArrayItem()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    interface com.example.bookshelf.FirebaseHelper.IHelper {
+        {abstract} + onFailure()
+        {abstract} + onSuccess()
     }
   }
   
@@ -159,16 +224,50 @@ title __BOOKSHELF's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.RequestDetailsActivity {
+        ~ getLocation : Button
+        ~ latitude : EditText
+        ~ latval : Double
+        ~ location : LatLng
+        ~ longitude : EditText
+        ~ longval : Double
+        # onCreate()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.RequestMyBook {
+        ~ theirUsername : String
+        ~ accept()
+        ~ decline()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    enum RequestStatus {
+      ACCEPTED
+      PENDING
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.RequestTheirBook {
+        {static} ~ requestNew()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.SearchBooksActivity {
         {static} + EXTRA_MESSAGE : String
         ~ user : FirebaseUser
-        - bookAdapter : ArrayAdapter<String>
         - db : FirebaseFirestore
-        - resultList : ArrayList<String>
         - searchBar : EditText
         - searchButton : Button
         - searchResults : ListView
-        - uidTv : TextView
         + matchBook()
         + openBookDescription()
         # onCreate()
@@ -196,6 +295,7 @@ title __BOOKSHELF's Class Diagram__\n
         - fullName : TextView
         - name : TextView
         - profilePic : ImageView
+        + setProfile()
         # onCreate()
     }
   }
@@ -219,6 +319,53 @@ title __BOOKSHELF's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.UserInfo {
+        - email : String
+        - fullname : String
+        - notifications : ArrayList<String>
+        - ownedBooks : ArrayList<String>
+        - phone : String
+        - picture : String
+        - username : String
+        + UserInfo()
+        + UserInfo()
+        + UserInfo()
+        + getEmail()
+        + getFullname()
+        + getNotifications()
+        + getOwnedBooks()
+        + getPhone()
+        + getPicture()
+        + getUserMap()
+        + getUsername()
+        + setEmail()
+        + setFullname()
+        + setNotifications()
+        + setOwnedBooks()
+        + setPhone()
+        + setPicture()
+        + setUsername()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    abstract class com.example.bookshelf.UserNotification {
+        ~ NotificationID : String
+        ~ NotificationText : String
+        ~ bookID : String
+        ~ date : String
+        ~ meetUpLocation : String
+        ~ ownerID : String
+        ~ requesterID : String
+        ~ UserNotification()
+        ~ asMap()
+        ~ updateStatus()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.UserNotificationsActivity {
         ~ uidTv : TextView
         ~ user : FirebaseUser
@@ -229,15 +376,26 @@ title __BOOKSHELF's Class Diagram__\n
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.UserProfileActivity {
-        ~ db : FirebaseFirestore
-        ~ editBtn : FloatingActionButton
-        ~ emailTv : TextView
-        ~ fullnameTv : TextView
-        ~ phoneTv : TextView
-        ~ profilePicImageV : ImageView
-        ~ signoutBtn : Button
-        ~ user : FirebaseUser
-        ~ usernameTv : TextView
+        + user : FirebaseUser
+        - db : FirebaseFirestore
+        - editBtn : FloatingActionButton
+        - emailTv : TextView
+        - fullnameTv : TextView
+        - phoneTv : TextView
+        - profilePicImageV : ImageView
+        - signoutBtn : Button
+        - usernameTv : TextView
+        + onOkPressed()
+        # onCreate()
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.ViewLocationActivity {
+        ~ location : LatLng
+        - map : GoogleMap
+        + onMapReady()
         # onCreate()
     }
   }
@@ -251,21 +409,43 @@ title __BOOKSHELF's Class Diagram__\n
   com.example.bookshelf.Book +-down- com.example.bookshelf.Book.BookStatus
   com.example.bookshelf.BookActivity .up.|> com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener
   com.example.bookshelf.BookActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.BookActivity o-- com.example.bookshelf.Book : currentBook
   com.example.bookshelf.BookArrayAdapter -up-|> android.widget.ArrayAdapter
   com.example.bookshelf.BookFactory o-- com.example.bookshelf.Book : thisBook
+  com.example.bookshelf.BorrowMyBook -up-|> com.example.bookshelf.UserNotification
+  com.example.bookshelf.BorrowMyBook o-- com.example.bookshelf.Book : myBook
+  com.example.bookshelf.BorrowTheirBook -up-|> com.example.bookshelf.UserNotification
+  com.example.bookshelf.BorrowTheirBook o-- com.example.bookshelf.Book : theirBook
   com.example.bookshelf.CreateAccountActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.CreateAccountActivity o-- com.example.bookshelf.UserInfo : userInfo
+  com.example.bookshelf.EditProfileFragment -up-|> androidx.fragment.app.DialogFragment
+  com.example.bookshelf.EditProfileFragment o-- com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener : listener
+  com.example.bookshelf.EditProfileFragment o-- com.example.bookshelf.UserInfo : userInfo
+  com.example.bookshelf.EditProfileFragment +-down- com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener
+  com.example.bookshelf.FirebaseHelper +-down- com.example.bookshelf.FirebaseHelper.IHelper
   com.example.bookshelf.MainActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.MakeRequestFragment -up-|> androidx.fragment.app.DialogFragment
   com.example.bookshelf.MakeRequestFragment o-- com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener : listener
   com.example.bookshelf.MakeRequestFragment +-down- com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener
+  com.example.bookshelf.RequestDetailsActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.RequestMyBook -up-|> com.example.bookshelf.UserNotification
+  com.example.bookshelf.RequestMyBook o-- com.example.bookshelf.Book : myBook
+  com.example.bookshelf.RequestTheirBook -up-|> com.example.bookshelf.UserNotification
+  com.example.bookshelf.RequestTheirBook o-- com.example.bookshelf.Book : theirBook
   com.example.bookshelf.SearchBooksActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.SearchBooksActivity o-- com.example.bookshelf.BookArrayAdapter : bookAdapter
   com.example.bookshelf.SignInActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserBooksActivity .up.|> com.example.bookshelf.AddBookFragment.DialogListener
   com.example.bookshelf.UserBooksActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.BookArrayAdapter : bookArrayAdapter
+  com.example.bookshelf.UserNotification o-- com.example.bookshelf.RequestStatus : status
   com.example.bookshelf.UserNotificationsActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.UserProfileActivity .up.|> com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener
   com.example.bookshelf.UserProfileActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.UserProfileActivity o-- com.example.bookshelf.UserInfo : userInfo
+  com.example.bookshelf.ViewLocationActivity .up.|> com.google.android.gms.maps.OnMapReadyCallback
+  com.example.bookshelf.ViewLocationActivity -up-|> androidx.fragment.app.FragmentActivity
 
 
 right footer
