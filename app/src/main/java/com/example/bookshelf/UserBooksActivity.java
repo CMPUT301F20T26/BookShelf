@@ -17,8 +17,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +37,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     BookFactory bookFactory;
     private FirebaseFirestore db;
 
-
-    //Firebase Authentication instance
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
@@ -45,39 +45,37 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         setContentView(R.layout.activity_user_books);  //Opening content view
 
         //Initialize variables
-        Button addBookButton;
+        final Button addBookButton;
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
         bookFactory = new BookFactory("books");
         bookList.setAdapter(bookAdapter);
-
-
-        /*FirebaseHelper firebaseHelper = new FirebaseHelper();
-        DocumentSnapshot o_books=firebaseHelper.get("users",user.getUid());
-        List<String> ownedBooks = (List<String>) o_books.getData().get("ownedBooks");*/
-        final DocumentSnapshot[] result = new DocumentSnapshot[1];
         db = FirebaseFirestore.getInstance();
+
+        // Extract books from the owner username and send to bookAdapter
         db.collection("users").document(user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
+                        if(task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
-                            List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
-                            for (int i = 0; i < ownedBooks.size(); i++) {
-                                bookFactory.get(ownedBooks.get(i));
+                            final List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
+                            for(int i = 0; i<ownedBooks.size(); i++){
+                                System.out.println(ownedBooks.get(i));
+                                db.collection("books").document(ownedBooks.get(i)).get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                                    getBook(bookFactory.get(documentSnapshot));
 
-                                //bookFactory.give();
-                               // System.out.println((bookFactory.ret(ownedBooks.get(i))));
-                                //bookAdapter.add(bookFactory.get(ownedBooks.get(i)));
-                                //bookAdapter.notifyDataSetChanged();
-                            }
-                        }}});
+                                                }
+                                            }});}}}});
 
         // Add button to add a book, opens a fragment, and adds a book
-
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,24 +98,23 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 pos = position;//to keep track of which item to edit
                 System.out.println(pos);
 
-                // when delete button pressed remove the selected item from GearAdapter
-                /*Button deleteButton = findViewById(R.id.delete);
+                // when delete button pressed remove the selected item from BookAdapter
+                Button deleteButton = findViewById(R.id.delete);
                 deleteButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View view) {
                         if (pos < bookList.getCount() && pos >= 0) {
-                                String rem_isbn = (bookDataList.get(pos)).getISBN().toString();
-                                collectionReference
-                                        .document(rem_isbn)
-                                        .delete();
+                            String remove_id = (bookDataList.get(pos)).getBookID();
+                            //TODO: remove the book from user owned books
+                            bookFactory.delete(remove_id);
                             bookDataList.remove(pos);
                             bookAdapter.notifyDataSetChanged();
                             pos = -1;
                     }
-                }});*/
+                }});
 
-                // when edit button clicked go to AddGearFragment to edit
+                // when edit button clicked go to AddBookFragment to edit
                 Button editButton = findViewById(R.id.edit);
                 editButton.setOnClickListener(new View.OnClickListener() {
 
@@ -126,14 +123,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         if (pos < bookList.getCount() && pos >= 0) {
                             AddBookFragment add_new = AddBookFragment.newInstance(bookAdapter.getItem(pos));
                             add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
-                            Book dbadd = bookDataList.get(pos);
-                            Map<String, Object> book = new HashMap<>();
-                            book.put("title", dbadd.getTitle());
-                            book.put("author", dbadd.getAuthor());
-                            book.put("isbn", dbadd.getISBN().toString());
-                            book.put("description", dbadd.getDescription());
-                            bookDataList.remove(pos);
-                            bookAdapter.notifyDataSetChanged();
                             pos = -1;
 
                         }
@@ -141,10 +130,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 });
             }
         });
-
-
-
-
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
@@ -185,26 +170,45 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
             }
         });
         //__________________________________________________________________________________________
-
     }
     @Override
-    public void onOkPressed(String author,String des,String isbn,String title) {
-        bookFactory.Author(author);
-        bookFactory.Description(des);
-        bookFactory.ISBN(Long.parseLong(isbn));
-        bookFactory.Title(title);
-        bookFactory.Status(Book.BookStatus.Available);
-        FirebaseHelper firebaseHelper = new FirebaseHelper();
-        DocumentSnapshot owner=firebaseHelper.get("users",user.getUid());
-        //Log.d("Error",owner.toString());
-//        String user_name = owner.getData().get("username").toString();
-//        bookFactory.OwnerUsername(user_name);
-        Book newadd = bookFactory.build();
-        bookDataList.add(newadd);
-        bookAdapter.notifyDataSetChanged();
-        bookFactory.New();
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title, final Boolean edit) {
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
+                            bookFactory.Author(author);
+                            bookFactory.Description(des);
+                            bookFactory.ISBN(Long.parseLong(isbn));
+                            bookFactory.Title(title);
+                            Book newadd;
+                            if(edit == true){
+                                bookFactory.Status(book.getStatus());
+                                newadd = bookFactory.edit(book.getBookID());
+                                pos = bookAdapter.getPosition(book);
+                                bookDataList.set(pos,newadd);
+                            }
+                            else {
+                                bookFactory.Status(Book.BookStatus.Available);
+                                newadd = bookFactory.build();
+                                bookDataList.add(newadd);
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            bookFactory.New();
+                        }
+                    }
+                });
     }
-    
+
+    @Override
+    public void getBook(Book book) {
+        bookAdapter.add(book);
+        bookAdapter.notifyDataSetChanged();
+        System.out.println(book.getTitle());
+    }
     public void openBookDescription(String id) {
         Intent intent = new Intent(this, BookActivity.class);
         // we want the message to be the book ID corresponding to the selected book

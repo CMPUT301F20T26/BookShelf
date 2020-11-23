@@ -30,7 +30,7 @@ import java.util.HashMap;
  * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
  */
 
-public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
+public class BookActivity extends AppCompatActivity{ //implements MakeRequestFragment.OnFragmentInteractionListener {
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
     private TextView title;
@@ -94,8 +94,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                     }
                             );
 
-                            BookFactory currentFactory = new BookFactory(db.collection("books"));
-                            currentBook = currentFactory.get(document, document.getId());
+                            BookFactory currentFactory = new BookFactory("books");
+                            currentBook = currentFactory.get(document);
 
                             //Filling book values
                             title.setText(currentBook.getTitle());

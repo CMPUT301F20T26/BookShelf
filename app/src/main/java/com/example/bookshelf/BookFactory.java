@@ -77,7 +77,7 @@ public class BookFactory {
      */
     public BookFactory PhotoURL(String photoURL) {
         thisBook.setPhotoURL(photoURL);
-        bookMap.put("photoURL", photoURL);
+        bookMap.put("coverImage", photoURL);
         return this;
     }
 
@@ -147,19 +147,18 @@ public class BookFactory {
     /**
      * Gets a book from Firebase, given the book ID.
      *
-     * @param bookID the book id
      * @return the book
      */
-    Book get(final DocumentSnapshot bookDoc, final String bookID){
+    Book get(final DocumentSnapshot bookDoc){
 
         final Book res = new Book();
         final String isbnString;
         Long isbn = 0L;
-                res.setBookID(bookID);
+                res.setBookID(bookDoc.getId());
             if(bookDoc.get("isbn") != null) {
                 isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
                 isbn = Long.parseLong(isbnString);
-                res.setBookID(bookID);
+                res.setBookID(bookDoc.getId());
             }
             if(bookDoc.get("title") != null) {
                 res.setTitle(bookDoc.get("title").toString());
@@ -177,10 +176,8 @@ public class BookFactory {
             if(bookDoc.get("description") != null) {
                 res.setDescription(bookDoc.get("description").toString());
             }
-
-            switch(bookDoc.get("status").toString()) {
-                case "Available": res.setStatus(Book.BookStatus.Available);
-            }
+            if(bookDoc.get("status") != null){
+            res.setStatus(bookDoc.get("status").toString());}
 
         return res;
 
@@ -198,7 +195,13 @@ public class BookFactory {
                 .set(thisBook);
         return thisBook;
     }
-
+    Book edit(String id){
+        bookCollectionReference
+                .document(id)
+                .update(bookMap);
+        thisBook.setBookID(id);
+        return thisBook;
+    }
     void delete(String id){
         bookCollectionReference
                 .document(id)

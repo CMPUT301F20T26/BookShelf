@@ -28,17 +28,17 @@ public class RequestTheirBook extends UserNotification {
 
         RequestTheirBook rq = new RequestTheirBook();
         rq.theirBook = theirBook;
-        rq.bookID = theirBook.getBookID();
-        rq.status = RequestStatus.PENDING;
-        rq.owner = theirID;
-        rq.requester = myId;
+        //rq.bookID = theirBook.getBookID();
+        //rq.status = RequestStatus.PENDING;
+        //rq.owner = theirID;
+        //rq.requester = myId;
 
         // create new notification, store the ID as notifID
         String[] notifID = new String[1];
-        notifID[0] = helper.add("notifications", rq.asMap());
+        //notifID[0] = helper.add("notifications", rq.asMap());
 
         // add notifID to rq object
-        rq.NotificationID = notifID[0];
+        //rq.NotificationID = notifID[0];
 
         // apppend notifID to both the requester (app user) and book owner notifications lists
         helper.append("users",theirID, "notifications", notifID);

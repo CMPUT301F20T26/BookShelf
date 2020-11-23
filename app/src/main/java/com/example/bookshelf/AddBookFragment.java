@@ -37,7 +37,6 @@ public class AddBookFragment extends DialogFragment {
     private EditText description;
     private DialogListener listener;
     String owner;
-    Hashtable<String, Object> book_details = new Hashtable<String, Object>();
 
 
     /**
@@ -47,7 +46,7 @@ public class AddBookFragment extends DialogFragment {
         /**
          * Add book.
          */
-        void onOkPressed(String author,String des,String isbn,String title);
+        void onOkPressed(Book book, String author,String des,String isbn,String title, Boolean edit);
     }
 
     /**
@@ -116,7 +115,10 @@ public class AddBookFragment extends DialogFragment {
                             toast.show();
                             return;
                         }
-                        listener.onOkPressed(author_new, des_new, isbn_new, title_new);
+                        if (getArguments() != null) {listener.onOkPressed(argBook,author_new, des_new, isbn_new, title_new,true);}
+                        else{listener.onOkPressed(argBook,author_new, des_new, isbn_new, title_new,false);}
+
+
                     }
 
                         //TODO: return book_details (have no clue)

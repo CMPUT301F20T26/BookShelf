@@ -5,7 +5,7 @@ package com.example.bookshelf;
  *
  * Another user requests to borrow the app user's book.
  */
-public class RequestMyBook extends UserNotification {
+public class RequestMyBook {//extends UserNotification {
     /**
      * The book.
      */
