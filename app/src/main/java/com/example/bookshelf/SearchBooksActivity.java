@@ -61,8 +61,6 @@ public class SearchBooksActivity extends AppCompatActivity {
         bookAdapter = new BookArrayAdapter(this, bookList);
         searchResults.setAdapter(bookAdapter);
 
-        // TODO: not including accept/borrow, my books
-
         searchButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 bookList.clear();
@@ -158,7 +156,9 @@ public class SearchBooksActivity extends AppCompatActivity {
 
         if (!check.isEmpty()) {
             if (titleMatcher.find() || userMatcher.find()) {
-                bookAdapter.add(book);
+                if(book.getStatus() == Book.BookStatus.Available) {
+                    bookAdapter.add(book);
+                }
             }
         }
     }
