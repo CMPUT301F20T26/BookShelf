@@ -15,12 +15,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,35 +34,35 @@ import java.util.Objects;
  * The type Add book fragment.
  */
 public class AddBookFragment extends DialogFragment {
+
+    // Layout Variables
     private EditText title;
     private EditText author;
     private EditText isbn;
     private EditText description;
     private DialogListener listener;
-    String owner;
+    private String ownerUsername;
 
+    //Position
+    private int position;
+
+    //Current User
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    //Database initialization
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    //Books Collection reference
+    private DocumentReference userDocumentRef = db.collection("users").document(user.getUid());
 
     /**
      * The interface Dialog listener.
      */
     public interface DialogListener{
-        /**
-         * Add book.
-         *
-         * @param book the book
-         */
-        void add_Book(Book book);
 
-        /**
-         * Edit book.
-         *
-         * @param book   the book
-         * @param title  the title
-         * @param author the author
-         * @param isbn   the isbn
-         * @param des    the des
-         */
-        void edit_Book(Book book, String title, String author, Long isbn, String des);
+        void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description);
+
+        void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, Integer position);
     }
 
     /**
@@ -67,14 +71,20 @@ public class AddBookFragment extends DialogFragment {
      * @param book the book
      * @return the add book fragment
      */
-    static AddBookFragment newInstance(Book book){
+    static AddBookFragment newInstance(Book book, int pos){
         Bundle args = new Bundle();
         args.putSerializable("book", book);
+        args.putInt("Position", pos);
 
         AddBookFragment fragment = new AddBookFragment();
         fragment.setArguments(args);
         return fragment;
     }
+
+    /**
+     * On fragment attach to context
+     * @param context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -82,38 +92,47 @@ public class AddBookFragment extends DialogFragment {
             listener = (DialogListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement DialogListener");
         }
     }
+
+    /**
+     * Crating dialog fragment
+     * @param savedInstanceState
+     * @return
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        final Book argBook;
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_book, null);
+        Book argBook = null;
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.activity_add_book, null);
+
         title = view.findViewById(R.id.Title_add);
         author = view.findViewById(R.id.Author_add);
         isbn = view.findViewById(R.id.ISBN_add);
         description = view.findViewById(R.id.Description_add);
-        final FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
-        final CollectionReference collectionReference = db.collection("books");
+        Book.BookStatus status = null;
+
         /**
          * If the object is to be edited then initialize add fields to Gear's existing fields
          */
         if(getArguments()!=null){
             argBook = (Book) getArguments().getSerializable("book");
+            position = getArguments().getInt("Position");
             assert argBook != null;
 
             title.setText(argBook.getTitle());
             author.setText(argBook.getAuthor());
-            isbn.setText(String.valueOf(argBook.getISBN()));
+            isbn.setText(String.valueOf(argBook.getIsbn()));
             description.setText(argBook.getDescription());
+            status = argBook.getStatus();
         }
-        else {
-            argBook = null;
-        }
+
+
         // TODO: integrate with BookFactory
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final Book finalArgBook = argBook;
+        final Book.BookStatus finalStatus = status;
         return builder
                 .setView(view)
                 .setTitle("Book")
@@ -121,70 +140,38 @@ public class AddBookFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        db.collection("users").document(user.getUid()).get()
+                        userDocumentRef.get()
                                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if(task.isSuccessful()) {
+                                        if (task.isSuccessful()) {
                                             DocumentSnapshot documentSnapshot = task.getResult();
-                                            owner = documentSnapshot.getData().get("username").toString();
+
+                                            ownerUsername = documentSnapshot.getData().get("username").toString();
                                             String title_new = title.getText().toString();
                                             String author_new = author.getText().toString();
                                             String isbn_new = isbn.getText().toString();
                                             String des_new = description.getText().toString();
+
                                             if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
                                                 Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
                                                 toast.show();
                                                 return;
                                             }
-                                            Book addBook;
-                                            Long isbn_add = Long.parseLong(isbn.getText().toString());
 
-                                            //Firebase Authentication instance
-
-
-                                            // using the right constructor for gear
-                                            if(des_new.isEmpty()){
-                                                addBook = new Book(title_new,author_new,isbn_add, owner);
-                                                Map<String, Object> book = new HashMap<>();
-                                                book.put("author", author_new);
-                                                book.put("description", "");
-                                                book.put("isbn", isbn_new);
-                                                book.put("ownerUsername", owner);
-                                                book.put("photoUrl","");
-                                                book.put("status",addBook.getStatus());
-                                                book.put("title", title_new);
-                                                collectionReference
-                                                        .document(isbn_new)
-                                                        .set(book);}
-                                            else{
-                                                addBook = new Book(title_new,author_new,des_new,isbn_add, owner);
-                                                Map<String, Object> book = new HashMap<>();
-
-                                                book.put("author", author_new);
-                                                book.put("description", des_new);
-                                                book.put("isbn", isbn_new);
-                                                book.put("ownerUsername", owner);
-                                                book.put("photoUrl","");
-                                                book.put("status",addBook.getStatus());
-                                                book.put("title", title_new);
-                                                collectionReference
-                                                        .document(isbn_new)
-                                                        .set(book);}
+                                            Long isbn_long = Long.parseLong(isbn.getText().toString());
+                                            String photoURL = isbn_new + ".png";
 
                                             // check if gear is to be edited or added
-                                            if (getArguments()!=null){
-                                                listener.edit_Book(argBook, title_new,author_new,isbn_add,des_new);
-                                            }
-                                            else{
-                                                listener.add_Book(addBook);
+                                            if (finalArgBook != null) {
+                                                listener.edit_Book(title_new, author_new, isbn_long, photoURL, ownerUsername, des_new, finalStatus, position);
+                                            } else {
+                                                listener.add_Book(title_new, author_new, isbn_long, photoURL, ownerUsername, des_new);
                                             }
                                         }
                                     }
                                 });
-                    }}).create();
-
-
+                    }
+                }).create();
     }
-}
+};

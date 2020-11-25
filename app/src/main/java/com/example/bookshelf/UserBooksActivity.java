@@ -13,67 +13,114 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hudomju.swipe.SwipeToDismissTouchListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
-    TextView uidTv;
-    ListView bookList;
-    ArrayAdapter<Book> bookAdapter;
-    ArrayList<Book> bookDataList;
-    int pos;
-    BookArrayAdapter bookArrayAdapter;
-    private List<Book> Books;
-    String user_name;
+    //Layout variables
+    private ListView bookList;
+    private FloatingActionButton addBookButton;
+
+    //Adapter and List view variables
+    private ArrayAdapter<Book> bookAdapter;
+    private ArrayList<Book> bookDataList;
+//    private int pos;
 
     //Firebase Authentication instance
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    //Current user's username
+    private String user_name;
+    private String userId;
+
+    //Database Initialization.
+    private FirebaseFirestore db =  FirebaseFirestore.getInstance();
+    //Books Collection reference
+    private CollectionReference bookCollection = db.collection("books");
+    //Current user's collection reference
+    private DocumentReference userDocument;
+
+    //Firebase helper instantiation.
+    private FirebaseHelper firebaseHelper;
+
+    public UserBooksActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_books);
 
-        final String userId = user.getUid();
-        Button addBookButton;
+        //Current user id
+        userId = user.getUid();
+        userDocument = db.collection("users").document(userId);
+
+        //Layout Assignments
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
+
+        //Adapter assignments
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
-        final FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
-
-
-        // TODO: clean up test code, integraet with bookfactory
         bookList.setAdapter(bookAdapter);
-        String titl = "Twiligt";
-        String auth = "Twiligt";
-        String desc = "Twiligt";
-        Long isb = (long) 124684641;
-        Book bookadd = new Book(titl, auth, desc, isb,"me");
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
 
-        final CollectionReference collectionReference = db.collection("books");
+        //Long Press to delete
+        bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Show confirmation fragment
+                return false;
+            }
+        });
+
+
+        //Click to edit
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Book clickedBook = bookDataList.get(i);
+                        AddBookFragment add_new = AddBookFragment.newInstance(clickedBook, i);
+                        add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
+                    }
+                });
+            }
+        });
+
+        // TODO: clean up test code, integrate with benefactory
+        //String titl = "Twiligt";
+        //String auth = "Twiligt";
+        //String desc = "Twiligt";
+        //Long isb = (long) 124684641;
+        //Book bookadd = new Book(titl, auth, desc, isb,"me");
+        //bookAdapter.add(bookadd);
+        //bookAdapter.add(bookadd);
+        //bookAdapter.add(bookadd);
+        //bookAdapter.add(bookadd);
+
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,105 +128,51 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 }
         });
 
-        // I am grabbing the username, from the user database and saving it in the user_name,
+        // I am grabbing the username and owned books list, from the user database and saving it in the user_name,
         // I checked whether its grabbing it by sending it to the log
-        db.collection("users").document(userId).get()
+        userDocument.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            user_name = documentSnapshot.getData().get("username").toString();
-                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                                        FirebaseFirestoreException error) {
-                                    bookDataList.clear();
-                                    if(error!= null){
-                                        Log.d("Error",error.getMessage());
-                                    }
-                                    else {
-                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                                            //Log.d("Error",String.valueOf(user_name));
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot userDocumentSnapshot = task.getResult();
+                            user_name = userDocumentSnapshot.getData().get("username").toString();
+                            ArrayList<String> userOwnedBooks = (ArrayList<String>) userDocumentSnapshot.getData().get("ownedBooks");
+                            for (String bookId : userOwnedBooks) {
+                                bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot bookDocumentSnapshot = task.getResult();
 
-                                            String user = String.valueOf(doc.getData().get("ownerUsername"));
-                                            Log.d("Error", String.valueOf(user_name.equals(user)));
-                                            Log.d("Error",String.valueOf(user));
-                                            if(user_name.equals(user)) {
-                                                String title = (String) doc.getData().get("title");
-                                                String author = (String) doc.getData().get("author");
-                                                String des = (String) doc.getData().get("description");
-                                                String isbn = (String) doc.getData().get("isbn");
-                                                isbn = isbn.replace("-", "");
-                                                Long isbn1 = Long.parseLong(isbn);
-                                                bookDataList.add(new Book(title, author, des, isbn1, user));
-                                            }
+                                            Book tempBook = new Book();
+
+                                            tempBook.setTitle(bookDocumentSnapshot.getData().get("title").toString());
+
+                                            tempBook.setCoverImage(bookDocumentSnapshot.getData().get("coverImage").toString());
+
+                                            tempBook.setDescription(bookDocumentSnapshot.getData().get("description").toString());
+
+                                            tempBook.setOwnerUsername(bookDocumentSnapshot.getData().get("ownerUsername").toString());
+
+                                            tempBook.setStatus((Book.BookStatus.valueOf(bookDocumentSnapshot.getData().get("status").toString())));
+
+                                            tempBook.setAuthor(bookDocumentSnapshot.getData().get("author").toString());
+
+                                            tempBook.setBookID(bookDocumentSnapshot.getId());
+                                            String tempIsbnString = bookDocumentSnapshot.getData().get("isbn").toString().replace("-", "");
+                                            Long tempIsbn = Long.parseLong(tempIsbnString);
+                                            tempBook.setIsbn(tempIsbn);
+
+                                            bookDataList.add(tempBook);
+                                            bookAdapter.notifyDataSetChanged();
                                         }
-
                                     }
-
-                                    bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
-                                }
-                            });
-
-                        }}});
-        // Here I want to compare the user_name and user of the book before adding it to the datalist
-        // so I print the books that belong to me
-        // Problem: user_name is null before I enter this step
-
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                pos = position;//to keep track of which item to edit
-                System.out.println(pos);
-
-                // when delete button pressed remove the selected item from GearAdapter
-                Button deleteButton = findViewById(R.id.delete);
-                deleteButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        if (pos < bookList.getCount() && pos >= 0) {
-                            if (pos < bookList.getCount() && pos >= 0) {
-                                String rem_isbn = (bookDataList.get(pos)).getISBN().toString();
-                                collectionReference
-                                        .document(rem_isbn)
-                                        .delete();
-                            bookDataList.remove(pos);
-                            bookAdapter.notifyDataSetChanged();
-                            pos = -1;
-                        }
-                    }
-                }});
-
-                // when edit button clicked go to AddGearFragment to edit
-                Button editButton = findViewById(R.id.edit);
-                editButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        if (pos < bookList.getCount() && pos >= 0) {
-                            AddBookFragment add_new = AddBookFragment.newInstance(bookAdapter.getItem(pos));
-                            add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
-                            Book dbadd = bookDataList.get(pos);
-                            Map<String, Object> book = new HashMap<>();
-                            book.put("title", dbadd.getTitle());
-                            book.put("author", dbadd.getAuthor());
-                            book.put("isbn", dbadd.getISBN().toString());
-                            book.put("description", dbadd.getDescription());
-                            collectionReference
-                                    .document(dbadd.getISBN().toString())
-                                    .update(book);
-                            pos = -1;
+                                });
+                            }
                         }
                     }
                 });
-            }
-        });
-
-
-
-
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
@@ -222,17 +215,72 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         //__________________________________________________________________________________________
 
     }
+
     @Override
-    public void add_Book(Book book) {
-        bookAdapter.add(book);
+    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
+        final Book editedBook = new Book();
+        editedBook.setTitle(title);
+        editedBook.setAuthor(author);
+        editedBook.setIsbn(isbn);
+        editedBook.setDescription(description);
+        editedBook.setCoverImage(photoURL);
+        editedBook.setOwnerUsername(ownerUsername);
+        editedBook.setStatus(Book.BookStatus.Available);
+
+        bookDataList.add(editedBook);
+        bookAdapter.notifyDataSetChanged();
+
+        bookCollection.add(editedBook.getBookFirebaseMap()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                userDocument.update("ownedBooks", FieldValue.arrayUnion(task.getResult().getId())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getApplicationContext(), "Successfully Added new book", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     @Override
-    public void edit_Book(Book book, String title, String author, Long isbn, String des) {
-        book.setTitle(title);
-        book.setAuthor(author);
-        book.setISBN(isbn);
-        book.setDescription(des);
+    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, Integer position) {
+        final Book editedBook = new Book();
+        editedBook.setTitle(title);
+        editedBook.setAuthor(author);
+        editedBook.setIsbn(isbn);
+        editedBook.setDescription(description);
+        editedBook.setCoverImage(photoURL);
+        editedBook.setOwnerUsername(ownerUsername);
+        editedBook.setStatus(status);
+
+        bookDataList.set(position, editedBook);
         bookAdapter.notifyDataSetChanged();
+
+
+        //Book exists already. Update books collection only.
+        bookCollection.whereEqualTo("isbn", String.valueOf(isbn)).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                    bookCollection.document(snapshot.getId()).update(
+                            "author",author,
+                            "description", description,
+                            "coverImage",photoURL,
+                            "description",description,
+                            "isbn",isbn
+                    ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
+
+
 }
