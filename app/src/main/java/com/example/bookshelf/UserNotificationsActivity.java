@@ -14,8 +14,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+
 public class UserNotificationsActivity extends AppCompatActivity {
-    
+
     private ListView notificationList;
     // private ListNotificationAdapter;
     private FirebaseFirestore db;
@@ -33,11 +35,18 @@ public class UserNotificationsActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        notificationList = findViewById(R.id.notification_list);
+
+        final ArrayList<ListNotifications> notifications = new ArrayList<ListNotifications>();
+//        notificationAdapter
+
 
 
 //        final String userId = user.getUid();
 //        uidTv = findViewById(R.id.uid_notifications);
 //        uidTv.setText(userId);
+
+
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it

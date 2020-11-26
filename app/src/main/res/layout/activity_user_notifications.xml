@@ -23,7 +23,7 @@
         app:menu="@menu/menu_bottom_navigation" />
 
     <ListView
-        android:id="@+id/Book_list"
+        android:id="@+id/notification_list"
         android:layout_width="409dp"
         android:layout_height="480dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
