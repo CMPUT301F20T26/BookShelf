@@ -16,7 +16,10 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
-    public class BookArrayAdapter extends ArrayAdapter<Book> {
+/**
+ * The type Book array adapter.
+ */
+public class BookArrayAdapter extends ArrayAdapter<Book> {
 
         private ArrayList<Book> books;
         private Context context;

@@ -1,17 +1,14 @@
 package com.example.bookshelf;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,19 +22,19 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.hudomju.swipe.SwipeToDismissTouchListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
+/**
+ * The type User books activity.
+ */
+public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener, DeleteConfirmFragment.DialogListener{
     //Layout variables
     private ListView bookList;
     private FloatingActionButton addBookButton;
@@ -61,9 +58,15 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
     //Current user's collection reference
     private DocumentReference userDocument;
 
+    //Firebase Storage
+    private StorageReference mStorageRef;
+
     //Firebase helper instantiation.
     private FirebaseHelper firebaseHelper;
 
+    /**
+     * Instantiates a new User books activity.
+     */
     public UserBooksActivity() {
     }
 
@@ -75,6 +78,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         //Current user id
         userId = user.getUid();
         userDocument = db.collection("users").document(userId);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         //Layout Assignments
         addBookButton = findViewById(R.id.add);
@@ -90,6 +94,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //Show confirmation fragment
+                new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
                 return false;
             }
         });
@@ -138,7 +143,7 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                             DocumentSnapshot userDocumentSnapshot = task.getResult();
                             user_name = userDocumentSnapshot.getData().get("username").toString();
                             ArrayList<String> userOwnedBooks = (ArrayList<String>) userDocumentSnapshot.getData().get("ownedBooks");
-                            for (String bookId : userOwnedBooks) {
+                            for (final String bookId : userOwnedBooks) {
                                 bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -158,6 +163,8 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                                             tempBook.setStatus((Book.BookStatus.valueOf(bookDocumentSnapshot.getData().get("status").toString())));
 
                                             tempBook.setAuthor(bookDocumentSnapshot.getData().get("author").toString());
+
+                                            tempBook.setBookID(bookId);
 
                                             tempBook.setBookID(bookDocumentSnapshot.getId());
                                             String tempIsbnString = bookDocumentSnapshot.getData().get("isbn").toString().replace("-", "");
@@ -227,12 +234,10 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         editedBook.setOwnerUsername(ownerUsername);
         editedBook.setStatus(Book.BookStatus.Available);
 
-        bookDataList.add(editedBook);
-        bookAdapter.notifyDataSetChanged();
-
         bookCollection.add(editedBook.getBookFirebaseMap()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
             public void onComplete(@NonNull Task<DocumentReference> task) {
+                editedBook.setBookID(task.getResult().getId());
                 userDocument.update("ownedBooks", FieldValue.arrayUnion(task.getResult().getId())).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -241,10 +246,13 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                 });
             }
         });
+
+        bookDataList.add(editedBook);
+        bookAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, Integer position) {
+    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, Integer position, final String bookId) {
         final Book editedBook = new Book();
         editedBook.setTitle(title);
         editedBook.setAuthor(author);
@@ -254,32 +262,61 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
         editedBook.setOwnerUsername(ownerUsername);
         editedBook.setStatus(status);
 
-        bookDataList.set(position, editedBook);
-        bookAdapter.notifyDataSetChanged();
-
 
         //Book exists already. Update books collection only.
-        bookCollection.whereEqualTo("isbn", String.valueOf(isbn)).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
-                    bookCollection.document(snapshot.getId()).update(
-                            "author",author,
-                            "description", description,
-                            "coverImage",photoURL,
-                            "description",description,
-                            "isbn",isbn
-                    ).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
-                            }
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+
+                editedBook.setBookID(bookId);
+                bookCollection.document(documentSnapshot.getId()).update(
+                        "author",author,
+                        "description", description,
+                        "coverImage",photoURL,
+                        "description",description,
+                        "isbn",isbn
+                ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
                         }
-                    });
-                }
+                    }
+                });
             }
         });
+
+
+        bookDataList.set(position, editedBook);
+        bookAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void deleteLongPress(Integer position){
+        final Book deletedBook = bookDataList.get(position);
+
+        //Delete from delete from books collection
+        bookCollection.document(deletedBook.getBookID()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getApplicationContext(), "Successfully deleted " + deletedBook.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        //Delete cover image from firebase storage.
+        StorageReference bookCoverRef = mStorageRef.child("Book Images/"+ deletedBook.getPhotoURL());
+        bookCoverRef.delete();
+
+        //Delete from book data list and update adapter
+        bookDataList.remove(deletedBook);
+        bookAdapter.notifyDataSetChanged();
+
     }
 
 

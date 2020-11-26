@@ -76,10 +76,10 @@
         android:layout_width="151dp"
         android:layout_height="164dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@drawable/portrait_icon" />
 
     <TextView
         android:id="@+id/profile_fullname"
