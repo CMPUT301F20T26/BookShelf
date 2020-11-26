@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,8 +30,10 @@ import java.util.HashMap;
 /**
  * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
  */
-
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener {
+    /**
+     * The constant EXTRA_MESSAGE.
+     */
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
     private TextView title;
@@ -92,7 +95,12 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                             Picasso.get().load(uri).into(displayPic);
                                         }
                                     }
-                            );
+                            ).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getApplicationContext(), "Failed to fetch image.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
                             BookFactory currentFactory = new BookFactory(db.collection("books"));
                             currentBook = currentFactory.get(document, document.getId());
@@ -100,7 +108,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                             //Filling book values
                             title.setText(currentBook.getTitle());
                             author.setText(currentBook.getAuthor());
-                            ISBN.setText(currentBook.getISBN().toString());
+                            ISBN.setText(currentBook.getIsbn().toString());
                             owner.setText(currentBook.getOwnerUsername());
                             status.setText(currentBook.getStatus().toString());
                             description.setText(currentBook.getDescription());
