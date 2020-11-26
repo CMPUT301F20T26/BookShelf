@@ -6,13 +6,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserNotificationsActivity extends AppCompatActivity {
+    
+    private ListView notificationList;
+    // private ListNotificationAdapter;
+    private FirebaseFirestore db;
 
     //Layout variables
     TextView uidTv;
@@ -25,9 +31,13 @@ public class UserNotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_notifications);
 
-        final String userId = user.getUid();
-        uidTv = findViewById(R.id.uid_notifications);
-        uidTv.setText(userId);
+        db = FirebaseFirestore.getInstance();
+
+
+
+//        final String userId = user.getUid();
+//        uidTv = findViewById(R.id.uid_notifications);
+//        uidTv.setText(userId);
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
