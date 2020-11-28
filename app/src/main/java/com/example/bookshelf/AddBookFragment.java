@@ -281,8 +281,15 @@ public class AddBookFragment extends DialogFragment {
             uploadPictureToDatabase();
         }
         else if(requestCode == SCAN_ACTIVITY_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
-            String isbn = data.getStringExtra("isbn");
-            isbnEt.setText(isbn);
+            final String isbn = data.getStringExtra("isbn");
+            isbnEt.post(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    isbnEt.setText(isbn);
+                }
+            });
         }
     }
 
