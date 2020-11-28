@@ -112,9 +112,9 @@ public class UserNotificationsActivity extends AppCompatActivity {
     public void matchNotification(ListNotifications notification){
         final String userId = user.getUid();
 
-        if((notification.getOwnerID() == userId && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID() == userId && notification.getStatus() == RequestStatus.ACCEPTED)) {
+//        if((notification.getOwnerID().equals(userId) && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID().equals(userId) && notification.getStatus() == RequestStatus.ACCEPTED)) {
             notificationAdapter.add(notification);
-        }
+//        }
 
     }
 

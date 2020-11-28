@@ -15,6 +15,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
+import java.util.Map;
+
 public class ListNotifications extends UserNotification{
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -38,34 +40,36 @@ public class ListNotifications extends UserNotification{
 
     static ListNotifications get(final DocumentSnapshot notifDoc){
         final ListNotifications notification = new ListNotifications();
+        Map<String, Object> notiDocData = notifDoc.getData();
+
         notification.setNotificationID(notifDoc.getId());
 
-        if(notifDoc.getData().get("bookID") != null) {
-            notification.setBook(notifDoc.getData().get("bookID").toString());
+        if(notiDocData.get("bookID") != null) {
+            notification.setBook(notiDocData.get("bookID").toString());
         }
-        if(notifDoc.getData().get("date") != null) {
-            notification.setDate(notifDoc.getData().get("date").toString());
+        if(notiDocData.get("date") != null) {
+            notification.setDate(notiDocData.get("date").toString());
         }
-        if(notifDoc.getData().get("meetUpLocation") != null) {
-            notification.setMeetUpLocation(notifDoc.getData().get("meetUpLocation").toString());
+        if(notiDocData.get("meetUpLocation") != null) {
+            notification.setMeetUpLocation(notiDocData.get("meetUpLocation").toString());
         }
-        if(notifDoc.getData().get("ownerID") != null) {
-            notification.setOwner(notifDoc.getData().get("ownerID").toString());
+        if(notiDocData.get("ownerID") != null) {
+            notification.setOwner(notiDocData.get("ownerID").toString());
         }
-        if(notifDoc.getData().get("requesterID") != null) {
-            notification.setRequester(notifDoc.getData().get("requesterID").toString());
+        if(notiDocData.get("requesterID") != null) {
+            notification.setRequester(notiDocData.get("requesterID").toString());
         }
-        if(notifDoc.getData().get("status") != null) {
-            notification.setStatus(notifDoc.getData().get("status").toString());
+        if(notiDocData.get("status") != null) {
+            notification.setStatus(notiDocData.get("status").toString());
         }
 
         return notification;
     }
 
     public void setStatus(String status){
-        if(status == "PENDING") {
+        if(status.equals("PENDING")) {
             this.status = RequestStatus.PENDING;
-        } else if (status == "ACCEPTED") {
+        } else if (status.equals("ACCEPTED")) {
             this.status = RequestStatus.ACCEPTED;
         }
     }
