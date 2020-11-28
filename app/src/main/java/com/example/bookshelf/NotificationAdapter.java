@@ -42,7 +42,11 @@ public class NotificationAdapter extends ArrayAdapter<ListNotifications> {
 
         final ListNotifications notification = notifications.get(position);
 
-        //TODO: need to update TextViews with names rather than IDs. I suppose a "fine" solution would be to get the fields right here.
+        title.setText(notification.getBookName());
+        owner.setText(notification.getOwnerName());
+        requester.setText(notification.getRequesterName());
+        status.setText(notification.getStatus().toString());
+        date.setText(notification.getDate());
 
         return view;
 
