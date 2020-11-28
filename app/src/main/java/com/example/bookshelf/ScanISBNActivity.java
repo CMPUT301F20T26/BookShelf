@@ -110,15 +110,6 @@ public class ScanISBNActivity extends AppCompatActivity {
                         }
                     });
 
-                    // Check if the barcode is constant
-                    //final String b1 = barcodeData;
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    final String b2=barcodeData;
-
                     buttonOK.setEnabled(true);
                     buttonOK.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -128,6 +119,17 @@ public class ScanISBNActivity extends AppCompatActivity {
                             setResult(RESULT_OK, intent);
                             finish();
                         }});
+
+                    // Check if the barcode is constant
+                    //final String b1 = barcodeData;
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    final String b2=barcodeData;
+
+
 
                     // Search the isbn for the books
 //                    if(b1.equals(b2)){
