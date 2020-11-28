@@ -36,7 +36,7 @@ public class ListNotifications extends UserNotification{
     public ListNotifications(){
     }
 
-    public ListNotifications get(DocumentSnapshot notifDoc){
+    static ListNotifications get(final DocumentSnapshot notifDoc){
         final ListNotifications notification = new ListNotifications();
         notification.setNotificationID(notifDoc.getId());
 
