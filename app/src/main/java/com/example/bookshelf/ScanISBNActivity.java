@@ -110,8 +110,18 @@ public class ScanISBNActivity extends AppCompatActivity {
                         }
                     });
 
+                    buttonOK.setEnabled(true);
+                    buttonOK.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent();
+                            intent.putExtra("isbn", barcodeData);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }});
+
                     // Check if the barcode is constant
-                    final String b1 = barcodeData;
+                    //final String b1 = barcodeData;
 //                    try {
 //                        Thread.sleep(2000);
 //                    } catch (InterruptedException e) {
@@ -119,15 +129,7 @@ public class ScanISBNActivity extends AppCompatActivity {
 //                    }
 //                    final String b2=barcodeData;
 
-                    buttonOK.setEnabled(true);
-                    buttonOK.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent();
-                            intent.putExtra("isbn", b1);
-                            setResult(RESULT_OK, intent);
-                            finish();
-                        }});
+
 
                     // Search the isbn for the books
 //                    if(b1.equals(b2)){
