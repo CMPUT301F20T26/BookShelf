@@ -99,18 +99,24 @@ public class ScanISBNActivity extends AppCompatActivity {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
-
+                    barcodeData = barcodes.valueAt(0).displayValue;
 
                     barcodeText.post(new Runnable() {
 
                         @Override
                         public void run() {
-                            barcodeData = barcodes.valueAt(0).displayValue;
+
                             barcodeText.setText(barcodeData);
                         }
                     });
 
-                    buttonOK.setEnabled(true);
+                    buttonOK.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            buttonOK.setEnabled(true);
+                        }
+                    });
+
                     buttonOK.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
