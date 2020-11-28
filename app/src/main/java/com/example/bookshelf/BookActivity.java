@@ -114,8 +114,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                 }
                             });
 
-                            BookFactory currentFactory = new BookFactory(db.collection("books"));
-                            currentBook = currentFactory.get(document, document.getId());
+                            BookFactory currentFactory = new BookFactory("books");
+                            currentBook = currentFactory.get(document);
 
                             //Filling book values
                             title.setText(currentBook.getTitle());
@@ -205,55 +205,29 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         intent.putExtra(EXTRA_MESSAGE, id);
         startActivity(intent);
     }
-
-    //This activity has no add capabilites
     @Override
-    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
-
-    }
-
-    @Override
-    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, final String bookId) {
-        final Book editedBook = new Book();
-        editedBook.setTitle(title);
-        editedBook.setAuthor(author);
-        editedBook.setIsbn(isbn);
-        editedBook.setDescription(description);
-        editedBook.setCoverImage(photoURL);
-        editedBook.setOwnerUsername(ownerUsername);
-        editedBook.setStatus(status);
-
-        //Book exists already. Update books collection only.
-        bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-
-                editedBook.setBookID(bookId);
-                bookCollection.document(documentSnapshot.getId()).update(
-                        "author",author,
-                        "description", description,
-                        "coverImage",photoURL,
-                        "description",description,
-                        "isbn",isbn
-                ).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title, final String coverURL, final Boolean edit) {
+        final BookFactory bookFactory = new BookFactory("books");
+        bookFactory.OwnerUsername(book.getOwnerUsername());
+        bookFactory.Author(author);
+        bookFactory.Description(des);
+        bookFactory.ISBN(Long.parseLong(isbn));
+        bookFactory.Title(title);
+        bookFactory.CoverImage(coverURL);
+        Book newadd;
+        if(edit == true){
+            bookFactory.Status(book.getStatus());
+            newadd = bookFactory.edit(book.getBookID());
+        }
+        else {}
+        bookFactory.New();
         //Refilling Book values
         this.title.setText(title);
         this.author.setText(author);
         this.ISBN.setText(String.valueOf(isbn));
-        this.owner.setText(ownerUsername);
-        this.status.setText(status.toString());
-        this.description.setText(description);
+        this.owner.setText(book.getOwnerUsername());
+        this.status.setText(book.getStatus().toString());
+        this.description.setText(des);
 
         //Refetching Book image
         String picUrl = "Book Images/" + isbn + ".png";

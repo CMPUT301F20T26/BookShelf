@@ -76,10 +76,10 @@ public class AddBookFragment extends DialogFragment {
      * The interface Dialog listener.
      */
     public interface DialogListener{
-
-        void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description);
-
-        void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, String bookId);
+        /**
+         * Add book.
+         */
+        void onOkPressed(Book book, String author,String des,String isbn,String title, String photoURL, Boolean edit);
     }
 
     /**
@@ -120,6 +120,7 @@ public class AddBookFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         Book argBook = null;
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.add_book_fragment, null);
 
@@ -189,6 +190,7 @@ public class AddBookFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final Book finalArgBook = argBook;
         final Book.BookStatus finalStatus = status;
+        final Book finalArgBook1 = argBook;
         return builder
                 .setView(view)
                 .setTitle("Book")
@@ -218,12 +220,10 @@ public class AddBookFragment extends DialogFragment {
                                             Long isbn_long = Long.parseLong(isbnEt.getText().toString());
                                             String coverUrl = isbn_new + ".png";
 
-                                            // check if gear is to be edited or added
-                                            if (finalArgBook != null) {
-                                                listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, finalArgBook.getBookID());
-                                            } else {
-                                                listener.add_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new);
-                                            }
+                                            // check if Book is to be edited or added
+
+                                            if (getArguments() != null) {listener.onOkPressed(finalArgBook1,author_new, des_new, isbn_new, title_new, coverUrl, true);}
+                                            else{listener.onOkPressed(finalArgBook1,author_new, des_new, isbn_new, title_new, coverUrl, false);}
                                         }
                                     }
                                 });

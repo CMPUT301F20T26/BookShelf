@@ -6,14 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -32,11 +30,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import com.google.firebase.firestore.Source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type User books activity.
  */
-public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener{
+public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener, BookFactory.bookListener{
     //Layout variables
     private ListView bookList;
     private FloatingActionButton addBookButton;
@@ -69,16 +73,20 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     //Extra message handler
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
 
+    BookFactory bookFactory;
+
     /**
      * Instantiates a new User books activity.
      */
     public UserBooksActivity() {
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_books);
+        setContentView(R.layout.activity_user_books);  //Opening content view
+
 
         //Current user id
         userId = user.getUid();
@@ -93,6 +101,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
         bookList.setAdapter(bookAdapter);
+        bookFactory = new BookFactory("books");
+        bookList.setAdapter(bookAdapter);
+        db = FirebaseFirestore.getInstance();
 
         //Long Press to delete
         bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -112,12 +123,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     @Override
                     public void onClick(View view) {
                         Book clickedBook = bookDataList.get(i);
-
                         openBookDescription(clickedBook.getBookID());
                     }
-                });
-            }
-        });
+                });}});
 
         //Clicking the add button
         addBookButton.setOnClickListener(new View.OnClickListener() {
@@ -171,73 +179,41 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             }
         });
         //__________________________________________________________________________________________
-
     }
 
     private void getUserOwnedBooks() {
-
+        // Extract books from the owner username and send to bookAdapter
         bookDataList.clear();
-        userDocument.get()
+        db.collection("users").document(user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot userDocumentSnapshot = task.getResult();
-                            user_name = userDocumentSnapshot.getData().get("username").toString();
-                            ArrayList<String> userOwnedBooks = (ArrayList<String>) userDocumentSnapshot.getData().get("ownedBooks");
-                            for (final String bookId : userOwnedBooks) {
-                                bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot bookDocumentSnapshot = task.getResult();
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            final List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
+                            for(int i = 0; i<ownedBooks.size(); i++){
+                                System.out.println(ownedBooks.get(i));
+                                db.collection("books").document(ownedBooks.get(i)).get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                                    getBook(bookFactory.get(documentSnapshot));
 
-                                            Book tempBook = new Book();
-
-                                            tempBook.setTitle(bookDocumentSnapshot.getData().get("title").toString());
-
-                                            tempBook.setCoverImage(bookDocumentSnapshot.getData().get("coverImage").toString());
-
-                                            tempBook.setDescription(bookDocumentSnapshot.getData().get("description").toString());
-
-                                            tempBook.setOwnerUsername(bookDocumentSnapshot.getData().get("ownerUsername").toString());
-
-                                            tempBook.setStatus((Book.BookStatus.valueOf(bookDocumentSnapshot.getData().get("status").toString())));
-
-                                            tempBook.setAuthor(bookDocumentSnapshot.getData().get("author").toString());
-
-                                            tempBook.setBookID(bookId);
-
-                                            tempBook.setBookID(bookDocumentSnapshot.getId());
-                                            String tempIsbnString = bookDocumentSnapshot.getData().get("isbn").toString().replace("-", "");
-                                            Long tempIsbn = Long.parseLong(tempIsbnString);
-                                            tempBook.setIsbn(tempIsbn);
-
-                                            bookDataList.add(tempBook);
-                                            bookAdapter.notifyDataSetChanged();
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
+                                                }
+                                            }});}}}});
     }
 
     @Override
     public void deleteLongPress(Integer position){
         final Book deletedBook = bookDataList.get(position);
-
+        bookFactory.delete(deletedBook.getBookID());
         //Delete from delete from books collection
-        bookCollection.document(deletedBook.getBookID()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+        userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID())).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID())).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getApplicationContext(), "Successfully deleted " + deletedBook.getTitle(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Toast.makeText(getApplicationContext(), "Successfully deleted " + deletedBook.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -248,7 +224,6 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //Delete from book data list and update adapter
         bookDataList.remove(deletedBook);
         bookAdapter.notifyDataSetChanged();
-
     }
 
     public void openBookDescription(String id) {
@@ -266,38 +241,40 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         }
     }
 
-    @Override
-    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
-        final Book newBook = new Book();
-        newBook.setTitle(title);
-        newBook.setAuthor(author);
-        newBook.setIsbn(isbn);
-        newBook.setDescription(description);
-        newBook.setCoverImage(photoURL);
-        newBook.setOwnerUsername(ownerUsername);
-        newBook.setStatus(Book.BookStatus.Available);
-
-        bookCollection.add(newBook.getBookFirebaseMap()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                newBook.setBookID(task.getResult().getId());
-                userDocument.update("ownedBooks", FieldValue.arrayUnion(task.getResult().getId())).addOnCompleteListener(new OnCompleteListener<Void>() {
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title, final String coverURL, final Boolean edit) {
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getApplicationContext(), "Successfully Added new book", Toast.LENGTH_SHORT).show();
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
+                            bookFactory.Author(author);
+                            bookFactory.Description(des);
+                            bookFactory.ISBN(Long.parseLong(isbn));
+                            bookFactory.Title(title);
+                            bookFactory.CoverImage(coverURL);
+                            Book newadd;
+                            if(edit == true){}
+                            else {
+                                bookFactory.Status(Book.BookStatus.Available);
+                                newadd = bookFactory.build();
+                                bookDataList.add(newadd);
+                                userDocument.update("ownedBooks", FieldValue.arrayUnion(newadd.getBookID()));
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            bookFactory.New();
+                        }
                     }
                 });
-            }
-        });
-
-        bookDataList.add(newBook);
-        bookAdapter.notifyDataSetChanged();
     }
 
-    //This activity has no edit capabilities
     @Override
-    public void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, String bookId) {
-
+    public void getBook(Book book) {
+        bookAdapter.add(book);
+        bookAdapter.notifyDataSetChanged();
+        System.out.println(book.getTitle());
     }
+
 
 }
