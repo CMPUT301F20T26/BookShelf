@@ -22,16 +22,4 @@
         android:inputType="textPersonName"
         android:text="Name" />
 
-    <Button
-        android:id="@+id/add_picture_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Upload Image" />
-
-    <ImageView
-        android:id="@+id/profile_pic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:srcCompat="@tools:sample/avatars" />
-
 </LinearLayout>

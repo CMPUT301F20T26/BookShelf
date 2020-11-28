@@ -50,13 +50,11 @@ public class AddBookFragment extends DialogFragment {
     private EditText descriptionEt;
     private ImageView bookIm;
     private Button pictureBtn;
+    private Button deletePictureBtn;
 
     //
     private DialogListener listener;
     private String ownerUsername;
-
-    //Position
-    private int position;
 
     //Current User
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -81,7 +79,7 @@ public class AddBookFragment extends DialogFragment {
 
         void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description);
 
-        void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, Integer position, String bookId);
+        void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, String bookId);
     }
 
     /**
@@ -90,10 +88,9 @@ public class AddBookFragment extends DialogFragment {
      * @param book the book
      * @return the add book fragment
      */
-    static AddBookFragment newInstance(Book book, int pos){
+    static AddBookFragment newInstance(Book book){
         Bundle args = new Bundle();
         args.putSerializable("book", book);
-        args.putInt("Position", pos);
 
         AddBookFragment fragment = new AddBookFragment();
         fragment.setArguments(args);
@@ -132,6 +129,7 @@ public class AddBookFragment extends DialogFragment {
         descriptionEt = view.findViewById(R.id.Description_add);
         bookIm = view.findViewById(R.id.cover_image);
         pictureBtn = view.findViewById(R.id.picture_button);
+        deletePictureBtn = view.findViewById(R.id.delete_picture);
 
         //Instantiating the storage reference
         storageReference = storage.getReference();
@@ -143,7 +141,6 @@ public class AddBookFragment extends DialogFragment {
          */
         if(getArguments()!=null){
             argBook = (Book) getArguments().getSerializable("book");
-            position = getArguments().getInt("Position");
             assert argBook != null;
 
             titleEt.setText(argBook.getTitle());
@@ -166,7 +163,7 @@ public class AddBookFragment extends DialogFragment {
             ).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getContext(), "Failed to fetch image.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "No Cover Image Stored.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -176,7 +173,14 @@ public class AddBookFragment extends DialogFragment {
         pictureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                choosePictureFromDevice();
+                chooseAndUploadPicture();
+            }
+        });
+
+        deletePictureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletePicture();
             }
         });
 
@@ -216,7 +220,7 @@ public class AddBookFragment extends DialogFragment {
 
                                             // check if gear is to be edited or added
                                             if (finalArgBook != null) {
-                                                listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, position, finalArgBook.getBookID());
+                                                listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, finalArgBook.getBookID());
                                             } else {
                                                 listener.add_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new);
                                             }
@@ -227,7 +231,24 @@ public class AddBookFragment extends DialogFragment {
                 }).create();
     }
 
-    private void choosePictureFromDevice() {
+    private void deletePicture() {
+            photoURL = "Book Images/" + isbnEt.getText().toString() + ".png";
+            StorageReference bookCoverRef = storageReference.child(photoURL);
+            bookCoverRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getContext(), "Successfully Deleted Cover Image.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "No cover image for book.", Toast.LENGTH_SHORT).show();
+                        bookIm.setImageDrawable(null);
+                    }
+                }
+            });
+
+    }
+
+    private void chooseAndUploadPicture() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);

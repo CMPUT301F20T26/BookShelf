@@ -1,10 +1,12 @@
 package com.example.bookshelf;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 /**
  * The type User books activity.
  */
-public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener, DeleteConfirmFragment.DialogListener{
+public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener{
     //Layout variables
     private ListView bookList;
     private FloatingActionButton addBookButton;
@@ -63,6 +65,9 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
     //Firebase helper instantiation.
     private FirebaseHelper firebaseHelper;
+
+    //Extra message handler
+    public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
 
     /**
      * Instantiates a new User books activity.
@@ -99,7 +104,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
             }
         });
 
-
         //Click to edit
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -108,24 +112,14 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                     @Override
                     public void onClick(View view) {
                         Book clickedBook = bookDataList.get(i);
-                        AddBookFragment add_new = AddBookFragment.newInstance(clickedBook, i);
-                        add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
+
+                        openBookDescription(clickedBook.getBookID());
                     }
                 });
             }
         });
 
-        // TODO: clean up test code, integrate with benefactory
-        //String titl = "Twiligt";
-        //String auth = "Twiligt";
-        //String desc = "Twiligt";
-        //Long isb = (long) 124684641;
-        //Book bookadd = new Book(titl, auth, desc, isb,"me");
-        //bookAdapter.add(bookadd);
-        //bookAdapter.add(bookadd);
-        //bookAdapter.add(bookadd);
-        //bookAdapter.add(bookadd);
-
+        //Clicking the add button
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,6 +129,54 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
         // I am grabbing the username and owned books list, from the user database and saving it in the user_name,
         // I checked whether its grabbing it by sending it to the log
+        getUserOwnedBooks();
+
+        //BOTTOM NAVIGATION_________________________________________________________________________
+        //Initialize nav bar and assign it
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
+
+        // Set home selected
+        bottomNavigationView.setSelectedItemId(R.id.books_page);
+
+        //Item Selected Listener
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                //Pass User's UID into activities on menu click
+                switch (menuItem.getItemId()) {
+                    case R.id.profile_page:
+                        Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                        startActivity(profileIntent);
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.notifications_page:
+                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
+                        startActivity(notificationIntent);
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.books_page:
+                        return true;
+                    case R.id.search_page:
+                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
+                        startActivity(searchIntent);
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.maps_page:
+                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
+                        startActivity(mapsIntent);
+                        overridePendingTransition(0, 0);
+                        return true;
+                }
+                return false;
+            }
+        });
+        //__________________________________________________________________________________________
+
+    }
+
+    private void getUserOwnedBooks() {
+
+        bookDataList.clear();
         userDocument.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -180,116 +222,6 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         }
                     }
                 });
-        //BOTTOM NAVIGATION_________________________________________________________________________
-        //Initialize nav bar and assign it
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
-
-        // Set home selected
-        bottomNavigationView.setSelectedItemId(R.id.books_page);
-
-        //Item Selected Listener
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                //Pass User's UID into activities on menu click
-                switch (menuItem.getItemId()) {
-                    case R.id.profile_page:
-                        Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                        startActivity(profileIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.notifications_page:
-                        Intent notificationIntent = new Intent(getApplicationContext(), UserNotificationsActivity.class);
-                        startActivity(notificationIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.books_page:
-                        return true;
-                    case R.id.search_page:
-                        Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
-                        startActivity(searchIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
-                }
-                return false;
-            }
-        });
-        //__________________________________________________________________________________________
-
-    }
-
-    @Override
-    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
-        final Book editedBook = new Book();
-        editedBook.setTitle(title);
-        editedBook.setAuthor(author);
-        editedBook.setIsbn(isbn);
-        editedBook.setDescription(description);
-        editedBook.setCoverImage(photoURL);
-        editedBook.setOwnerUsername(ownerUsername);
-        editedBook.setStatus(Book.BookStatus.Available);
-
-        bookCollection.add(editedBook.getBookFirebaseMap()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentReference> task) {
-                editedBook.setBookID(task.getResult().getId());
-                userDocument.update("ownedBooks", FieldValue.arrayUnion(task.getResult().getId())).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getApplicationContext(), "Successfully Added new book", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-        bookDataList.add(editedBook);
-        bookAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, Integer position, final String bookId) {
-        final Book editedBook = new Book();
-        editedBook.setTitle(title);
-        editedBook.setAuthor(author);
-        editedBook.setIsbn(isbn);
-        editedBook.setDescription(description);
-        editedBook.setCoverImage(photoURL);
-        editedBook.setOwnerUsername(ownerUsername);
-        editedBook.setStatus(status);
-
-
-        //Book exists already. Update books collection only.
-        bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-
-                editedBook.setBookID(bookId);
-                bookCollection.document(documentSnapshot.getId()).update(
-                        "author",author,
-                        "description", description,
-                        "coverImage",photoURL,
-                        "description",description,
-                        "isbn",isbn
-                ).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-
-
-        bookDataList.set(position, editedBook);
-        bookAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -319,5 +251,53 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
 
     }
 
+    public void openBookDescription(String id) {
+        Intent intent = new Intent(this, BookActivity.class);
+        // we want the message to be the book ID corresponding to the selected book
+        intent.putExtra(EXTRA_MESSAGE, id);
+        startActivityForResult(intent, 2);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 2 && resultCode==RESULT_OK) {
+            getUserOwnedBooks();
+        }
+    }
+
+    @Override
+    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
+        final Book newBook = new Book();
+        newBook.setTitle(title);
+        newBook.setAuthor(author);
+        newBook.setIsbn(isbn);
+        newBook.setDescription(description);
+        newBook.setCoverImage(photoURL);
+        newBook.setOwnerUsername(ownerUsername);
+        newBook.setStatus(Book.BookStatus.Available);
+
+        bookCollection.add(newBook.getBookFirebaseMap()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                newBook.setBookID(task.getResult().getId());
+                userDocument.update("ownedBooks", FieldValue.arrayUnion(task.getResult().getId())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getApplicationContext(), "Successfully Added new book", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        bookDataList.add(newBook);
+        bookAdapter.notifyDataSetChanged();
+    }
+
+    //This activity has no edit capabilities
+    @Override
+    public void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, String bookId) {
+
+    }
 
 }
