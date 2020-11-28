@@ -45,6 +45,7 @@ public class ScanISBNActivity extends AppCompatActivity {
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_text);
         buttonOK = findViewById(R.id.buttonOK);
+        initialiseDetectorsAndSources();
     }
 
     private void initialiseDetectorsAndSources() {
