@@ -111,7 +111,7 @@ public class ScanISBNActivity extends AppCompatActivity {
                     });
 
                     // Check if the barcode is constant
-                    final String b1 = barcodeData;
+                    //final String b1 = barcodeData;
 //                    try {
 //                        Thread.sleep(2000);
 //                    } catch (InterruptedException e) {
@@ -124,7 +124,7 @@ public class ScanISBNActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent();
-                            intent.putExtra("isbn", b1);
+                            intent.putExtra("isbn", barcodeData);
                             setResult(RESULT_OK, intent);
                             finish();
                         }});
