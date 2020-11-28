@@ -153,14 +153,14 @@ public class ScanISBNActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        getSupportActionBar().hide();
+     //   getSupportActionBar().hide();
         cameraSource.release();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         initialiseDetectorsAndSources();
     }
 }
