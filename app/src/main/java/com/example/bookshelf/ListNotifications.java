@@ -1,9 +1,26 @@
 package com.example.bookshelf;
 
+import android.net.Uri;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 public class ListNotifications extends UserNotification{
 
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String owner;
+    private String requester;
+    private String book;
 
     public ListNotifications(RequestStatus status, String notifID, String date, String location, String ownerID, String requestID, String bookID){
 
@@ -24,7 +41,7 @@ public class ListNotifications extends UserNotification{
         notification.setNotificationID(notifDoc.getId());
 
         if(notifDoc.getData().get("bookID") != null) {
-            notification.setBookID(notifDoc.getData().get("bookID").toString());
+            notification.setBook(notifDoc.getData().get("bookID").toString());
         }
         if(notifDoc.getData().get("date") != null) {
             notification.setDate(notifDoc.getData().get("date").toString());
@@ -33,10 +50,10 @@ public class ListNotifications extends UserNotification{
             notification.setMeetUpLocation(notifDoc.getData().get("meetUpLocation").toString());
         }
         if(notifDoc.getData().get("ownerID") != null) {
-            notification.setOwnerID(notifDoc.getData().get("ownerID").toString());
+            notification.setOwner(notifDoc.getData().get("ownerID").toString());
         }
         if(notifDoc.getData().get("requesterID") != null) {
-            notification.setBookID(notifDoc.getData().get("requesterID").toString());
+            notification.setRequester(notifDoc.getData().get("requesterID").toString());
         }
         if(notifDoc.getData().get("status") != null) {
             notification.setStatus(notifDoc.getData().get("status").toString());
@@ -65,16 +82,67 @@ public class ListNotifications extends UserNotification{
         this.meetUpLocation = location;
     }
 
-    public void setOwnerID(String id){
+    public void setOwner(String id){
         this.ownerID = id;
+        db.collection("users")
+                .document(id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //Book Document
+                            DocumentSnapshot document = task.getResult();
+                            setOwnerName(document.getData().get("username").toString());
+                        }
+                    }
+                });
     }
 
-    public void setRequesterID(String id){
+    public void setRequester(String id){
         this.requesterID = id;
+        db.collection("users")
+                .document(id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //Book Document
+                            DocumentSnapshot document = task.getResult();
+                            setRequesterName(document.getData().get("username").toString());
+                        }
+                    }
+                });
     }
 
-    public void setBookID(String id){
+    public void setBook(String id){
         this.bookID = id;
+        db.collection("books")
+                .document(id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //Book Document
+                            DocumentSnapshot document = task.getResult();
+                            setBookName(document.getData().get("title").toString());
+                        }
+                    }
+                });
+    }
+
+    public void setOwnerName(String name) {
+        this.owner = name;
+    }
+
+    public void setRequesterName(String name) {
+        this.requester = name;
+    }
+
+    public void setBookName(String name) {
+        this.book = name;
     }
 
     public RequestStatus getStatus(){
@@ -104,4 +172,11 @@ public class ListNotifications extends UserNotification{
     public String getBookID(){
         return this.bookID;
     }
+
+    public String getOwnerName(){return this.owner;}
+
+    public String getRequesterName(){return this.requester;}
+
+    public String getBookName(){return this.book;}
+
 }
