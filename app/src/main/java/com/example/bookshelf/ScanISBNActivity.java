@@ -109,39 +109,50 @@ public class ScanISBNActivity extends AppCompatActivity {
                             barcodeText.setText(barcodeData);
                         }
                     });
+
                     // Check if the barcode is constant
-                    String b1 = barcodeData;
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    final String b2=barcodeData;
+                    final String b1 = barcodeData;
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    final String b2=barcodeData;
+
+                    buttonOK.setEnabled(true);
+                    buttonOK.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent();
+                            intent.putExtra("isbn", b1);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }});
 
                     // Search the isbn for the books
-                    if(b1.equals(b2)){
-                        buttonOK.setEnabled(true);
-                        buttonOK.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent intent = new Intent();
-                                intent.putExtra("isbn", b2);
-                                setResult(RESULT_OK, intent);
-                                finish();
-                            }
-                        });
-                        // Check the status of the network connection.
-                        /*
-                        ConnectivityManager connMgr = (ConnectivityManager)
-                                getSystemService(Context.CONNECTIVITY_SERVICE);
-                        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-
-                        // If the network is active and the search field is not empty, start a FetchBook AsyncTask.
-                        if (networkInfo != null && networkInfo.isConnected() && b2.length()!=0) {
-                            new FetchBook(b2).execute(b2);
-                    }*/
-
-                    }
+//                    if(b1.equals(b2)){
+//                        buttonOK.setEnabled(true);
+//                        buttonOK.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                Intent intent = new Intent();
+//                                intent.putExtra("isbn", b2);
+//                                setResult(RESULT_OK, intent);
+//                                finish();
+//                            }
+//                        });
+//                        // Check the status of the network connection.
+//                        /*
+//                        ConnectivityManager connMgr = (ConnectivityManager)
+//                                getSystemService(Context.CONNECTIVITY_SERVICE);
+//                        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//
+//                        // If the network is active and the search field is not empty, start a FetchBook AsyncTask.
+//                        if (networkInfo != null && networkInfo.isConnected() && b2.length()!=0) {
+//                            new FetchBook(b2).execute(b2);
+//                    }*/
+//
+//                    }
 
 
 
