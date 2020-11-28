@@ -91,7 +91,6 @@ public class ListNotifications extends UserNotification{
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            //Book Document
                             DocumentSnapshot document = task.getResult();
                             setOwnerName(document.getData().get("username").toString());
                         }
@@ -108,7 +107,6 @@ public class ListNotifications extends UserNotification{
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            //Book Document
                             DocumentSnapshot document = task.getResult();
                             setRequesterName(document.getData().get("username").toString());
                         }
@@ -125,7 +123,6 @@ public class ListNotifications extends UserNotification{
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
-                            //Book Document
                             DocumentSnapshot document = task.getResult();
                             setBookName(document.getData().get("title").toString());
                         }
