@@ -51,6 +51,7 @@ public class AddBookFragment extends DialogFragment {
     private ImageView bookIm;
     private Button pictureBtn;
     private Button deletePictureBtn;
+    private Button scanButton;
 
     //
     private DialogListener listener;
@@ -71,6 +72,9 @@ public class AddBookFragment extends DialogFragment {
     private Uri imageUri;
 
     private String photoURL = null;
+
+    private static final int GET_CONTENT_REQUEST_CODE = 0;
+    private static final int SCAN_ACTIVITY_REQUEST_CODE = 1;
 
     /**
      * The interface Dialog listener.
@@ -130,6 +134,7 @@ public class AddBookFragment extends DialogFragment {
         bookIm = view.findViewById(R.id.cover_image);
         pictureBtn = view.findViewById(R.id.picture_button);
         deletePictureBtn = view.findViewById(R.id.delete_picture);
+        scanButton = view.findViewById(R.id.scan_button);
 
         //Instantiating the storage reference
         storageReference = storage.getReference();
@@ -183,6 +188,13 @@ public class AddBookFragment extends DialogFragment {
                 deletePicture();
             }
         });
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View view) {
+                                              scanISBN();
+                                          }
+                                      });
 
 
         // TODO: integrate with BookFactory
@@ -252,16 +264,25 @@ public class AddBookFragment extends DialogFragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, 1);
+        startActivityForResult(intent, GET_CONTENT_REQUEST_CODE);
+    }
+
+    private void scanISBN() {
+        Intent intent = new Intent(this.getContext(), ScanISBNActivity.class);
+        startActivityForResult(intent, SCAN_ACTIVITY_REQUEST_CODE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+        if(requestCode == GET_CONTENT_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
             imageUri = data.getData();
             bookIm.setImageURI(imageUri);
             uploadPictureToDatabase();
+        }
+        else if(requestCode == SCAN_ACTIVITY_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
+            String isbn = data.getStringExtra("isbn");
+            isbnEt.setText(isbn);
         }
     }
 
