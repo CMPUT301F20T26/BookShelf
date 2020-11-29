@@ -1,24 +1,24 @@
 package com.example.bookshelf;
 
 
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * BookFactory - For creating new books.
@@ -65,7 +65,7 @@ public class BookFactory {
      * @param ISBN the isbn
      */
     public BookFactory ISBN(Long ISBN) {
-        thisBook.setISBN(ISBN);
+        thisBook.setIsbn(ISBN);
         bookMap.put("isbn", ISBN);
         return this;
     }
@@ -172,7 +172,7 @@ public class BookFactory {
             }
             if(bookDoc.get("author") != null) {
                 res.setAuthor(bookDoc.get("author").toString());
-                res.setISBN(isbn);
+                res.setIsbn(isbn);
             }
             if(bookDoc.get("coverImage") != null) {
                 res.setCoverImage(bookDoc.get("coverImage").toString());

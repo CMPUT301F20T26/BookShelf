@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 /**
  * User profile activity for viewing user information.
@@ -43,6 +47,11 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
     //Database instance
     private FirebaseFirestore db;
 
+    //Storage and Upload Imaging vrariables
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageReference;
+    private Uri uri;
+
     /**
      * The User for authentication
      */
@@ -62,6 +71,7 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
 
         //Database instance initialization
         db = FirebaseFirestore.getInstance();
+        storageReference = storage.getReference();
 
         //Fill Data in page
         db.collection("users").document(user.getUid()).get()
@@ -79,6 +89,22 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
                             fullnameTv.setText(userInfo.getFullname());
                             emailTv.setText(userInfo.getEmail());
                             phoneTv.setText(userInfo.getPhone());
+
+                            //Loading user profile pic
+//                            storageReference.child(photoURL).getDownloadUrl().addOnSuccessListener(
+//                                    new OnSuccessListener<Uri>() {
+//                                        @Override
+//                                        public void onSuccess(Uri uri) {
+//                                            Picasso.get().load(uri).into(bookIm);
+//                                        }
+//                                    }
+//                            ).addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Toast.makeText(getApplicationContext(), "Failed to fetch image.", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+
 
                         }
                     }
