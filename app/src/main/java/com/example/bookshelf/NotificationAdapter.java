@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NotificationAdapter extends ArrayAdapter<ListNotifications> {
         private ArrayList<ListNotifications> notifications;
@@ -43,8 +44,8 @@ public class NotificationAdapter extends ArrayAdapter<ListNotifications> {
         final ListNotifications notification = notifications.get(position);
 
         title.setText(notification.getBookName());
-        owner.setText(notification.getOwnerName());
-        requester.setText(notification.getRequesterName());
+        owner.setText("Owner: "+notification.getOwnerName());
+        requester.setText("Requester: "+notification.getRequesterName());
         status.setText(notification.getStatus().toString());
         date.setText(notification.getDate());
 
