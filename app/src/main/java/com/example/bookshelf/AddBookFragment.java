@@ -34,7 +34,6 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
-
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
@@ -245,20 +244,19 @@ public class AddBookFragment extends DialogFragment {
     }
 
     private void deletePicture() {
-            photoURL = "Book Images/" + isbnEt.getText().toString() + ".png";
-            StorageReference bookCoverRef = storageReference.child(photoURL);
-            bookCoverRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Successfully Deleted Cover Image.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "No cover image for book.", Toast.LENGTH_SHORT).show();
-                        bookIm.setImageDrawable(null);
-                    }
+        photoURL = "Book Images/" + isbnEt.getText().toString() + ".png";
+        StorageReference bookCoverRef = storageReference.child(photoURL);
+        bookCoverRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Successfully Deleted Cover Image.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "No cover image for book.", Toast.LENGTH_SHORT).show();
+                    bookIm.setImageDrawable(null);
                 }
-            });
-
+            }
+        });
     }
 
     private void chooseAndUploadPicture() {

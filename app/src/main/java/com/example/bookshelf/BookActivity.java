@@ -37,10 +37,12 @@ import java.util.HashMap;
 /**
  * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
  */
+
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener, AddBookFragment.DialogListener {
     /**
      * The constant EXTRA_MESSAGE.
      */
+
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
     private TextView title;
@@ -205,21 +207,29 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         intent.putExtra(EXTRA_MESSAGE, id);
         startActivity(intent);
     }
+
     @Override
-    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title, final String coverURL, final Boolean edit) {
-        final BookFactory bookFactory = new BookFactory("books");
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        this.finish();
+    }
+
+    @Override
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
+        BookFactory bookFactory = new BookFactory("books");
         bookFactory.OwnerUsername(book.getOwnerUsername());
         bookFactory.Author(author);
         bookFactory.Description(des);
         bookFactory.ISBN(Long.parseLong(isbn));
         bookFactory.Title(title);
-        bookFactory.CoverImage(coverURL);
+        bookFactory.CoverImage(photoURL);
         Book newadd;
         if(edit == true){
             bookFactory.Status(book.getStatus());
             newadd = bookFactory.edit(book.getBookID());
         }
         else {}
+        bookFactory.edit(book.getBookID());
         bookFactory.New();
         //Refilling Book values
         this.title.setText(title);
@@ -247,9 +257,4 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_OK);
-        this.finish();
-    }
 }

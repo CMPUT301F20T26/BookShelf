@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,6 +23,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -73,7 +82,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     //Extra message handler
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
 
-    BookFactory bookFactory;
+    //BookFactory call
+    private BookFactory bookFactory;
+
 
     /**
      * Instantiates a new User books activity.
@@ -86,6 +97,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_books);  //Opening content view
+
+       //Initialize variables
+        final FloatingActionButton addBookButton;
 
 
         //Current user id
@@ -100,7 +114,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //Adapter assignments
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
+
         bookList.setAdapter(bookAdapter);
+
         bookFactory = new BookFactory("books");
         bookList.setAdapter(bookAdapter);
         db = FirebaseFirestore.getInstance();
@@ -206,16 +222,44 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     }
 
     @Override
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
+
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
+                            bookFactory.Author(author);
+                            bookFactory.Description(des);
+                            bookFactory.ISBN(Long.parseLong(isbn));
+                            bookFactory.Title(title);
+                            bookFactory.CoverImage(photoURL);
+                            Book newadd;
+                            if(edit == true){}
+                            else {
+                                bookFactory.Status(Book.BookStatus.Available);
+                                newadd = bookFactory.build();
+                                bookDataList.add(newadd);
+                                userDocument.update("ownedBooks", FieldValue.arrayUnion(newadd.getBookID()));
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            bookFactory.New();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void getBook(Book book) {
+        bookAdapter.add(book);
+    }
+
     public void deleteLongPress(Integer position){
         final Book deletedBook = bookDataList.get(position);
         bookFactory.delete(deletedBook.getBookID());
-        //Delete from delete from books collection
-        userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID())).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Toast.makeText(getApplicationContext(), "Successfully deleted " + deletedBook.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID()));
 
         //Delete cover image from firebase storage.
         StorageReference bookCoverRef = mStorageRef.child("Book Images/"+ deletedBook.getPhotoURL());
@@ -240,41 +284,4 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             getUserOwnedBooks();
         }
     }
-
-    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title, final String coverURL, final Boolean edit) {
-        db.collection("users").document(user.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
-                            bookFactory.Author(author);
-                            bookFactory.Description(des);
-                            bookFactory.ISBN(Long.parseLong(isbn));
-                            bookFactory.Title(title);
-                            bookFactory.CoverImage(coverURL);
-                            Book newadd;
-                            if(edit == true){}
-                            else {
-                                bookFactory.Status(Book.BookStatus.Available);
-                                newadd = bookFactory.build();
-                                bookDataList.add(newadd);
-                                userDocument.update("ownedBooks", FieldValue.arrayUnion(newadd.getBookID()));
-                            }
-                            bookAdapter.notifyDataSetChanged();
-                            bookFactory.New();
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public void getBook(Book book) {
-        bookAdapter.add(book);
-        bookAdapter.notifyDataSetChanged();
-        System.out.println(book.getTitle());
-    }
-
-
 }
