@@ -37,6 +37,7 @@ public class ScanISBNActivity extends AppCompatActivity {
     private TextView barcodeText;
     private String barcodeData;
     private Button buttonOK;
+    private Button buttonOKTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,17 @@ public class ScanISBNActivity extends AppCompatActivity {
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_text);
         buttonOK = findViewById(R.id.buttonOK);
+
+        buttonOKTest = findViewById(R.id.buttonOKTest);
+        buttonOKTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("isbn", "9876543219876");
+                setResult(RESULT_OK, intent);
+                finish();
+            }});
+
         initialiseDetectorsAndSources();
     }
 

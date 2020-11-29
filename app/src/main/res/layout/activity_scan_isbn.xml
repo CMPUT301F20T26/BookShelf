@@ -39,5 +39,16 @@
         android:text="@android:string/ok"
         app:layout_constraintTop_toBottomOf="@id/barcode_text"
          />
+    <Button
+        android:id="@+id/buttonOKTest"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+
+        android:text="OKTEST"
+        app:layout_constraintTop_toBottomOf="@id/buttonOK"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
