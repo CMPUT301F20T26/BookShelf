@@ -207,7 +207,7 @@ public class AddBookFragment extends DialogFragment {
                         String author_new = authorEt.getText().toString();
                         String isbn_new = isbnEt.getText().toString();
                         String des_new = descriptionEt.getText().toString();
-                        if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
+                        if (title_new.equals("") || author_new.equals("") || isbn_new.equals("g")) {
                             Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
                             toast.show();
                             return;
