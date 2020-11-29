@@ -83,9 +83,9 @@ public class SearchBooksActivity extends AppCompatActivity {
 //                                                             document.getData().get("ownerUsername").toString());
 //                                        book.setBookID(document.getId());
 
-//                                        BookFactory searchFactory = new BookFactory(db.collection("books"));
-  //                                      Book findBook = searchFactory.get(document, document.getId());
-       //                                 matchBook(findBook, bookList);
+                                        BookFactory searchFactory = new BookFactory("books");
+                                        Book findBook = searchFactory.get(document);
+                                        matchBook(findBook, bookList);
                                     }
                                 }
                             }
