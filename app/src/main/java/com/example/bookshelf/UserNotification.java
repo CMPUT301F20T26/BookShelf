@@ -3,6 +3,7 @@ package com.example.bookshelf;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * The abstract type User notification.
  *
@@ -29,6 +30,7 @@ public abstract class UserNotification {
     String ownerID;
     String requesterID;
     String bookID;
+    
 
     Map<String, Object> asMap() {
         Map<String, Object> map = new HashMap<>();
