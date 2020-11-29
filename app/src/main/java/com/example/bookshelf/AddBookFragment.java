@@ -34,6 +34,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
@@ -77,9 +81,11 @@ public class AddBookFragment extends DialogFragment {
      */
     public interface DialogListener{
 
-        void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description);
+        /**
+         * Add book.
+         */
+        void onOkPressed(Book book, String author,String des,String isbn,String title, String photoURL, Boolean edit);
 
-        void edit_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description, Book.BookStatus status, String bookId);
     }
 
     /**
@@ -120,6 +126,7 @@ public class AddBookFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+
         Book argBook = null;
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.add_book_fragment, null);
 
@@ -196,56 +203,44 @@ public class AddBookFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        userDocumentRef.get()
-                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            DocumentSnapshot documentSnapshot = task.getResult();
+                        String title_new = titleEt.getText().toString();
+                        String author_new = authorEt.getText().toString();
+                        String isbn_new = isbnEt.getText().toString();
+                        String des_new = descriptionEt.getText().toString();
+                        if (title_new.equals("") || author_new.equals("") || isbn_new.equals("g")) {
+                            Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
+                            toast.show();
+                            return;
+                        }
+                        Long isbn_long = Long.parseLong(isbnEt.getText().toString());
+                        String coverUrl = isbn_new + ".png";
 
-                                            ownerUsername = documentSnapshot.getData().get("username").toString();
-                                            String title_new = titleEt.getText().toString();
-                                            String author_new = authorEt.getText().toString();
-                                            String isbn_new = isbnEt.getText().toString();
-                                            String des_new = descriptionEt.getText().toString();
+                        if (getArguments() != null) {listener.onOkPressed(finalArgBook,author_new, des_new, isbn_new, title_new,coverUrl,true);}
+                        else{listener.onOkPressed(finalArgBook,author_new, des_new, isbn_new, title_new,coverUrl,false);}
 
-                                            if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
-                                                Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
-                                                toast.show();
-                                                return;
-                                            }
 
-                                            Long isbn_long = Long.parseLong(isbnEt.getText().toString());
-                                            String coverUrl = isbn_new + ".png";
-
-                                            // check if gear is to be edited or added
-                                            if (finalArgBook != null) {
-                                                listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, finalArgBook.getBookID());
-                                            } else {
-                                                listener.add_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new);
-                                            }
-                                        }
-                                    }
-                                });
                     }
-                }).create();
+
+                        //TODO: return book_details (have no clue)
+
+
+    }).create();
     }
 
     private void deletePicture() {
-            photoURL = "Book Images/" + isbnEt.getText().toString() + ".png";
-            StorageReference bookCoverRef = storageReference.child(photoURL);
-            bookCoverRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(getContext(), "Successfully Deleted Cover Image.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getContext(), "No cover image for book.", Toast.LENGTH_SHORT).show();
-                        bookIm.setImageDrawable(null);
-                    }
+        photoURL = "Book Images/" + isbnEt.getText().toString() + ".png";
+        StorageReference bookCoverRef = storageReference.child(photoURL);
+        bookCoverRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Successfully Deleted Cover Image.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "No cover image for book.", Toast.LENGTH_SHORT).show();
+                    bookIm.setImageDrawable(null);
                 }
-            });
-
+            }
+        });
     }
 
     private void chooseAndUploadPicture() {

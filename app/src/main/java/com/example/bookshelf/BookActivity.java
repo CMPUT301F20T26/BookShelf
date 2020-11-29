@@ -37,10 +37,12 @@ import java.util.HashMap;
 /**
  * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
  */
+
 public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener, AddBookFragment.DialogListener {
     /**
      * The constant EXTRA_MESSAGE.
      */
+
     public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
     private ImageView displayPic;
     private TextView title;
@@ -114,8 +116,8 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                 }
                             });
 
-                            BookFactory currentFactory = new BookFactory(db.collection("books"));
-                            currentBook = currentFactory.get(document, document.getId());
+                            BookFactory currentFactory = new BookFactory("books");
+                            currentBook = currentFactory.get(document);
 
                             //Filling book values
                             title.setText(currentBook.getTitle());
@@ -206,54 +208,36 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         startActivity(intent);
     }
 
-    //This activity has no add capabilites
     @Override
-    public void add_Book(String title, String author, Long isbn, String photoURL, String ownerUsername, String description) {
-
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        this.finish();
     }
 
     @Override
-    public void edit_Book(String title, final String author, final Long isbn, final String photoURL, final String ownerUsername, final String description, Book.BookStatus status, final String bookId) {
-        final Book editedBook = new Book();
-        editedBook.setTitle(title);
-        editedBook.setAuthor(author);
-        editedBook.setIsbn(isbn);
-        editedBook.setDescription(description);
-        editedBook.setCoverImage(photoURL);
-        editedBook.setOwnerUsername(ownerUsername);
-        editedBook.setStatus(status);
-
-        //Book exists already. Update books collection only.
-        bookCollection.document(bookId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-
-                editedBook.setBookID(bookId);
-                bookCollection.document(documentSnapshot.getId()).update(
-                        "author",author,
-                        "description", description,
-                        "coverImage",photoURL,
-                        "description",description,
-                        "isbn",isbn
-                ).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Successfully updated book", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
+        BookFactory bookFactory = new BookFactory("books");
+        bookFactory.OwnerUsername(book.getOwnerUsername());
+        bookFactory.Author(author);
+        bookFactory.Description(des);
+        bookFactory.ISBN(Long.parseLong(isbn));
+        bookFactory.Title(title);
+        bookFactory.CoverImage(photoURL);
+        Book newadd;
+        if(edit == true){
+            bookFactory.Status(book.getStatus());
+            newadd = bookFactory.edit(book.getBookID());
+        }
+        else {}
+        bookFactory.edit(book.getBookID());
+        bookFactory.New();
         //Refilling Book values
         this.title.setText(title);
         this.author.setText(author);
         this.ISBN.setText(String.valueOf(isbn));
-        this.owner.setText(ownerUsername);
-        this.status.setText(status.toString());
-        this.description.setText(description);
+        this.owner.setText(book.getOwnerUsername());
+        this.status.setText(book.getStatus().toString());
+        this.description.setText(des);
 
         //Refetching Book image
         String picUrl = "Book Images/" + isbn + ".png";
@@ -273,9 +257,4 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_OK);
-        this.finish();
-    }
 }
