@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -282,6 +283,7 @@ public class AddBookFragment extends DialogFragment {
         }
         else if(requestCode == SCAN_ACTIVITY_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
             final String isbn = data.getStringExtra("isbn");
+            Log.d("DEBUG", isbn);
             isbnEt.post(new Runnable() {
 
                 @Override
