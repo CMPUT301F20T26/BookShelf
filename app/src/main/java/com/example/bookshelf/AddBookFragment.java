@@ -281,7 +281,7 @@ public class AddBookFragment extends DialogFragment {
             bookIm.setImageURI(imageUri);
             uploadPictureToDatabase();
         }
-        else if(requestCode == SCAN_ACTIVITY_REQUEST_CODE && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
+        else if(requestCode == SCAN_ACTIVITY_REQUEST_CODE && resultCode==RESULT_OK){ // && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
             final String isbn = data.getStringExtra("isbn");
             Log.d("DEBUG", isbn);
             isbnEt.post(new Runnable() {
