@@ -1,29 +1,26 @@
 package com.example.bookshelf;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserNotificationsActivity extends AppCompatActivity {
 
-    private ListView notificationList;
+    private ListView notificationListView;
     private NotificationAdapter notificationAdapter;
     private FirebaseFirestore db;
 
@@ -32,6 +29,8 @@ public class UserNotificationsActivity extends AppCompatActivity {
 
     //Firebase Authentication instance
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    final ArrayList<ListNotifications> notifications = new ArrayList<ListNotifications>();
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,31 +39,46 @@ public class UserNotificationsActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        notificationList = findViewById(R.id.notification_list);
+        notificationListView = findViewById(R.id.notification_list);
 
-        final ArrayList<ListNotifications> notifications = new ArrayList<ListNotifications>();
-        notificationAdapter = new NotificationAdapter(this, notifications);
-        notificationList.setAdapter(notificationAdapter);
+        final ArrayList<ListNotifications> notificationsList = new ArrayList<ListNotifications>();
+        notificationAdapter = new NotificationAdapter(this, notificationsList);
+        notificationListView.setAdapter(notificationAdapter);
 
-        db.collection("notifications")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
+        final FirebaseHelper helper = new FirebaseHelper();
 
-                                ListNotifications displayNotification = ListNotifications.get(document);
-                                matchNotification(displayNotification);
-                            }
-                        }
-                    }
-                });
+        final FirebaseHelper.IHelper notifListener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                final List<DocumentSnapshot> res = (List<DocumentSnapshot>) o;
+                for (DocumentSnapshot snapshot : res){
+                    notificationsList.add(ListNotifications.get(snapshot));
+                    //notificationAdapter.notifyDataSetChanged();
+                }
+                notificationAdapter.notifyDataSetChanged();
+            }
 
-//        final String userId = user.getUid();
-//        uidTv = findViewById(R.id.uid_notifications);
-//        uidTv.setText(userId);
+            @Override
+            public void onFailure(Object o) {
 
+            }
+        };
+
+        FirebaseHelper.IHelper arrayListener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                final List<String> myNotif = (List<String>) o;
+                helper.getList("notifications", myNotif, notifListener);
+                //notificationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Object o) {
+
+            }
+        };
+
+        helper.getUserArray("notifications", arrayListener);
 
 
         //BOTTOM NAVIGATION_________________________________________________________________________
@@ -79,7 +93,7 @@ public class UserNotificationsActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 //Pass User's UID into activities on menu click
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.profile_page:
                         Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                         startActivity(profileIntent);
@@ -104,13 +118,5 @@ public class UserNotificationsActivity extends AppCompatActivity {
         //__________________________________________________________________________________________
     }
 
-    public void matchNotification(ListNotifications notification){
-        final String userId = user.getUid();
-
-//        if((notification.getOwnerID().equals(userId) && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID().equals(userId) && notification.getStatus() == RequestStatus.ACCEPTED)) {
-            notificationAdapter.add(notification);
-//        }
-
-    }
 
 }

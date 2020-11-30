@@ -11,15 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class NotificationAdapter extends ArrayAdapter<ListNotifications> {
-        private ArrayList<ListNotifications> notifications;
+        private ArrayList<ListNotifications> notificationsList;
         private Context context;
 
         public NotificationAdapter(Context context, ArrayList<ListNotifications> notifications){
             super(context,0, notifications);
-            this.notifications = notifications;
+            this.notificationsList = notifications;
             this.context = context;
         }
 
@@ -41,7 +40,7 @@ public class NotificationAdapter extends ArrayAdapter<ListNotifications> {
         TextView date = view.findViewById(R.id.date);
 
 
-        final ListNotifications notification = notifications.get(position);
+        final ListNotifications notification = notificationsList.get(position);
 
         title.setText(notification.getBookName());
         owner.setText("Owner: "+notification.getOwnerName());

@@ -12,14 +12,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.model.Document;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.text.RandomStringGenerator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -64,6 +67,28 @@ public class FirebaseHelper {
                             listener.onSuccess(result[0]);
                         }}});
     }
+
+
+    /**
+     * Gets a document snapshot from Firebase, and returns it through the listener interface.
+     *
+     * @param collectionPath the collection path
+     * @param docID          the doc id
+     */
+    void getList(String collectionPath, List<String> docID, final IHelper listener){
+
+        db.collection(collectionPath).whereIn(FieldPath.documentId(), docID).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            List<DocumentSnapshot> list  = task.getResult().getDocuments();
+                            listener.onSuccess(list);
+                        }
+                    }
+                });
+    }
+
 
     /**
      * Add a new document to a collection, returning the document ID.
@@ -154,6 +179,18 @@ public class FirebaseHelper {
                         // todo: on failure
                     }
                 });
+    }
+
+
+    void getUserArray(final String which, final IHelper listener) {
+        DocumentReference docRef = db.collection("users").document(getAppUserID());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                final List<String> r1 = (List<String>) task.getResult().getData().get(which);
+                listener.onSuccess(r1);
+            }
+        });
     }
 
 
