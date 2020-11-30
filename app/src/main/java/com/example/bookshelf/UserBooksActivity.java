@@ -57,6 +57,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     //Layout variables
     private ListView bookList;
     private FloatingActionButton addBookButton;
+    private Spinner spinner;
 
     //Adapter and List view variables
     private ArrayAdapter<Book> bookAdapter;
@@ -107,7 +108,6 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
        //Initialize variables
         final FloatingActionButton addBookButton;
 
-
         //Current user id
         userId = user.getUid();
         userDocument = db.collection("users").document(userId);
@@ -126,16 +126,6 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         bookFactory = new BookFactory("books");
         bookList.setAdapter(bookAdapter);
         db = FirebaseFirestore.getInstance();
-
-        //Long Press to delete
-        bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //Show confirmation fragment
-                new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
-                return false;
-            }
-        });
 
         //Click to edit
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -156,7 +146,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     new AddBookFragment().show(getSupportFragmentManager(), "ADD_BOOK");
                 }
         });
-        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
+        spinner = (Spinner) findViewById(R.id.spinner2);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.filter, android.R.layout.simple_spinner_item);
@@ -171,46 +161,80 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     bookAdapter.clear();
                     getUserOwnedBooks("All");
                     addBookButton.setVisibility(View.VISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
+                        }
+                    });
                 }
                 else if(i==1){
                     bookAdapter.clear();
                     getUserOwnedBooks("Available");
                     addBookButton.setVisibility(View.VISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
+                        }
+                    });
                 }
                 else if(i==2){
                     bookAdapter.clear();
-                    getUserOwnedBooks("Requested");
+                    OwnerRequestedBooks();
                     addBookButton.setVisibility(View.INVISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
+                        }
+                    });
                 }
                 else if(i==3){
                     bookAdapter.clear();
                     getUserOwnedBooks("Accepted");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
                 }
                 else if(i==4){
                     bookAdapter.clear();
                     getUserOwnedBooks("Borrowed");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+
                 }
                 else if(i==5){
                     bookAdapter.clear();
                     UserBorrowedBooks("All");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
                 }
                 else if(i==6){
                     bookAdapter.clear();
-                    UserBorrowedBooks("Requested");
+                    UserRequestedBooks("Requested");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
                 }
                 else if(i==7){
                     bookAdapter.clear();
                     UserBorrowedBooks("Accepted");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
                 }
                 else if(i==8){
                     bookAdapter.clear();
                     UserBorrowedBooks("Borrowed");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
                 }
 
             }
@@ -324,6 +348,48 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             }
         });
     }
+    private void UserRequestedBooks(final String status){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("requesterID").toString().equals(userId) && RequestStatus.valueOf(snapshot.getData().get("status").toString()).equals(RequestStatus.PENDING)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),status,false);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+    private void OwnerRequestedBooks(){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("ownerID").toString().equals(userId) && RequestStatus.valueOf(snapshot.getData().get("status").toString()).equals(RequestStatus.PENDING)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),"Requested",true);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
     @Override
     public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
 
@@ -357,7 +423,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     @Override
     public void getBook(Book book,String status, Boolean own) {
         if(status.equals("All")){
-            if(book.getStatus()== Book.BookStatus.Available && own==false ){
+            if(book.getStatus()== Book.BookStatus.Available && !own){
                 book.setStatus("Requested");
             }
             bookDataList.add(book);
@@ -367,7 +433,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                 bookDataList.add(book);
                 bookAdapter.notifyDataSetChanged();
             }
-            else if(book.getStatus()== Book.BookStatus.Available && own==false ){
+            else if(book.getStatus()== Book.BookStatus.Available && status.equals("Requested") ){
                 book.setStatus("Requested");
                 bookDataList.add(book);
                 bookAdapter.notifyDataSetChanged();
@@ -402,7 +468,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 2 && resultCode==RESULT_OK) {
-            getUserOwnedBooks("All");
+            spinner.setSelection(0);
         }
     }
 }
