@@ -22,8 +22,8 @@
 
     <ListView
         android:id="@+id/Book_list"
-        android:layout_width="408dp"
-        android:layout_height="462dp"
+        android:layout_width="fill_parent"
+        android:layout_height="480dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -97,7 +97,7 @@ public class SearchTest {
      *
      * @throws Exception
      */
-    @Test
+    @Before
     public void start() throws Exception {
         Activity activity = rule.getActivity();
     }
@@ -169,6 +169,11 @@ public class SearchTest {
         solo.enterText((EditText) solo.getView(R.id.create_account_user_pwd), testPassword);
         solo.clickOnButton("Create Account");
 
+<<<<<<< HEAD
+=======
+        //Wait for profile page activity to open
+        solo.waitForActivity(UserProfileActivity.class);
+>>>>>>> de15900e8998897544a34e13ab176b41355adf0d
         solo.assertCurrentActivity("Wrong Activity", UserProfileActivity.class);
 
         // Navigate to the search page

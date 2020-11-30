@@ -74,14 +74,6 @@ public class SearchBooksActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-//                                        String isbnString = document.getData().get("isbn").toString().replace("-", "");
-//                                        Long isbn = Long.parseLong(isbnString);
-//                                        Book book = new Book(document.getData().get("title").toString(),
-//                                                             document.getData().get("author").toString(),
-//                                                             isbn,
-//                                                             document.getData().get("description").toString(),
-//                                                             document.getData().get("ownerUsername").toString());
-//                                        book.setBookID(document.getId());
 
                                         BookFactory searchFactory = new BookFactory("books");
                                         Book findBook = searchFactory.get(document);
@@ -130,11 +122,6 @@ public class SearchBooksActivity extends AppCompatActivity {
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.search_page:
-                        return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
                         return true;
                 }
                 return false;

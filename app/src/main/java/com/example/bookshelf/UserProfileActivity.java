@@ -49,7 +49,6 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
 
     //Storage and Upload Imaging vrariables
     private FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageReference;
     private Uri uri;
 
     /**
@@ -71,7 +70,7 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
 
         //Database instance initialization
         db = FirebaseFirestore.getInstance();
-        storageReference = storage.getReference();
+        StorageReference storageReference = storage.getReference();
 
         //Fill Data in page
         db.collection("users").document(user.getUid()).get()
@@ -159,11 +158,6 @@ public class UserProfileActivity extends AppCompatActivity implements EditProfil
                     case R.id.search_page:
                         Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
                         startActivity(searchIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
                         overridePendingTransition(0, 0);
                         return true;
                 }
