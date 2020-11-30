@@ -88,17 +88,6 @@ public class BottomNavigationTest {
     }
 
     /**
-     * Runs after all tests are completed. Calls deleteUser function and closes all opened
-     * activities
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        deleteUser();
-        solo.finishOpenedActivities();
-    }
-
-    /**
      * Gets the current activity
      * @throws Exception
      */
@@ -112,7 +101,7 @@ public class BottomNavigationTest {
      * Then deletes the tested user from the database.
      */
     @Test
-    public void checkNavigation(){
+    public void checkNavigation() throws Exception {
         solo.assertCurrentActivity("Wrong Activity", CreateAccountActivity.class);
 
         //Test inputs
@@ -166,7 +155,7 @@ public class BottomNavigationTest {
         solo.waitForActivity(RequestDetailsActivity.class);
         solo.assertCurrentActivity("Wrong Activity", RequestDetailsActivity.class);
 
-
+        deleteUser();
 
     }
 
