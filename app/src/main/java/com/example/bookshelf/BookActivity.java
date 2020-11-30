@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -38,7 +36,8 @@ import java.util.HashMap;
  * This activity is for viewing the details of a book that has been searched for, and allowing the user to make a borrow request on the book.
  */
 
-public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener, AddBookFragment.DialogListener {
+public class BookActivity extends AppCompatActivity implements MakeRequestFragment.OnFragmentInteractionListener,
+        AddBookFragment.DialogListener, BookRequestersViewFragment.DialogListener {
     /**
      * The constant EXTRA_MESSAGE.
      */
@@ -53,6 +52,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
     private TextView status;
     private String bookId;
     private FloatingActionButton bookEditBtn;
+    private FloatingActionButton bookRequestsBtn;
 
     //Firebase authentication instance
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -90,6 +90,7 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
         owner = findViewById(R.id.owner_text);
         status = findViewById(R.id.status_text);
         bookEditBtn = findViewById(R.id.book_edit);
+        bookRequestsBtn = findViewById(R.id.book_requesters);
 
         bookCollection.document(message)
                 .get()
@@ -134,13 +135,21 @@ public class BookActivity extends AppCompatActivity implements MakeRequestFragme
                                     String currentUserUsername = task.getResult().getData().get("username").toString();
                                     if(!currentUserUsername.trim().equals(currentBook.getOwnerUsername().trim())){
                                         bookEditBtn.setVisibility(View.INVISIBLE);
+                                        bookRequestsBtn.setVisibility(View.INVISIBLE);
                                     }else{
-                                        //Starting the edit book fragment on  edit book click
+                                        //Starting the edit book fragment on edit book click
                                         bookEditBtn.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 AddBookFragment add_new = AddBookFragment.newInstance(currentBook);
                                                 add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
+                                            }
+                                        });
+
+                                        bookRequestsBtn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                new BookRequestersViewFragment(currentBook.getBookID()).show(getSupportFragmentManager(), "REQUESTERS");
                                             }
                                         });
                                     }
