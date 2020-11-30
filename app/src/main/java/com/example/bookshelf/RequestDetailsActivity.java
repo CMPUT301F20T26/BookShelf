@@ -1,14 +1,18 @@
 package com.example.bookshelf;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.gms.maps.model.LatLng;
@@ -16,35 +20,100 @@ import com.google.android.gms.maps.model.LatLng;
 public class RequestDetailsActivity extends AppCompatActivity {
     Double latval, longval;
     LatLng location; // LatLng type used by the maps API to specify a location
-    Button getLocation;
-    EditText latitude, longitude;
-    
+    Button getLocation, saveLocation;
+    TextView latlng, title;
+    final int GET_LOCATION = 1;
+    boolean ownerFlag;
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if ((requestCode == GET_LOCATION) && resultCode == RESULT_OK){
+            assert data != null;
+            location = data.getParcelableExtra("Specified Location");
+            latlng.setText(String.format("Latitude: %s and Longitude: %s", location.latitude, location.longitude));
+        }
+
+        if (location == null)
+        {
+            location = new LatLng(53.528333, -113.528917);
+        }
+    }
+
+    public void transformActivity() {
+        title = findViewById(R.id.req_text);
+        saveLocation = findViewById(R.id.save_details);
+        getLocation = findViewById(R.id.get_location);
+
+        if (ownerFlag) {
+            saveLocation.setVisibility(View.INVISIBLE);
+            title.setText("");
+            title.setText("View Request Details");
+            getLocation.setText("");
+            getLocation.setText("View Location");
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent intent = getIntent();
+        ownerFlag = intent.getBooleanExtra("Owner Flag", false);
+        transformActivity();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_details);
 
         // Get all the necessary views
         getLocation = findViewById(R.id.get_location);
-        latitude = findViewById(R.id.Lat);
-        longitude = findViewById(R.id.Long);
+        latlng = findViewById(R.id.Lat);
+
+
+
+
 
         // Listener for the get location button. Will launch the map fragment activity
         getLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                latval = Double.parseDouble(latitude.getText().toString());
-                longval = Double.parseDouble(longitude.getText().toString());
-                location = new LatLng(latval, longval);
-
                 // put the LatLng item into an intent to be used by the map fragment activity
                 Intent viewLocation = new Intent(getApplicationContext(), ViewLocationActivity.class);
-                viewLocation.putExtra("LATITUDE AND LONGITUDE", location); // TODO: choose lat/lon from map
-                startActivity(viewLocation);
+                startActivityForResult(viewLocation, GET_LOCATION);
                 overridePendingTransition(0, 0);
             }
         });
+
+
+
+
+
+        saveLocation = findViewById(R.id.save_details);
+        saveLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(RequestDetailsActivity.this)
+                        .setTitle("Confirm Location")
+                        .setMessage("Are you sure you want to save these Location details?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent output = new Intent();
+                                output.putExtra("Saved Location", location);
+                                setResult(RESULT_OK, output);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+
+            }
+        });
+
+
+
+
+
 
 
         //BOTTOM NAVIGATION_________________________________________________________________________

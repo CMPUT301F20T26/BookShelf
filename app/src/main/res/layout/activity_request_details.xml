@@ -30,94 +30,80 @@
         app:menu="@menu/menu_bottom_navigation" />
 
     <TextView
-        android:layout_width="370dp"
-        android:layout_height="68dp"
-        android:gravity="center"
+        android:layout_width="383dp"
+        android:layout_height="117dp"
+        android:id="@+id/req_text"
+        android:gravity="center_horizontal|center_vertical"
         android:text="Request Details (Test)"
         android:textAlignment="center"
-        android:textAllCaps="true"
         android:textSize="36sp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
+        app:layout_constraintBottom_toTopOf="@+id/get_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintVertical_bias="0.05"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.044" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/Lat_text"
-        android:layout_width="171dp"
-        android:layout_height="22dp"
-        android:gravity="start|center_vertical"
-        android:text="Latitude"
-        android:textAlignment="viewStart"
+        android:layout_width="300dp"
+        android:layout_height="25dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="Latitude and Longitude Details"
+        android:textAlignment="center"
         android:textAllCaps="true"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.083"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.30" />
 
-    <EditText
+    <TextView
         android:id="@+id/Lat"
         android:layout_width="370dp"
         android:layout_height="50dp"
-        android:gravity="start|center_vertical"
-        android:hint="Enter the Latitude of the Location"
-        android:textAlignment="viewStart"
+        android:gravity="center_horizontal|center_vertical"
+        android:hint="Specified Latitude and Longitude of Location"
+        android:textAlignment="center"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Lat_text"
-        app:layout_constraintVertical_bias="0.043" />
-
-    <TextView
-        android:id="@+id/Long_text"
-        android:layout_width="171dp"
-        android:layout_height="22dp"
-        android:gravity="start|center_vertical"
-        android:text="Longitude"
-        android:textAlignment="viewStart"
-        android:textAllCaps="true"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.083"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45" />
-
-    <EditText
-        android:id="@+id/Long"
-        android:layout_width="370dp"
-        android:layout_height="50dp"
-        android:gravity="start|center_vertical"
-        android:hint="Enter the Longitude of the Location"
-        android:textAlignment="viewStart"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.487"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Long_text"
-        app:layout_constraintVertical_bias="0.043" />
+        app:layout_constraintVertical_bias="0.08" />
 
     <Button
         android:id="@+id/get_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="296dp"
+        android:background="@color/colorPrimary"
+        android:padding="16dp"
+        android:requiresFadingEdge="horizontal|vertical"
         android:text="Get Location"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Long"
-        android:requiresFadingEdge="horizontal|vertical"
+        app:layout_constraintTop_toBottomOf="@+id/Lat"
+        app:layout_constraintVertical_bias="2" />
+
+    <Button
+        android:id="@+id/save_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:background="@color/colorPrimary"
         android:padding="16dp"
-        android:background="@color/colorPrimary"/>
+        android:requiresFadingEdge="horizontal|vertical"
+        android:text="Save Location Details"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.902"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

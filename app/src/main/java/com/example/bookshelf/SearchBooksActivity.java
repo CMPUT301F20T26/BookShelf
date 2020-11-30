@@ -132,7 +132,7 @@ public class SearchBooksActivity extends AppCompatActivity {
                     case R.id.search_page:
                         return true;
                     case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
+                        Intent mapsIntent = new Intent(getApplicationContext(), BorrowBook.class);
                         startActivity(mapsIntent);
                         overridePendingTransition(0, 0);
                         return true;

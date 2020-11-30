@@ -12,5 +12,6 @@
     <string name="edit">Edit</string>
     <string name="add_picture">Add Picture</string>
     <string name="title_activity_view_location1">Map</string>
+    <string name="icon">CommonsWare logo</string>
 
 </resources>
