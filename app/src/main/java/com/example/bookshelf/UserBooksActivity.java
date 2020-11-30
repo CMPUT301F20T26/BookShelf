@@ -74,6 +74,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     private FirebaseFirestore db =  FirebaseFirestore.getInstance();
     //Books Collection reference
     private CollectionReference bookCollection = db.collection("books");
+
+    private CollectionReference notificationsCollection = db.collection("notifications");
     //Current user's collection reference
     private DocumentReference userDocument;
 
@@ -213,22 +215,40 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         if(i==0){
+            bookAdapter.clear();
             getUserOwnedBooks("All");
         }
         else if(i==1){
+            bookAdapter.clear();
             getUserOwnedBooks("Available");
         }
         else if(i==2){
+            bookAdapter.clear();
             getUserOwnedBooks("Requested");
         }
         else if(i==3){
+            bookAdapter.clear();
             getUserOwnedBooks("Accepted");
         }
         else if(i==4){
+            bookAdapter.clear();
             getUserOwnedBooks("Borrowed");
         }
         else if(i==5){
-            getUserOwnedBooks("Loaned");
+            bookAdapter.clear();
+            UserBorrowedBooks("All");
+        }
+        else if(i==6){
+            bookAdapter.clear();
+            UserBorrowedBooks("Requested");
+        }
+        else if(i==7){
+            bookAdapter.clear();
+            UserBorrowedBooks("Accepted");
+        }
+        else if(i==8){
+            bookAdapter.clear();
+            UserBorrowedBooks("Borrowed");
         }
 
     }
@@ -272,7 +292,27 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                                                 }
                                             }});}}}});
     }
-
+    private void UserBorrowedBooks(final String status){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("requesterID").toString().equals(userId)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),status);
+                                    }
+                                }
+                            });
+                    }
+                }
+            }
+        });
+    }
     @Override
     public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
 
@@ -343,8 +383,5 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         if(requestCode == 2 && resultCode==RESULT_OK) {
             getUserOwnedBooks("All");
         }
-    }
-    private void Sort(String status){
-
     }
 }
