@@ -97,7 +97,7 @@ public class BookRequestersViewFragment extends DialogFragment {
                                 reqestsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                     @Override
                                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                        //Start a new intent
+                                        //Start a new intent here
                                         //Pass in the variable called notificationId to the new intent
                                     }
                                 });
