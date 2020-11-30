@@ -51,8 +51,6 @@ public class RequestDetailsActivity extends AppCompatActivity {
         //Initialize nav bar and assign it
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav_bar);
 
-        // Set home selected
-        bottomNavigationView.setSelectedItemId(R.id.maps_page);
 
         //Item Selected Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -79,8 +77,6 @@ public class RequestDetailsActivity extends AppCompatActivity {
                         Intent searchIntent = new Intent(getApplicationContext(), SearchBooksActivity.class);
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
-                        return true;
-                    case R.id.maps_page:
                         return true;
                 }
                 return false;
