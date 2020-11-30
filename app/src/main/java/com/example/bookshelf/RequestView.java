@@ -18,9 +18,13 @@ public class RequestView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.request_view);
-
         Intent intent = getIntent();
         String info = intent.getStringExtra("Book Info");
+
+        accept = findViewById(R.id.request_accept);
+        decline = findViewById(R.id.request_decline);
+
+
 
 
     }
