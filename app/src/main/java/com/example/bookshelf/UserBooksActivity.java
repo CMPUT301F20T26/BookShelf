@@ -287,7 +287,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot documentSnapshot = task.getResult();
-                                                    getBook(bookFactory.get(documentSnapshot),status);
+                                                    getBook(bookFactory.get(documentSnapshot),status,true);
 
                                                 }
                                             }});}}}});
@@ -304,7 +304,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if(task.isSuccessful()){
                                     DocumentSnapshot documentSnapshot = task.getResult();
-                                    getBook(bookFactory.get(documentSnapshot),status);
+                                    getBook(bookFactory.get(documentSnapshot),status,false);
                                     }
                                 }
                             });
@@ -344,8 +344,11 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     }
 
     @Override
-    public void getBook(Book book,String status) {
+    public void getBook(Book book,String status, Boolean own) {
         if(status.equals("All")){
+            if(book.getStatus()== Book.BookStatus.Available && own==false ){
+                book.setStatus("Requested");
+            }
             bookDataList.add(book);
             bookAdapter.notifyDataSetChanged();}
         else{

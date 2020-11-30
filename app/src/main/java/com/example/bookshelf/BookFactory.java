@@ -30,7 +30,7 @@ public class BookFactory {
         /**
          * Add book.
          */
-        void getBook(Book book, String status);
+        void getBook(Book book, String status, Boolean own);
     }
 
 
