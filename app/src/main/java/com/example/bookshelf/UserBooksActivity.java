@@ -53,7 +53,7 @@ import java.util.Map;
 /**
  * The type User books activity.
  */
-public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener, BookFactory.bookListener, AdapterView.OnItemSelectedListener{
+public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener, BookFactory.bookListener{
     //Layout variables
     private ListView bookList;
     private FloatingActionButton addBookButton;
@@ -164,7 +164,62 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
+        spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("All");
+                    addBookButton.setVisibility(View.VISIBLE);
+                }
+                else if(i==1){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Available");
+                    addBookButton.setVisibility(View.VISIBLE);
+                }
+                else if(i==2){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Requested");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==3){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==4){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==5){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("All");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==6){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Requested");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==7){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==8){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         // I am grabbing the username and owned books list, from the user database and saving it in the user_name,
         // I checked whether its grabbing it by sending it to the log
@@ -212,51 +267,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //__________________________________________________________________________________________
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if(i==0){
-            bookAdapter.clear();
-            getUserOwnedBooks("All");
-        }
-        else if(i==1){
-            bookAdapter.clear();
-            getUserOwnedBooks("Available");
-        }
-        else if(i==2){
-            bookAdapter.clear();
-            getUserOwnedBooks("Requested");
-        }
-        else if(i==3){
-            bookAdapter.clear();
-            getUserOwnedBooks("Accepted");
-        }
-        else if(i==4){
-            bookAdapter.clear();
-            getUserOwnedBooks("Borrowed");
-        }
-        else if(i==5){
-            bookAdapter.clear();
-            UserBorrowedBooks("All");
-        }
-        else if(i==6){
-            bookAdapter.clear();
-            UserBorrowedBooks("Requested");
-        }
-        else if(i==7){
-            bookAdapter.clear();
-            UserBorrowedBooks("Accepted");
-        }
-        else if(i==8){
-            bookAdapter.clear();
-            UserBorrowedBooks("Borrowed");
-        }
 
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 
     public class SpinnerActivity extends Activity implements AdapterView.OnItemSelectedListener {
         @Override
@@ -356,7 +367,14 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                 bookDataList.add(book);
                 bookAdapter.notifyDataSetChanged();
             }
-        }
+            else if(book.getStatus()== Book.BookStatus.Available && own==false ){
+                book.setStatus("Requested");
+                bookDataList.add(book);
+                bookAdapter.notifyDataSetChanged();
+            }
+
+
+    }
     }
 
     public void deleteLongPress(Integer position){
