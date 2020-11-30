@@ -52,7 +52,9 @@ public class ScanISBNActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra("isbn", "9876543219876");
+                intent.putExtra("isbn", "9780553804577");
+
+
                 setResult(RESULT_OK, intent);
                 finish();
             }});

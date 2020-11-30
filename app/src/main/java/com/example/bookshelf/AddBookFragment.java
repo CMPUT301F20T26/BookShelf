@@ -20,6 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,6 +40,15 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
@@ -75,6 +90,7 @@ public class AddBookFragment extends DialogFragment {
 
     private static final int GET_CONTENT_REQUEST_CODE = 0;
     private static final int SCAN_ACTIVITY_REQUEST_CODE = 1;
+
 
     /**
      * The interface Dialog listener.
@@ -290,6 +306,82 @@ public class AddBookFragment extends DialogFragment {
                     isbnEt.setText(isbn);
                 }
             });
+
+            RequestQueue queue = Volley.newRequestQueue(this.getContext());
+
+            String url ="https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn;
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
+                    url,
+                    null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                JSONArray itemsArray = response.getJSONArray("items");
+
+                                // Initialize iterator and results fields.
+                                int i = 0;
+                                String title = null;
+                                String authors = null;
+                                String description = null;
+
+                                // Look for results in the items array, exiting when both the title and author
+                                // are found or when all items have been checked.
+                                if (authors == null && title == null) {
+                                    // Get the current item information.
+                                    JSONObject book = itemsArray.getJSONObject(0);
+                                    JSONObject volumeInfo = book.getJSONObject("volumeInfo");
+
+                                    // Try to get the author, title, description
+                                    try {
+                                        title = volumeInfo.getString("title");
+                                        authors = volumeInfo.getString("authors").replaceAll("[]\"\\[]", "").replaceAll(",", ", ");
+
+                                        description = volumeInfo.getString("description");
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    // Move to the next item.
+                                    i++;
+                                }
+                                final String finalAuthors = authors;
+                                authorEt.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        authorEt.setText(finalAuthors);
+                                    }
+                                });
+                                final String finalTitle = title;
+                                titleEt.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        titleEt.setText(finalTitle);
+                                    }
+                                });
+                                final String finalDescription = description;
+                                descriptionEt.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        descriptionEt.setText(finalDescription);
+                                    }
+                                });
+
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //textView.setText("That didn't work!");
+                }
+            }
+            );
+            queue.add(request);
+
         }
     }
 
