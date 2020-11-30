@@ -46,24 +46,37 @@ public class UserNotificationsActivity extends AppCompatActivity {
         notificationAdapter = new NotificationAdapter(this, notifications);
         notificationList.setAdapter(notificationAdapter);
 
-        db.collection("notifications")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
+        final FirebaseHelper helper = new FirebaseHelper();
 
-                                ListNotifications displayNotification = ListNotifications.get(document);
-                                matchNotification(displayNotification);
+        FirebaseHelper.IHelper listener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                final List<String> myNotif = (List<String>) o;
+                db.collection("notifications")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                            ListNotifications displayNotification = ListNotifications.get(document);
+                                            matchNotification(displayNotification, myNotif);
+
+                                    }
+                                }
                             }
-                        }
-                    }
-                });
+                        });
+            }
 
-//        final String userId = user.getUid();
-//        uidTv = findViewById(R.id.uid_notifications);
-//        uidTv.setText(userId);
+            @Override
+            public void onFailure(Object o) {
+
+            }
+        };
+
+
+            helper.getUserArray("notifications", listener);
+
 
 
 
@@ -109,11 +122,13 @@ public class UserNotificationsActivity extends AppCompatActivity {
         //__________________________________________________________________________________________
     }
 
-    public void matchNotification(ListNotifications notification){
-        final String userId = user.getUid();
+    public void matchNotification(ListNotifications notification, List<String> myNotif){
 
-//        if((notification.getOwnerID().equals(userId) && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID().equals(userId) && notification.getStatus() == RequestStatus.ACCEPTED)) {
+        if (myNotif.contains(notification.NotificationID)){
             notificationAdapter.add(notification);
+        }
+//        if((notification.getOwnerID().equals(userId) && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID().equals(userId) && notification.getStatus() == RequestStatus.ACCEPTED)) {
+
 //        }
 
     }

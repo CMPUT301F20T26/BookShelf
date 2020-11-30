@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.text.RandomStringGenerator;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -154,6 +155,18 @@ public class FirebaseHelper {
                         // todo: on failure
                     }
                 });
+    }
+
+
+    void getUserArray(final String which, final IHelper listener) {
+        DocumentReference docRef = db.collection("users").document(getAppUserID());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                final List<String> r1 = (List<String>) task.getResult().getData().get(which);
+                listener.onSuccess(r1);
+            }
+        });
     }
 
 
