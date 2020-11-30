@@ -158,11 +158,11 @@ public class BookFactory {
         final String isbnString;
         Long isbn = 0L;
 
-            res.setBookID(bookID);
+            res.setBookID(bookDoc.getId());
             if(bookDoc.getData().get("isbn") != null) {
                 isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
                 isbn = Long.parseLong(isbnString);
-                res.setBookID(bookID);
+                res.setBookID(bookDoc.getId());
             }
             if(bookDoc.getData().get("title") != null) {
                 res.setTitle(bookDoc.get("title").toString());
