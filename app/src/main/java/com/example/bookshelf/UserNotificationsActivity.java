@@ -50,14 +50,12 @@ public class UserNotificationsActivity extends AppCompatActivity {
         final FirebaseHelper.IHelper notifListener = new FirebaseHelper.IHelper() {
             @Override
             public void onSuccess(Object o) {
-                final DocumentSnapshot res = (DocumentSnapshot) o;
-                ListNotifications n = ListNotifications.get(res);
-                if (n != null) {
-                    notificationsList.add(n);
-
+                final List<DocumentSnapshot> res = (List<DocumentSnapshot>) o;
+                for (DocumentSnapshot snapshot : res){
+                    notificationsList.add(ListNotifications.get(snapshot));
+                    //notificationAdapter.notifyDataSetChanged();
                 }
                 notificationAdapter.notifyDataSetChanged();
-
 
             }
 
@@ -71,10 +69,8 @@ public class UserNotificationsActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Object o) {
                 final List<String> myNotif = (List<String>) o;
-                for (String n : myNotif) {
-                    helper.get("notifications", n, notifListener);
-
-                }
+                helper.getList("notifications", myNotif, notifListener);
+                //notificationAdapter.notifyDataSetChanged();
             }
 
             @Override

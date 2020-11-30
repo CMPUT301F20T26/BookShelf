@@ -62,13 +62,14 @@ public class ListNotifications extends UserNotification{
             if(notifDoc.get("status") != null) {
                 notification.setStatus(notifDoc.get("status").toString());
             }
+            return notification;
         }
         else
         {
             return null;
         }
 
-        return notification;
+
     }
 
     public void setStatus(String status){
