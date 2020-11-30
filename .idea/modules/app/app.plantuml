@@ -33,6 +33,12 @@ title __BOOKSHELF.APP's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.BookRequestersViewFragment {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.BorrowMyBook {
     }
   }
@@ -57,6 +63,12 @@ title __BOOKSHELF.APP's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.DeleteConfirmFragment {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.EditProfileFragment {
     }
   }
@@ -69,6 +81,12 @@ title __BOOKSHELF.APP's Class Diagram__\n
   
 
   namespace com.example.bookshelf {
+    class com.example.bookshelf.ListNotifications {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
     class com.example.bookshelf.MainActivity {
     }
   }
@@ -76,6 +94,12 @@ title __BOOKSHELF.APP's Class Diagram__\n
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.MakeRequestFragment {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.NotificationAdapter {
     }
   }
   
@@ -100,6 +124,18 @@ title __BOOKSHELF.APP's Class Diagram__\n
 
   namespace com.example.bookshelf {
     class com.example.bookshelf.RequestTheirBook {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.RequestView {
+    }
+  }
+  
+
+  namespace com.example.bookshelf {
+    class com.example.bookshelf.ScanISBNActivity {
     }
   }
   
@@ -161,38 +197,53 @@ title __BOOKSHELF.APP's Class Diagram__\n
   com.example.bookshelf.AddBookFragment -up-|> androidx.fragment.app.DialogFragment
   com.example.bookshelf.AddBookFragment o-- com.example.bookshelf.AddBookFragment.DialogListener : listener
   com.example.bookshelf.Book .up.|> java.io.Serializable
-  com.example.bookshelf.Book o-- com.example.bookshelf.Book.BookStatus : Status
+  com.example.bookshelf.Book o-- com.example.bookshelf.Book.BookStatus : status
+  com.example.bookshelf.BookActivity .up.|> com.example.bookshelf.AddBookFragment.DialogListener
+  com.example.bookshelf.BookActivity .up.|> com.example.bookshelf.BookRequestersViewFragment.DialogListener
   com.example.bookshelf.BookActivity .up.|> com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener
   com.example.bookshelf.BookActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.BookActivity o-- com.example.bookshelf.Book : currentBook
   com.example.bookshelf.BookArrayAdapter -up-|> android.widget.ArrayAdapter
+  com.example.bookshelf.BookFactory o-- com.example.bookshelf.BookFactory.bookListener : listener
   com.example.bookshelf.BookFactory o-- com.example.bookshelf.Book : thisBook
+  com.example.bookshelf.BookRequestersViewFragment -up-|> androidx.fragment.app.DialogFragment
+  com.example.bookshelf.BookRequestersViewFragment o-- com.example.bookshelf.BookRequestersViewFragment.DialogListener : listener
   com.example.bookshelf.BorrowMyBook -up-|> com.example.bookshelf.UserNotification
   com.example.bookshelf.BorrowMyBook o-- com.example.bookshelf.Book : myBook
   com.example.bookshelf.BorrowTheirBook -up-|> com.example.bookshelf.UserNotification
   com.example.bookshelf.BorrowTheirBook o-- com.example.bookshelf.Book : theirBook
   com.example.bookshelf.CreateAccountActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.CreateAccountActivity o-- com.example.bookshelf.UserInfo : userInfo
+  com.example.bookshelf.DeleteConfirmFragment -up-|> androidx.fragment.app.DialogFragment
+  com.example.bookshelf.DeleteConfirmFragment o-- com.example.bookshelf.DeleteConfirmFragment.DialogListener : listener
   com.example.bookshelf.EditProfileFragment -up-|> androidx.fragment.app.DialogFragment
   com.example.bookshelf.EditProfileFragment o-- com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener : listener
   com.example.bookshelf.EditProfileFragment o-- com.example.bookshelf.UserInfo : userInfo
+  com.example.bookshelf.ListNotifications -up-|> com.example.bookshelf.UserNotification
   com.example.bookshelf.MainActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.MakeRequestFragment -up-|> androidx.fragment.app.DialogFragment
   com.example.bookshelf.MakeRequestFragment o-- com.example.bookshelf.MakeRequestFragment.OnFragmentInteractionListener : listener
+  com.example.bookshelf.NotificationAdapter -up-|> android.widget.ArrayAdapter
   com.example.bookshelf.RequestDetailsActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.RequestMyBook -up-|> com.example.bookshelf.UserNotification
   com.example.bookshelf.RequestMyBook o-- com.example.bookshelf.Book : myBook
   com.example.bookshelf.RequestTheirBook -up-|> com.example.bookshelf.UserNotification
   com.example.bookshelf.RequestTheirBook o-- com.example.bookshelf.Book : theirBook
+  com.example.bookshelf.RequestView -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.ScanISBNActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.SearchBooksActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.SearchBooksActivity o-- com.example.bookshelf.BookArrayAdapter : bookAdapter
   com.example.bookshelf.SignInActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserBooksActivity .up.|> com.example.bookshelf.AddBookFragment.DialogListener
+  com.example.bookshelf.UserBooksActivity .up.|> com.example.bookshelf.BookFactory.bookListener
+  com.example.bookshelf.UserBooksActivity .up.|> com.example.bookshelf.DeleteConfirmFragment.DialogListener
   com.example.bookshelf.UserBooksActivity -up-|> androidx.appcompat.app.AppCompatActivity
-  com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.BookArrayAdapter : bookArrayAdapter
+  com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.BookFactory : bookFactory
+  com.example.bookshelf.UserBooksActivity o-- com.example.bookshelf.FirebaseHelper : firebaseHelper
   com.example.bookshelf.UserNotification o-- com.example.bookshelf.RequestStatus : status
   com.example.bookshelf.UserNotificationsActivity -up-|> androidx.appcompat.app.AppCompatActivity
+  com.example.bookshelf.UserNotificationsActivity o-- com.example.bookshelf.NotificationAdapter : notificationAdapter
   com.example.bookshelf.UserProfileActivity .up.|> com.example.bookshelf.EditProfileFragment.OnFragmentInteractionListener
   com.example.bookshelf.UserProfileActivity -up-|> androidx.appcompat.app.AppCompatActivity
   com.example.bookshelf.UserProfileActivity o-- com.example.bookshelf.UserInfo : userInfo
