@@ -42,25 +42,31 @@ public class ListNotifications extends UserNotification{
         final ListNotifications notification = new ListNotifications();
         Map<String, Object> notiDocData = notifDoc.getData();
 
-        notification.setNotificationID(notifDoc.getId());
+        if(notiDocData != null){
+            notification.setNotificationID(notifDoc.getId());
 
-        if(notiDocData.get("bookID") != null) {
-            notification.setBook(notiDocData.get("bookID").toString());
+            if(notiDocData.get("bookID") != null) {
+                notification.setBook(notiDocData.get("bookID").toString());
+            }
+            if(notiDocData.get("date") != null) {
+                notification.setDate(notiDocData.get("date").toString());
+            }
+            if(notiDocData.get("meetUpLocation") != null) {
+                notification.setMeetUpLocation(notiDocData.get("meetUpLocation").toString());
+            }
+            if(notiDocData.get("ownerID") != null) {
+                notification.setOwner(notiDocData.get("ownerID").toString());
+            }
+            if(notiDocData.get("requesterID") != null) {
+                notification.setRequester(notiDocData.get("requesterID").toString());
+            }
+            if(notiDocData.get("status") != null) {
+                notification.setStatus(notiDocData.get("status").toString());
+            }
         }
-        if(notiDocData.get("date") != null) {
-            notification.setDate(notiDocData.get("date").toString());
-        }
-        if(notiDocData.get("meetUpLocation") != null) {
-            notification.setMeetUpLocation(notiDocData.get("meetUpLocation").toString());
-        }
-        if(notiDocData.get("ownerID") != null) {
-            notification.setOwner(notiDocData.get("ownerID").toString());
-        }
-        if(notiDocData.get("requesterID") != null) {
-            notification.setRequester(notiDocData.get("requesterID").toString());
-        }
-        if(notiDocData.get("status") != null) {
-            notification.setStatus(notiDocData.get("status").toString());
+        else
+        {
+            return null;
         }
 
         return notification;
