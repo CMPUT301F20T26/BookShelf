@@ -210,19 +210,18 @@ public class AddBookFragment extends DialogFragment {
                                             String des_new = descriptionEt.getText().toString();
 
                                             if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
-                                                Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
-                                                toast.show();
-                                                return;
-                                            }
+                                                Toast.makeText(getContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_SHORT).show();
+                                            }else {
 
-                                            Long isbn_long = Long.parseLong(isbnEt.getText().toString());
-                                            String coverUrl = isbn_new + ".png";
+                                                Long isbn_long = Long.parseLong(isbnEt.getText().toString());
+                                                String coverUrl = isbn_new + ".png";
 
-                                            // check if gear is to be edited or added
-                                            if (finalArgBook != null) {
-                                                listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, finalArgBook.getBookID());
-                                            } else {
-                                                listener.add_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new);
+                                                // check if gear is to be edited or added
+                                                if (finalArgBook != null) {
+                                                    listener.edit_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new, finalStatus, finalArgBook.getBookID());
+                                                } else {
+                                                    listener.add_Book(title_new, author_new, isbn_long, coverUrl, ownerUsername, des_new);
+                                                }
                                             }
                                         }
                                     }

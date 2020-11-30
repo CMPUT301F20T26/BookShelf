@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/profile_background"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:background="@drawable/profile_background"
     tools:context=".UserBooksActivity">
 
     <!--  Bottom navigation -->
@@ -42,7 +42,6 @@
         android:text="Library"
         android:textColor="@color/white"
         android:textSize="36sp"
-        app:layout_constraintBottom_toTopOf="@+id/Book_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -60,6 +59,57 @@
         app:itemTextColor="@drawable/menu_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/menu_bottom_navigation" />
+
+    <Button
+        android:id="@+id/books_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="My Books"
+        app:layout_constraintEnd_toStartOf="@+id/books_borrowing"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
+
+    <Button
+        android:id="@+id/books_borrowing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Borriwing"
+        app:layout_constraintBottom_toBottomOf="@+id/books_user"
+        app:layout_constraintEnd_toStartOf="@+id/books_requested"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/books_user" />
+
+    <Button
+        android:id="@+id/books_accepted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accpeted"
+        app:layout_constraintBottom_toBottomOf="@+id/books_user"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/books_requested" />
+
+    <Button
+        android:id="@+id/books_requested"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Requested"
+        app:layout_constraintBottom_toBottomOf="@+id/books_user"
+        app:layout_constraintEnd_toStartOf="@+id/books_accepted"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/books_borrowing" />
+
+    <TextView
+        android:id="@+id/filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filter: My Books"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/books_user" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
