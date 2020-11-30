@@ -4,17 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-
+import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +27,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
@@ -42,6 +43,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import com.google.firebase.firestore.Source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The type User books activity.
@@ -67,6 +74,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     private FirebaseFirestore db =  FirebaseFirestore.getInstance();
     //Books Collection reference
     private CollectionReference bookCollection = db.collection("books");
+
+    private CollectionReference notificationsCollection = db.collection("notifications");
     //Current user's collection reference
     private DocumentReference userDocument;
 
@@ -82,11 +91,13 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     //BookFactory call
     private BookFactory bookFactory;
 
+
     /**
      * Instantiates a new User books activity.
      */
     public UserBooksActivity() {
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +106,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
 
        //Initialize variables
         final FloatingActionButton addBookButton;
+
 
         //Current user id
         userId = user.getUid();
@@ -108,6 +120,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //Adapter assignments
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
+
+        bookList.setAdapter(bookAdapter);
 
         bookFactory = new BookFactory("books");
         bookList.setAdapter(bookAdapter);
@@ -131,12 +145,9 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     @Override
                     public void onClick(View view) {
                         Book clickedBook = bookDataList.get(i);
-
                         openBookDescription(clickedBook.getBookID());
                     }
-                });
-            }
-        });
+                });}});
 
         //Clicking the add button
         addBookButton.setOnClickListener(new View.OnClickListener() {
@@ -145,10 +156,74 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     new AddBookFragment().show(getSupportFragmentManager(), "ADD_BOOK");
                 }
         });
+        Spinner spinner = (Spinner) findViewById(R.id.spinner2);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.filter, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("All");
+                    addBookButton.setVisibility(View.VISIBLE);
+                }
+                else if(i==1){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Available");
+                    addBookButton.setVisibility(View.VISIBLE);
+                }
+                else if(i==2){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Requested");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==3){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==4){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==5){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("All");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==6){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Requested");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==7){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+                else if(i==8){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         // I am grabbing the username and owned books list, from the user database and saving it in the user_name,
         // I checked whether its grabbing it by sending it to the log
-        getUserOwnedBooks();
+
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
@@ -192,8 +267,22 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //__________________________________________________________________________________________
     }
 
-    private void getUserOwnedBooks() {
 
+
+    public class SpinnerActivity extends Activity implements AdapterView.OnItemSelectedListener {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view,
+                                   int pos, long id) {
+            // An item was selected. You can retrieve the selected item using
+            // parent.getItemAtPosition(pos)
+        }
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            // Another interface callback
+        }
+    }
+    private void getUserOwnedBooks(final String status) {
+        // Extract books from the owner username and send to bookAdapter
         bookDataList.clear();
         db.collection("users").document(user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -203,26 +292,46 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                             DocumentSnapshot documentSnapshot = task.getResult();
                             final List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
                             for(int i = 0; i<ownedBooks.size(); i++){
-                                System.out.println(ownedBooks.get(i));
                                 db.collection("books").document(ownedBooks.get(i)).get()
                                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()) {
                                                     DocumentSnapshot documentSnapshot = task.getResult();
-                                                    getBook(bookFactory.get(documentSnapshot));
+                                                    getBook(bookFactory.get(documentSnapshot),status,true);
 
                                                 }
                                             }});}}}});
     }
-
+    private void UserBorrowedBooks(final String status){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("requesterID").toString().equals(userId)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),status,false);
+                                    }
+                                }
+                            });
+                    }
+                }
+            }
+        });
+    }
     @Override
     public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
+
         db.collection("users").document(user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()) {
+                        if(task.isSuccessful()){
                             DocumentSnapshot documentSnapshot = task.getResult();
                             bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
                             bookFactory.Author(author);
@@ -246,13 +355,30 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     }
 
     @Override
-    public void getBook(Book book) {
-        bookAdapter.add(book);
+    public void getBook(Book book,String status, Boolean own) {
+        if(status.equals("All")){
+            if(book.getStatus()== Book.BookStatus.Available && own==false ){
+                book.setStatus("Requested");
+            }
+            bookDataList.add(book);
+            bookAdapter.notifyDataSetChanged();}
+        else{
+            if(book.getStatus().toString().equals(status)){
+                bookDataList.add(book);
+                bookAdapter.notifyDataSetChanged();
+            }
+            else if(book.getStatus()== Book.BookStatus.Available && own==false ){
+                book.setStatus("Requested");
+                bookDataList.add(book);
+                bookAdapter.notifyDataSetChanged();
+            }
+
+
     }
+    }
+
     public void deleteLongPress(Integer position){
         final Book deletedBook = bookDataList.get(position);
-
-        //Delete from delete from books collection
         bookFactory.delete(deletedBook.getBookID());
         userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID()));
 
@@ -263,7 +389,6 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         //Delete from book data list and update adapter
         bookDataList.remove(deletedBook);
         bookAdapter.notifyDataSetChanged();
-
     }
 
     public void openBookDescription(String id) {
@@ -277,7 +402,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 2 && resultCode==RESULT_OK) {
-            getUserOwnedBooks();
+            getUserOwnedBooks("All");
         }
     }
 }

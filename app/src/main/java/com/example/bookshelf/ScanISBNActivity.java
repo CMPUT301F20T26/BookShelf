@@ -53,6 +53,8 @@ public class ScanISBNActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.putExtra("isbn", "9780553804577");
+
+
                 setResult(RESULT_OK, intent);
                 finish();
             }});

@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+
 import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
@@ -91,17 +92,14 @@ public class AddBookFragment extends DialogFragment {
     private static final int SCAN_ACTIVITY_REQUEST_CODE = 1;
 
 
-
     /**
      * The interface Dialog listener.
      */
     public interface DialogListener{
-
         /**
          * Add book.
          */
         void onOkPressed(Book book, String author,String des,String isbn,String title, String photoURL, Boolean edit);
-
     }
 
     /**
@@ -220,6 +218,7 @@ public class AddBookFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final Book finalArgBook = argBook;
         final Book.BookStatus finalStatus = status;
+        final Book finalArgBook1 = argBook;
         return builder
                 .setView(view)
                 .setTitle("Book")
@@ -227,28 +226,37 @@ public class AddBookFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String title_new = titleEt.getText().toString();
-                        String author_new = authorEt.getText().toString();
-                        String isbn_new = isbnEt.getText().toString();
-                        String des_new = descriptionEt.getText().toString();
-                        if (title_new.equals("") || author_new.equals("") || isbn_new.equals("g")) {
-                            Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
-                            toast.show();
-                            return;
-                        }
-                        Long isbn_long = Long.parseLong(isbnEt.getText().toString());
-                        String coverUrl = isbn_new + ".png";
+                        userDocumentRef.get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = task.getResult();
 
-                        if (getArguments() != null) {listener.onOkPressed(finalArgBook,author_new, des_new, isbn_new, title_new,coverUrl,true);}
-                        else{listener.onOkPressed(finalArgBook,author_new, des_new, isbn_new, title_new,coverUrl,false);}
+                                            ownerUsername = documentSnapshot.getData().get("username").toString();
+                                            String title_new = titleEt.getText().toString();
+                                            String author_new = authorEt.getText().toString();
+                                            String isbn_new = isbnEt.getText().toString();
+                                            String des_new = descriptionEt.getText().toString();
 
+                                            if (title_new.isEmpty() || author_new.isEmpty() || isbn_new.isEmpty()) {
+                                                Toast toast = Toast.makeText((Objects.requireNonNull(getActivity())).getBaseContext(), "Required Fields Empty! Please try again.", Toast.LENGTH_LONG);
+                                                toast.show();
+                                                return;
+                                            }
 
+                                            Long isbn_long = Long.parseLong(isbnEt.getText().toString());
+                                            String coverUrl = isbn_new + ".png";
+
+                                            // check if Book is to be edited or added
+
+                                            if (getArguments() != null) {listener.onOkPressed(finalArgBook1,author_new, des_new, isbn_new, title_new, coverUrl, true);}
+                                            else{listener.onOkPressed(finalArgBook1,author_new, des_new, isbn_new, title_new, coverUrl, false);}
+                                        }
+                                    }
+                                });
                     }
-
-                        //TODO: return book_details (have no clue)
-
-
-    }).create();
+                }).create();
     }
 
     private void deletePicture() {
@@ -298,6 +306,7 @@ public class AddBookFragment extends DialogFragment {
                     isbnEt.setText(isbn);
                 }
             });
+
             RequestQueue queue = Volley.newRequestQueue(this.getContext());
 
             String url ="https://www.googleapis.com/books/v1/volumes?q=isbn:" + isbn;
@@ -372,6 +381,7 @@ public class AddBookFragment extends DialogFragment {
             }
             );
             queue.add(request);
+
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,7 +30,7 @@ public class BookFactory {
         /**
          * Add book.
          */
-        void getBook(Book book);
+        void getBook(Book book, String status, Boolean own);
     }
 
 
