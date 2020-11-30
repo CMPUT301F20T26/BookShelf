@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
+
 /**
  * The type Book.
  */
@@ -185,23 +186,27 @@ public class Book implements Serializable {
      *
      * @param status the status
      */
-    public void setStatus(String status) {
-        if (status.equals("Available")) {
-            this.status = BookStatus.Available;
-        } else if (status.equals("Requested")) {
-            this.status = BookStatus.Requested;
-        } else if (status.equals("Accepted")) {
-            this.status = BookStatus.Accepted;
-        } else if (status.equals("Borrowed")) {
-            this.status = BookStatus.Borrowed;
-        } else if (status.equals("Loaned")) {
-            this.status = BookStatus.Loaned;
-        } else {
-            Log.d("Error", "Invalid Status");
-        }
-    }
     public void setStatus(BookStatus status) {
         this.status = status;
+    }
+    public void setStatus(String status) {
+        if(status.equals("Available")){
+            this.status = BookStatus.Available;
+        }
+        else if(status.equals("Requested")){
+            this.status = BookStatus.Requested;
+        }
+        else if(status.equals("Accepted")){
+            this.status = BookStatus.Accepted;
+        }
+        else if(status.equals("Borrowed")){
+            this.status = BookStatus.Borrowed;
+        }else if(status.equals("Loaned")){
+            this.status = BookStatus.Loaned;
+        }
+        else{
+            Log.d("Error","Invalid Status");
+        }
     }
 
     /**

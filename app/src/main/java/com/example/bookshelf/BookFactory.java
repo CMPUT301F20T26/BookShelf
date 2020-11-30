@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,7 +30,7 @@ public class BookFactory {
         /**
          * Add book.
          */
-        void getBook(Book book);
+        void getBook(Book book, String status, Boolean own);
     }
 
 
@@ -158,30 +157,35 @@ public class BookFactory {
         final Book res = new Book();
         final String isbnString;
         Long isbn = 0L;
-                res.setBookID(bookDoc.getId());
-            if(bookDoc.get("isbn") != null) {
+
+            res.setBookID(bookDoc.getId());
+            if(bookDoc.getData().get("isbn") != null) {
                 isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
                 isbn = Long.parseLong(isbnString);
                 res.setBookID(bookDoc.getId());
             }
-            if(bookDoc.get("title") != null) {
+            if(bookDoc.getData().get("title") != null) {
                 res.setTitle(bookDoc.get("title").toString());
             }
-            if(bookDoc.get("ownerUsername") != null) {
+            if(bookDoc.getData().get("ownerUsername") != null) {
                 res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
             }
-            if(bookDoc.get("author") != null) {
+            if(bookDoc.getData().get("author") != null) {
                 res.setAuthor(bookDoc.get("author").toString());
                 res.setIsbn(isbn);
             }
-            if(bookDoc.get("coverImage") != null) {
+            if(bookDoc.getData().get("coverImage") != null) {
                 res.setCoverImage(bookDoc.get("coverImage").toString());
             }
-            if(bookDoc.get("description") != null) {
+            if(bookDoc.getData().get("description") != null) {
                 res.setDescription(bookDoc.get("description").toString());
             }
             if(bookDoc.get("status") != null){
             res.setStatus(bookDoc.get("status").toString());}
+
+            if(bookDoc.getData().get("status") != null) {
+                res.setStatus(Book.BookStatus.valueOf(bookDoc.get("status").toString()));
+            }
 
 
         return res;

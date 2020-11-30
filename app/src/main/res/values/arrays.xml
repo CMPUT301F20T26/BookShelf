@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="filter">
+        <item>My Books Show All</item>
+        <item>-->Available</item>
+        <item>-->Requested</item>
+        <item>-->Accepted</item>
+        <item>-->Borrowed</item>
+        <item>Borrowed/Requested Books</item>
+        <item>-->Requested</item>
+        <item>-->Accepted</item>
+        <item>-->Borrowed</item>
+    </string-array>
+
+</resources>

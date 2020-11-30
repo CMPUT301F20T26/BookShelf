@@ -6,13 +6,26 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserNotificationsActivity extends AppCompatActivity {
+
+    private ListView notificationList;
+    private NotificationAdapter notificationAdapter;
+    private FirebaseFirestore db;
 
     //Layout variables
     TextView uidTv;
@@ -25,9 +38,34 @@ public class UserNotificationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_notifications);
 
-        final String userId = user.getUid();
-        uidTv = findViewById(R.id.uid_notifications);
-        uidTv.setText(userId);
+        db = FirebaseFirestore.getInstance();
+
+        notificationList = findViewById(R.id.notification_list);
+
+        final ArrayList<ListNotifications> notifications = new ArrayList<ListNotifications>();
+        notificationAdapter = new NotificationAdapter(this, notifications);
+        notificationList.setAdapter(notificationAdapter);
+
+        db.collection("notifications")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                ListNotifications displayNotification = ListNotifications.get(document);
+                                matchNotification(displayNotification);
+                            }
+                        }
+                    }
+                });
+
+//        final String userId = user.getUid();
+//        uidTv = findViewById(R.id.uid_notifications);
+//        uidTv.setText(userId);
+
+
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
@@ -65,4 +103,14 @@ public class UserNotificationsActivity extends AppCompatActivity {
         });
         //__________________________________________________________________________________________
     }
+
+    public void matchNotification(ListNotifications notification){
+        final String userId = user.getUid();
+
+//        if((notification.getOwnerID().equals(userId) && notification.getStatus() == RequestStatus.PENDING) || (notification.getRequesterID().equals(userId) && notification.getStatus() == RequestStatus.ACCEPTED)) {
+            notificationAdapter.add(notification);
+//        }
+
+    }
+
 }

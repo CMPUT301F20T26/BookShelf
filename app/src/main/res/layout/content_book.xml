@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
         android:text="Author"
+        android:maxLength="15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/TitleView" />
 
@@ -39,6 +40,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
+        android:layout_marginTop="8dp"
+        android:maxLength="250"
         android:text="Description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/AuthorView" />
