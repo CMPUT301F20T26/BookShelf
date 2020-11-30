@@ -107,7 +107,7 @@ public class SearchTest {
      *
      * @throws Exception
      */
-    @Test
+    @Before
     public void start() throws Exception {
         Activity activity = rule.getActivity();
     }
@@ -161,6 +161,25 @@ public class SearchTest {
      */
     @Test
     public void searchBookByName() throws Exception {
+        solo.assertCurrentActivity("Wrong Activity", CreateAccountActivity.class);
+
+        //Test inputs
+        String testFullname = "firstname lastname";
+        String testusername = "username";
+        final String testEmail = "firstname.lastname@gmail.com";
+        String testPhone = "7803403052";
+        final String testPassword = "password123";
+
+        //Enter valid field inputs
+        solo.enterText((EditText) solo.getView(R.id.create_account_full_name), testFullname);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_name), testusername);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_email), testEmail);
+        solo.enterText((EditText) solo.getView(R.id.create_account_phone_number), testPhone);
+        solo.enterText((EditText) solo.getView(R.id.create_account_user_pwd), testPassword);
+        solo.clickOnButton("Create Account");
+
+        //Wait for profile page activity to open
+        solo.waitForActivity(UserProfileActivity.class);
         solo.assertCurrentActivity("Wrong Activity", UserProfileActivity.class);
 
         // Navigate to the search page
