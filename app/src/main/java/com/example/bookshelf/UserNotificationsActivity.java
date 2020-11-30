@@ -56,7 +56,6 @@ public class UserNotificationsActivity extends AppCompatActivity {
                     //notificationAdapter.notifyDataSetChanged();
                 }
                 notificationAdapter.notifyDataSetChanged();
-
             }
 
             @Override
