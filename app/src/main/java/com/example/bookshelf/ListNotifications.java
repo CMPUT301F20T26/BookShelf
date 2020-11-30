@@ -38,6 +38,12 @@ public class ListNotifications extends UserNotification{
     public ListNotifications(){
     }
 
+    /**
+     *
+     *
+     * @param notifDoc Document Sna
+     * @return
+     */
     static ListNotifications get(final DocumentSnapshot notifDoc){
         final ListNotifications notification = new ListNotifications();
 
