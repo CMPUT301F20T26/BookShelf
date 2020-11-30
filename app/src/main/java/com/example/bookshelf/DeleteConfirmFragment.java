@@ -20,28 +20,30 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 /**
- * This fragment acts to receive confirmation from the user to make a request on a particular book.
+ * This fragment acts to receive confirmation from the user to delete a book.
  */
 
-public class MakeRequestFragment extends DialogFragment {
-    private TextView confirmText;
-    private OnFragmentInteractionListener listener;
+public class DeleteConfirmFragment extends DialogFragment {
+    private DialogListener listener;
 
-    MakeRequestFragment() {
+    private Integer position;
+
+    DeleteConfirmFragment(int position) {
+        this.position = position;
     }
 
-    public interface OnFragmentInteractionListener {
-        void onOkPressed();
+    public interface DialogListener {
+        void deleteLongPress(Integer position);
     }
 
     @Override
     public void onAttach(Context context){
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            listener = (OnFragmentInteractionListener) context;
+        if (context instanceof DialogListener) {
+            listener = (DialogListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement DialogListener");
         }
     }
 
@@ -53,13 +55,13 @@ public class MakeRequestFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
-                .setTitle("Make book request?")
+                .setTitle("Are you sure you want to delete this book?")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //on ok pressed we want to set status to requested and update in firebase, notifying owner
-                        listener.onOkPressed(); // TODO: implement request creation
+                        // Delete the current book on long press
+                        listener.deleteLongPress(position);
                     }
                 }).create();
     }

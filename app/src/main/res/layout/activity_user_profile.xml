@@ -13,6 +13,7 @@
         android:id="@+id/profile_email"
         android:layout_width="356dp"
         android:layout_height="66dp"
+        android:background="@drawable/rectangle3"
         android:gravity="center"
         android:text="TextView"
         android:textAlignment="gravity"
@@ -21,12 +22,13 @@
         app:layout_constraintBottom_toTopOf="@+id/profile_phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profile_fullname" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_username" />
 
     <TextView
         android:id="@+id/profile_phone"
         android:layout_width="345dp"
         android:layout_height="62dp"
+        android:background="@drawable/rectangle3"
         android:gravity="center"
         android:text="TextView"
         android:textAlignment="gravity"
@@ -74,13 +76,13 @@
         android:layout_width="151dp"
         android:layout_height="164dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        tools:srcCompat="@drawable/portrait_icon" />
 
     <TextView
-        android:id="@+id/profile_username"
+        android:id="@+id/profile_fullname"
         android:layout_width="170dp"
         android:layout_height="60dp"
         android:layout_marginStart="36dp"
@@ -96,9 +98,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/profile_fullname"
+        android:id="@+id/profile_username"
         android:layout_width="361dp"
         android:layout_height="58dp"
+        android:background="@drawable/rectangle3"
         android:gravity="center"
         android:text="TextView"
         android:textAlignment="gravity"
@@ -110,9 +113,11 @@
         app:layout_constraintTop_toBottomOf="@+id/profile_pict" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/profile_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/profile_edit_btn"
+        android:layout_width="49dp"
+        android:layout_height="49dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
         android:clickable="true"
         app:backgroundTint="#166FFF"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_bar"

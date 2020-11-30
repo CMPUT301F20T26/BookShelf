@@ -1,5 +1,7 @@
 package com.example.bookshelf;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -9,44 +11,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * The type Book.
  */
 public class Book implements Serializable {
-    private String Title;
-    private String Author;
-    private Long ISBN;
-    private String photoURL;
-    private BookStatus Status;
-    private String ownerUsername;
-    private String description;
-
-
-
-    /**
-     * Gets book id.
-     *
-     * @return the book id
-     */
-    public String getBookID() {
-        return BookID;
-    }
-
-    /**
-     * Sets book id.
-     *
-     * @param bookID the book id
-     */
-    public void setBookID(String bookID) {
-        BookID = bookID;
-    }
-
-    private String BookID;
-
-
     /**
      * The enum Book status.
      */
@@ -72,80 +44,61 @@ public class Book implements Serializable {
          */
         Loaned};
 
+
+    //Book Attributes
+    private String title;
+    private String author;
+    private Long isbn;
+    private String photoURL;
+    private BookStatus status;
+    private String ownerUsername;
+    private String description;
+    private String BookID;
+
     /**
      * Instantiates a new Book.
-     *
-     * @param title       the title
-     * @param author      the author
-     * @param ISBN        the isbn
-     * @param photoURL    url to book cover
-     * @param description short  description
+     * Used for creating already existing books
+     * @param title         the title
+     * @param author        the author
+     * @param isbn          the isbn
+     * @param photoURL      the photo url
+     * @param status        the status
+     * @param ownerUsername the owner username
+     * @param description   the description
      */
-    public Book(String title, String author, Long ISBN, String photoURL, String description, String ownerUsername) {
-        this.Title = title;
-        this.Author = author;
-        this.ISBN = ISBN;
-        this.Status = BookStatus.Available;
+    public Book(String title, String author, Long isbn, String photoURL, BookStatus status , String ownerUsername, String description) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.status = status;
         this.photoURL = photoURL;
         this.description = description;
         this.ownerUsername = ownerUsername;
     }
 
+
     /**
-     * Instantiates a new Book.
+     * Gets book id.
      *
-     * @param title    the title
-     * @param author   the author
-     * @param ISBN     the isbn
-     * @param photoURL url to book cover
+     * @return the book id
      */
-    public Book(String title, String author, Long ISBN, String photoURL, String ownerUsername) {
-        Title = title;
-        Author = author;
-        this.ISBN = ISBN;
-        this.photoURL = photoURL;
-        this.Status = BookStatus.Available;
-        this.ownerUsername = ownerUsername;
+    public String getBookID() {
+        return BookID;
     }
 
     /**
-     * Instantiates a new Book.
+     * Sets book id.
      *
-     * @param title  the title
-     * @param author the author
-     * @param ISBN   the isbn
+     * @param bookID the book id
      */
-    public Book(String title, String author, Long ISBN, String ownerUsername) {
-        this.Title = title;
-        this.Author = author;
-        this.ISBN = ISBN;
-        this.Status = BookStatus.Available;
-        this.ownerUsername = ownerUsername;
+    public void setBookID(String bookID) {
+        BookID = bookID;
     }
-
-    /**
-     * Instantiates a new Book.
-     *
-     * @param title       the title
-     * @param author      the author
-     * @param description the description
-     * @param ISBN        the isbn
-     */
-    public Book(String title, String author, String description, Long ISBN, String ownerUsername) {
-        Title = title;
-        Author = author;
-        this.description = description;
-        this.ISBN = ISBN;
-        this.Status = BookStatus.Available;
-        this.ownerUsername = ownerUsername;
-    }
-
 
     /**
      * Instantiates a new Book.
      */
     public Book() {}
-
 
     /**
      * Gets title.
@@ -153,7 +106,7 @@ public class Book implements Serializable {
      * @return the title
      */
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     /**
@@ -162,7 +115,7 @@ public class Book implements Serializable {
      * @param title the title
      */
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     /**
@@ -171,7 +124,7 @@ public class Book implements Serializable {
      * @return the author
      */
     public String getAuthor() {
-        return Author;
+        return author;
     }
 
     /**
@@ -180,7 +133,7 @@ public class Book implements Serializable {
      * @param author the author
      */
     public void setAuthor(String author) {
-        Author = author;
+        this.author = author;
     }
 
     /**
@@ -188,17 +141,17 @@ public class Book implements Serializable {
      *
      * @return the isbn
      */
-    public Long getISBN() {
-        return ISBN;
+    public Long getIsbn() {
+        return isbn;
     }
 
     /**
      * Sets isbn.
      *
-     * @param ISBN the isbn
+     * @param isbn the isbn
      */
-    public void setISBN(Long ISBN) {
-        this.ISBN = ISBN;
+    public void setIsbn(Long isbn) {
+        this.isbn = isbn;
     }
 
     /**
@@ -215,7 +168,7 @@ public class Book implements Serializable {
      *
      * @param photoURL the photo url
      */
-    public void setPhotoURL(String photoURL) {
+    public void setCoverImage(String photoURL) {
         this.photoURL = photoURL;
     }
 
@@ -225,7 +178,7 @@ public class Book implements Serializable {
      * @return the status
      */
     public BookStatus getStatus() {
-        return Status;
+        return status;
     }
 
     /**
@@ -234,7 +187,26 @@ public class Book implements Serializable {
      * @param status the status
      */
     public void setStatus(BookStatus status) {
-        Status = status;
+        this.status = status;
+    }
+    public void setStatus(String status) {
+        if(status.equals("Available")){
+            this.status = BookStatus.Available;
+        }
+        else if(status.equals("Requested")){
+            this.status = BookStatus.Requested;
+        }
+        else if(status.equals("Accepted")){
+            this.status = BookStatus.Accepted;
+        }
+        else if(status.equals("Borrowed")){
+            this.status = BookStatus.Borrowed;
+        }else if(status.equals("Loaned")){
+            this.status = BookStatus.Loaned;
+        }
+        else{
+            Log.d("Error","Invalid Status");
+        }
     }
 
     /**
@@ -279,6 +251,24 @@ public class Book implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
         return BookID.equals(book.BookID);
+    }
+
+    /**
+     * Returns a book map that can be pushed to firebase
+     * @return
+     */
+    public HashMap<String, Object> getBookFirebaseMap(){
+        HashMap<String, Object> bookMap = new HashMap<String, Object>();
+        bookMap.put("author", this.author);
+        bookMap.put("coverImage", this.photoURL);
+        bookMap.put("description",this.description);
+        bookMap.put("isbn", this.isbn);
+        bookMap.put("ownerUsername", this.ownerUsername);
+        bookMap.put("status", this.status);
+        bookMap.put("title", this.title);
+
+        return bookMap;
+
     }
 
     @Override

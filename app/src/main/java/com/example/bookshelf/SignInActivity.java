@@ -84,9 +84,5 @@ public class SignInActivity extends AppCompatActivity {
                 startActivity(createAccountIntent);
             }
         });
-
-
-
-
     }
 }
