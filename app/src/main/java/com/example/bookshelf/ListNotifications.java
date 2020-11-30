@@ -40,28 +40,27 @@ public class ListNotifications extends UserNotification{
 
     static ListNotifications get(final DocumentSnapshot notifDoc){
         final ListNotifications notification = new ListNotifications();
-        Map<String, Object> notiDocData = notifDoc.getData();
 
-        if(notiDocData != null){
+        if(notifDoc != null){
             notification.setNotificationID(notifDoc.getId());
 
-            if(notiDocData.get("bookID") != null) {
-                notification.setBook(notiDocData.get("bookID").toString());
+            if(notifDoc.get("bookID") != null) {
+                notification.setBook(notifDoc.get("bookID").toString());
             }
-            if(notiDocData.get("date") != null) {
-                notification.setDate(notiDocData.get("date").toString());
+            if(notifDoc.get("date") != null) {
+                notification.setDate(notifDoc.get("date").toString());
             }
-            if(notiDocData.get("meetUpLocation") != null) {
-                notification.setMeetUpLocation(notiDocData.get("meetUpLocation").toString());
+            if(notifDoc.get("meetUpLocation") != null) {
+                notification.setMeetUpLocation(notifDoc.get("meetUpLocation").toString());
             }
-            if(notiDocData.get("ownerID") != null) {
-                notification.setOwner(notiDocData.get("ownerID").toString());
+            if(notifDoc.get("ownerID") != null) {
+                notification.setOwner(notifDoc.get("ownerID").toString());
             }
-            if(notiDocData.get("requesterID") != null) {
-                notification.setRequester(notiDocData.get("requesterID").toString());
+            if(notifDoc.get("requesterID") != null) {
+                notification.setRequester(notifDoc.get("requesterID").toString());
             }
-            if(notiDocData.get("status") != null) {
-                notification.setStatus(notiDocData.get("status").toString());
+            if(notifDoc.get("status") != null) {
+                notification.setStatus(notifDoc.get("status").toString());
             }
         }
         else

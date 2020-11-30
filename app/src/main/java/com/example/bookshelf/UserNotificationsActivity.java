@@ -54,8 +54,9 @@ public class UserNotificationsActivity extends AppCompatActivity {
                 ListNotifications n = ListNotifications.get(res);
                 if (n != null) {
                     notificationsList.add(n);
-                    notificationAdapter.notifyDataSetChanged();
+
                 }
+                notificationAdapter.notifyDataSetChanged();
 
 
             }
