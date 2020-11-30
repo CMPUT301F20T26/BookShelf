@@ -43,7 +43,7 @@ public class DeleteConfirmFragment extends DialogFragment {
             listener = (DialogListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement DialogListener");
         }
     }
 

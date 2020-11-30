@@ -75,8 +75,8 @@ public class SearchBooksActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                        BookFactory searchFactory = new BookFactory(db.collection("books"));
-                                        Book findBook = searchFactory.get(document, document.getId());
+                                        BookFactory searchFactory = new BookFactory("books");
+                                        Book findBook = searchFactory.get(document);
                                         matchBook(findBook, bookList);
                                     }
                                 }

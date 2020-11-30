@@ -37,6 +37,7 @@ public class RequestTheirBook extends UserNotification {
         // add notifID to RequestTheirBook object
         rq.NotificationID = notifID[0];
 
+
         /*
             Since we need to add the notification to the book owner's notification list, we need to
             look up the book owner's user ID, which requires a firebase call.

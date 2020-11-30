@@ -1,8 +1,19 @@
 package com.example.bookshelf;
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
+
 
 /**
  * The type Book.
@@ -177,6 +188,25 @@ public class Book implements Serializable {
      */
     public void setStatus(BookStatus status) {
         this.status = status;
+    }
+    public void setStatus(String status) {
+        if(status.equals("Available")){
+            this.status = BookStatus.Available;
+        }
+        else if(status.equals("Requested")){
+            this.status = BookStatus.Requested;
+        }
+        else if(status.equals("Accepted")){
+            this.status = BookStatus.Accepted;
+        }
+        else if(status.equals("Borrowed")){
+            this.status = BookStatus.Borrowed;
+        }else if(status.equals("Loaned")){
+            this.status = BookStatus.Loaned;
+        }
+        else{
+            Log.d("Error","Invalid Status");
+        }
     }
 
     /**
