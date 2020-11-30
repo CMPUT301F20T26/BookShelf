@@ -1,34 +1,47 @@
 @startuml
 
 folder "books (collection)" {
-file "book (doc)" {
+file "bookID (doc)" as b {
 artifact title
 artifact author
 artifact description
 artifact isbn
 artifact ownerUsername
-artifact photoUrl
+artifact coverImage
 artifact status
 }
 }
 
-folder "users (collection)" {
-file "userID (doc)"{
+folder "users (collection)"  as u  {
+file "userID (doc)"  {
 artifact username
 artifact email
 artifact fullname
-artifact notifications
-artifact ownedbooks
+artifact "notifications (array)" as nu
+artifact "ownedBooks (array)" as bu
 artifact phone
 artifact picture
 }
 }
 
-
-package "Other Groups" {
-FTP - [Second Component]
-
-[First Component] --> FTP
+folder "notifications (collection)" {
+file "notificationID (doc)" as n {
+artifact book
+artifact date
+artifact meetUpLocation
+artifact owner
+artifact requester
+artifact status
 }
+}
+
+book --> b
+bu --> b
+nu -up-> n
+
+'username --> UserLookup
+'owner --> UserLookup
+'requester --> UserLookup
+'UserLookup --> u
 
 @enduml

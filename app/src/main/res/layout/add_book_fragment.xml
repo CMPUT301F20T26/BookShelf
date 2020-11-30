@@ -47,10 +47,28 @@
             android:maxLength="250"/>
 
         <Button
-            android:id="@+id/Pictureadd_button"
+            android:id="@+id/scan_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scan ISBN" />
+
+        <Button
+            android:id="@+id/picture_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add_picture" />
+
+        <Button
+            android:id="@+id/delete_picture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Picture" />
+
+        <ImageView
+            android:id="@+id/cover_image"
+            android:layout_width="match_parent"
+            android:layout_height="194dp"
+            app:srcCompat="@drawable/books_icon" />
 
     </LinearLayout>
 

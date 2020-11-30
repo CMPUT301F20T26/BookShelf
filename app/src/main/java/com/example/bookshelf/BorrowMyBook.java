@@ -2,12 +2,11 @@ package com.example.bookshelf;
 
 
 /**
- * The type Borrow agreement. Created when a BorrowRequest is accepted.
+ * BorrowMyBook. Created when a RequestMyBook is accepted.
  *
- * The Borrow Agreement is the agreement between the user and another user who requested to borrow
- * their book.
+ * Represents an agreement to let somebody borrow your book.
  */
-public class BorrowAgreement extends UserNotification {
+public class BorrowMyBook extends UserNotification {
     /**
      * The book.
      */
@@ -24,7 +23,7 @@ public class BorrowAgreement extends UserNotification {
      *
      * @param request the request
      */
-    BorrowAgreement(BorrowRequest request)
+    BorrowMyBook(RequestMyBook request)
     {
         myBook = request.myBook;
         theirUsername = request.theirUsername;
@@ -34,10 +33,14 @@ public class BorrowAgreement extends UserNotification {
     /**
      * Scan book to loan.
      */
-    void scanBookToLoan() {};
+    void scanBookToLoan() {
+        // TODO: implement scanBookToLoan
+    };
 
     /**
      * Scan book to confirm return.
      */
-    void scanBookConfirmReturn() {};
+    void scanBookConfirmReturn() {
+        // TODO: implement scanBookToConfirmReturn
+    };
 }

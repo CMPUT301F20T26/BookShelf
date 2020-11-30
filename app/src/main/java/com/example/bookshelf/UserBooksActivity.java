@@ -4,180 +4,253 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-
+import android.widget.Spinner;
+import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserBooksActivity extends AppCompatActivity implements AddBookFragment.DialogListener {
-    TextView uidTv;
-    ListView bookList;
-    ArrayAdapter<Book> bookAdapter;
-    ArrayList<Book> bookDataList;
-    int pos;
-    BookArrayAdapter bookArrayAdapter;
-    private List<Book> Books;
-    String user_name;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import com.google.firebase.firestore.Source;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * The type User books activity.
+ */
+public class UserBooksActivity extends AppCompatActivity implements DeleteConfirmFragment.DialogListener, AddBookFragment.DialogListener, BookFactory.bookListener{
+    //Layout variables
+    private ListView bookList;
+    private FloatingActionButton addBookButton;
+    private Spinner spinner;
+
+    //Adapter and List view variables
+    private ArrayAdapter<Book> bookAdapter;
+    private ArrayList<Book> bookDataList;
+//    private int pos;
 
     //Firebase Authentication instance
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    //Current user's username
+    private String user_name;
+    private String userId;
+
+    //Database Initialization.
+    private FirebaseFirestore db =  FirebaseFirestore.getInstance();
+    //Books Collection reference
+    private CollectionReference bookCollection = db.collection("books");
+
+    private CollectionReference notificationsCollection = db.collection("notifications");
+    //Current user's collection reference
+    private DocumentReference userDocument;
+
+    //Firebase Storage
+    private StorageReference mStorageRef;
+
+    //Firebase helper instantiation.
+    private FirebaseHelper firebaseHelper;
+
+    //Extra message handler
+    public static final String EXTRA_MESSAGE = "com.example.bookshelf.MESSAGE";
+
+    //BookFactory call
+    private BookFactory bookFactory;
+
+
+    /**
+     * Instantiates a new User books activity.
+     */
+    public UserBooksActivity() {
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_books);
+        setContentView(R.layout.activity_user_books);  //Opening content view
 
-        final String userId = user.getUid();
-        Button addBookButton;
+       //Initialize variables
+        final FloatingActionButton addBookButton;
+
+        //Current user id
+        userId = user.getUid();
+        userDocument = db.collection("users").document(userId);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        //Layout Assignments
         addBookButton = findViewById(R.id.add);
         bookList = findViewById(R.id.Book_list);
+
+        //Adapter assignments
         bookDataList = new ArrayList<>();
         bookAdapter = new BookArrayAdapter(this,bookDataList);
-        final FirebaseFirestore db;
-        db = FirebaseFirestore.getInstance();
-
-
 
         bookList.setAdapter(bookAdapter);
-        String titl = "Twiligt";
-        String auth = "Twiligt";
-        String desc = "Twiligt";
-        Long isb = (long) 124684641;
-        Book bookadd = new Book(titl, auth, desc, isb,"me");
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
-        bookAdapter.add(bookadd);
 
-        final CollectionReference collectionReference = db.collection("books");
+        bookFactory = new BookFactory("books");
+        bookList.setAdapter(bookAdapter);
+        db = FirebaseFirestore.getInstance();
+
+        //Click to edit
+        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Book clickedBook = bookDataList.get(i);
+                        openBookDescription(clickedBook.getBookID());
+                    }
+                });}});
+
+        //Clicking the add button
         addBookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                     new AddBookFragment().show(getSupportFragmentManager(), "ADD_BOOK");
                 }
         });
+        spinner = (Spinner) findViewById(R.id.spinner2);
+// Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.filter, android.R.layout.simple_spinner_item);
+// Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
 
-        // I am grabbing the username, from the user database and saving it in the user_name,
-        // I checked whether its grabbing it by sending it to the log
-        db.collection("users").document(userId).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            user_name = documentSnapshot.getData().get("username").toString();
-                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable
-                                        FirebaseFirestoreException error) {
-                                    bookDataList.clear();
-                                    if(error!= null){
-                                        Log.d("Error",error.getMessage());
-                                    }
-                                    else {
-                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                                            //Log.d("Error",String.valueOf(user_name));
-
-                                            String user = String.valueOf(doc.getData().get("ownerUsername"));
-                                            Log.d("Error", String.valueOf(user_name.equals(user)));
-                                            Log.d("Error",String.valueOf(user));
-                                            if(user_name.equals(user)) {
-                                                String title = (String) doc.getData().get("title");
-                                                String author = (String) doc.getData().get("author");
-                                                String des = (String) doc.getData().get("description");
-                                                String isbn = (String) doc.getData().get("isbn");
-                                                isbn = isbn.replace("-", "");
-                                                Long isbn1 = Long.parseLong(isbn);
-                                                bookDataList.add(new Book(title, author, des, isbn1, user));
-                                            }
-                                        }
-
-                                    }
-
-                                    bookAdapter.notifyDataSetChanged(); // Notifying the adapter to render any new data fetched
-                                }
-                            });
-
-                        }}});
-        // Here I want to compare the user_name and user of the book before adding it to the datalist
-        // so I print the books that belong to me
-        // Problem: user_name is null before I enter this step
-
-        bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //  Spinner menu to filter
+        spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                pos = position;//to keep track of which item to edit
-                System.out.println(pos);
-
-                // when delete button pressed remove the selected item from GearAdapter
-                Button deleteButton = findViewById(R.id.delete);
-                deleteButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        if (pos < bookList.getCount() && pos >= 0) {
-                            if (pos < bookList.getCount() && pos >= 0) {
-                                String rem_isbn = (bookDataList.get(pos)).getISBN().toString();
-                                collectionReference
-                                        .document(rem_isbn)
-                                        .delete();
-                            bookDataList.remove(pos);
-                            bookAdapter.notifyDataSetChanged();
-                            pos = -1;
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("All");
+                    addBookButton.setVisibility(View.VISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
                         }
-                    }
-                }});
-
-                // when edit button clicked go to AddGearFragment to edit
-                Button editButton = findViewById(R.id.edit);
-                editButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        if (pos < bookList.getCount() && pos >= 0) {
-                            AddBookFragment add_new = AddBookFragment.newInstance(bookAdapter.getItem(pos));
-                            add_new.show(getSupportFragmentManager(),"EDIT_GEAR");
-                            Book dbadd = bookDataList.get(pos);
-                            Map<String, Object> book = new HashMap<>();
-                            book.put("title", dbadd.getTitle());
-                            book.put("author", dbadd.getAuthor());
-                            book.put("isbn", dbadd.getISBN().toString());
-                            book.put("description", dbadd.getDescription());
-                            collectionReference
-                                    .document(dbadd.getISBN().toString())
-                                    .update(book);
-                            pos = -1;
+                    });
+                }
+                else if(i==1){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Available");
+                    addBookButton.setVisibility(View.VISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
                         }
-                    }
-                });
+                    });
+                }
+                else if(i==2){
+                    bookAdapter.clear();
+                    OwnerRequestedBooks();
+                    // Add button turned off
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    //Long Press to delete
+                    bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            //Show confirmation fragment
+                            new DeleteConfirmFragment(i).show(getSupportFragmentManager(), "DELETE");
+                            return false;
+                        }
+                    });
+                }
+                else if(i==3){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    // Do not show delete option
+                    bookList.setOnItemLongClickListener(null);
+                }
+                else if(i==4){
+                    bookAdapter.clear();
+                    getUserOwnedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+
+                }
+                else if(i==5){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("All");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+                }
+                else if(i==6){
+                    bookAdapter.clear();
+                    UserRequestedBooks("Requested");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+                }
+                else if(i==7){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Accepted");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+                }
+                else if(i==8){
+                    bookAdapter.clear();
+                    UserBorrowedBooks("Borrowed");
+                    addBookButton.setVisibility(View.INVISIBLE);
+                    bookList.setOnItemLongClickListener(null);
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
-
+        // I am grabbing the username and owned books list, from the user database and saving it in the user_name,
+        // I checked whether its grabbing it by sending it to the log
 
 
         //BOTTOM NAVIGATION_________________________________________________________________________
@@ -210,29 +283,188 @@ public class UserBooksActivity extends AppCompatActivity implements AddBookFragm
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
                 }
                 return false;
             }
         });
         //__________________________________________________________________________________________
-
-    }
-    @Override
-    public void add_Book(Book book) {
-        bookAdapter.add(book);
     }
 
+
+    // Get all user owned books by given status, or grab all
+    private void getUserOwnedBooks(final String status) {
+        // Extract books from the owner username and send to bookAdapter
+        bookDataList.clear();
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            final List<String> ownedBooks = (List<String>) documentSnapshot.getData().get("ownedBooks");
+                            for(int i = 0; i<ownedBooks.size(); i++){
+                                db.collection("books").document(ownedBooks.get(i)).get()
+                                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                                    getBook(bookFactory.get(documentSnapshot),status,true);
+
+                                                }
+                                            }});}}}});
+    }
+
+    // Get all user borrowed books accepted or borrowed
+    private void UserBorrowedBooks(final String status){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("requesterID").toString().equals(userId)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),status,false);
+                                    }
+                                }
+                            });
+                    }
+                }
+            }
+        });
+    }
+
+    // Gets all user requested books
+    private void UserRequestedBooks(final String status){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("requesterID").toString().equals(userId) && RequestStatus.valueOf(snapshot.getData().get("status").toString()).equals(RequestStatus.PENDING)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),status,false);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    //  Books of user that have been requested
+    private void OwnerRequestedBooks(){
+        bookDataList.clear();
+        notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for(QueryDocumentSnapshot snapshot: queryDocumentSnapshots){
+                    if(snapshot.getData().get("ownerID").toString().equals(userId) && RequestStatus.valueOf(snapshot.getData().get("status").toString()).equals(RequestStatus.PENDING)){
+                        bookCollection.document(snapshot.getData().get("bookID").toString()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    getBook(bookFactory.get(documentSnapshot),"Requested",true);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    //  Creates a book and adds to firebase for add functionality
     @Override
-    public void edit_Book(Book book, String title, String author, Long isbn, String des) {
-        book.setTitle(title);
-        book.setAuthor(author);
-        book.setISBN(isbn);
-        book.setDescription(des);
+    public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
+
+        db.collection("users").document(user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            bookFactory.OwnerUsername(documentSnapshot.getData().get("username").toString());
+                            bookFactory.Author(author);
+                            bookFactory.Description(des);
+                            bookFactory.ISBN(Long.parseLong(isbn));
+                            bookFactory.Title(title);
+                            bookFactory.CoverImage(photoURL);
+                            Book newadd;
+                            if(edit == true){}
+                            else {
+                                bookFactory.Status(Book.BookStatus.Available);
+                                newadd = bookFactory.build();
+                                bookDataList.add(newadd);
+                                userDocument.update("ownedBooks", FieldValue.arrayUnion(newadd.getBookID()));
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                            bookFactory.New();
+                        }
+                    }
+                });
+    }
+
+    //  Creates object of books
+    @Override
+    public void getBook(Book book,String status, Boolean own) {
+        if(status.equals("All")){
+            if(book.getStatus()== Book.BookStatus.Available && !own){
+                book.setStatus("Requested");
+            }
+            bookDataList.add(book);
+            bookAdapter.notifyDataSetChanged();}
+        else{
+            if(book.getStatus().toString().equals(status)){
+                bookDataList.add(book);
+                bookAdapter.notifyDataSetChanged();
+            }
+            else if(book.getStatus()== Book.BookStatus.Available && status.equals("Requested") ){
+                book.setStatus("Requested");
+                bookDataList.add(book);
+                bookAdapter.notifyDataSetChanged();
+            }
+
+
+    }
+    }
+    // Delete on long press
+    public void deleteLongPress(Integer position){
+        final Book deletedBook = bookDataList.get(position);
+        bookFactory.delete(deletedBook.getBookID());
+        userDocument.update("ownedBooks", FieldValue.arrayRemove(deletedBook.getBookID()));
+
+        //Delete cover image from firebase storage.
+        StorageReference bookCoverRef = mStorageRef.child("Book Images/"+ deletedBook.getPhotoURL());
+        bookCoverRef.delete();
+
+        //Delete from book data list and update adapter
+        bookDataList.remove(deletedBook);
         bookAdapter.notifyDataSetChanged();
+    }
+    // Book view upon press
+    public void openBookDescription(String id) {
+        Intent intent = new Intent(this, BookActivity.class);
+        // we want the message to be the book ID corresponding to the selected book
+        intent.putExtra(EXTRA_MESSAGE, id);
+        startActivityForResult(intent, 2);
+    }
+    //  Open all owned books when activity enters
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 2 && resultCode==RESULT_OK) {
+            spinner.setSelection(0);
+        }
     }
 }

@@ -99,17 +99,6 @@ public class AddBook {
     }
 
     /**
-     * Runs after all tests are completed. Calls deleteUser function and closes all opened
-     * activities
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        deleteUser();
-        solo.finishOpenedActivities();
-    }
-
-    /**
      * Gets the current activity
      *
      * @throws Exception
@@ -117,6 +106,7 @@ public class AddBook {
     @Test
     public void start() throws Exception {
         Activity activity = rule.getActivity();
+        deleteUser();
     }
 
     /**
@@ -187,14 +177,18 @@ public class AddBook {
         solo.clickInList(0,0);
         solo.clickOnButton("Delete");
         results = (ListView) solo.getView(R.id.Book_list);
+        Assert.assertEquals(1, ((ListView) solo.getView(R.id.Book_list)).getAdapter().getCount());
+        //Assert.assertEquals(Book.class, results.getAdapter().getItem(0).getClass());
 
         // Tell the test to expect an exception to be thrown because of the next statement
-        exception.expect(IndexOutOfBoundsException.class);
+        //exception.expect(IndexOutOfBoundsException.class);
 
         // Try to access a book that has already been deleted through the array adapter
         // , causing the adapter to throw an IndexOutOfBounds exception which is expected by the
         // previous statement, hence test passes
-        Assert.assertEquals(" ", results.getAdapter().getItem(0).toString());
+        //Assert.assertEquals(" ", results.getAdapter().getItem(0).toString());
+
+//        deleteUser();
 
     }
 }

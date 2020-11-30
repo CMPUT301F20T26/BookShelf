@@ -1,33 +1,85 @@
 package com.example.bookshelf;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserNotificationsActivity extends AppCompatActivity {
+
+    private ListView notificationListView;
+    private NotificationAdapter notificationAdapter;
+    private FirebaseFirestore db;
 
     //Layout variables
     TextView uidTv;
 
     //Firebase Authentication instance
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    final ArrayList<ListNotifications> notifications = new ArrayList<ListNotifications>();
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_notifications);
 
-        final String userId = user.getUid();
-        uidTv = findViewById(R.id.uid_notifications);
-        uidTv.setText(userId);
+        db = FirebaseFirestore.getInstance();
+
+        notificationListView = findViewById(R.id.notification_list);
+
+        final ArrayList<ListNotifications> notificationsList = new ArrayList<ListNotifications>();
+        notificationAdapter = new NotificationAdapter(this, notificationsList);
+        notificationListView.setAdapter(notificationAdapter);
+
+        final FirebaseHelper helper = new FirebaseHelper();
+
+        final FirebaseHelper.IHelper notifListener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                final List<DocumentSnapshot> res = (List<DocumentSnapshot>) o;
+                for (DocumentSnapshot snapshot : res){
+                    notificationsList.add(ListNotifications.get(snapshot));
+                    //notificationAdapter.notifyDataSetChanged();
+                }
+                notificationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Object o) {
+
+            }
+        };
+
+        FirebaseHelper.IHelper arrayListener = new FirebaseHelper.IHelper() {
+            @Override
+            public void onSuccess(Object o) {
+                final List<String> myNotif = (List<String>) o;
+                helper.getList("notifications", myNotif, notifListener);
+                //notificationAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Object o) {
+
+            }
+        };
+
+        helper.getUserArray("notifications", arrayListener);
+
 
         //BOTTOM NAVIGATION_________________________________________________________________________
         //Initialize nav bar and assign it
@@ -41,7 +93,7 @@ public class UserNotificationsActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 //Pass User's UID into activities on menu click
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.profile_page:
                         Intent profileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                         startActivity(profileIntent);
@@ -59,15 +111,12 @@ public class UserNotificationsActivity extends AppCompatActivity {
                         startActivity(searchIntent);
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.maps_page:
-                        Intent mapsIntent = new Intent(getApplicationContext(), RequestDetailsActivity.class);
-                        startActivity(mapsIntent);
-                        overridePendingTransition(0, 0);
-                        return true;
                 }
                 return false;
             }
         });
         //__________________________________________________________________________________________
     }
+
+
 }

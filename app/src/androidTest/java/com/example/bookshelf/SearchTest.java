@@ -91,16 +91,6 @@ public class SearchTest {
                 });
     }
 
-    /**
-     * Runs after all tests are completed. Calls deleteUser function and closes all opened
-     * activities
-     * @throws Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-        deleteUser();
-        solo.finishOpenedActivities();
-    }
 
     /**
      * Gets the current activity
@@ -152,6 +142,7 @@ public class SearchTest {
         Assert.assertEquals("Beach Safari", resultDetails.get(0).getText().toString());
         Assert.assertEquals("Witzel, Mawil", resultDetails.get(1).getText().toString());
         Assert.assertEquals("adekunle", resultDetails.get(2).getText().toString());
+        deleteUser();
     }
 
     /**
@@ -178,8 +169,11 @@ public class SearchTest {
         solo.enterText((EditText) solo.getView(R.id.create_account_user_pwd), testPassword);
         solo.clickOnButton("Create Account");
 
+<<<<<<< HEAD
+=======
         //Wait for profile page activity to open
         solo.waitForActivity(UserProfileActivity.class);
+>>>>>>> de15900e8998897544a34e13ab176b41355adf0d
         solo.assertCurrentActivity("Wrong Activity", UserProfileActivity.class);
 
         // Navigate to the search page
@@ -198,6 +192,7 @@ public class SearchTest {
         Assert.assertEquals("Beach Safari", resultDetails.get(0).getText().toString());
         Assert.assertEquals("Witzel, Mawil", resultDetails.get(1).getText().toString());
         Assert.assertEquals("adekunle", resultDetails.get(2).getText().toString());
+        deleteUser();
     }
 
 }

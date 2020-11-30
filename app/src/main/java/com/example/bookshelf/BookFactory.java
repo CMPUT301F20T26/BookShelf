@@ -1,22 +1,40 @@
 package com.example.bookshelf;
 
 
+
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * BookFactory - For creating new books.
  */
 public class BookFactory {
+    private final FirebaseFirestore db;
+    final ArrayList<Book> temp = new ArrayList<Book>();
+    private BookFactory.bookListener listener;
+    public interface bookListener{
+        /**
+         * Add book.
+         */
+        void getBook(Book book, String status, Boolean own);
+    }
+
+
+    // TODO: use FireBaseHelper
 
     /**
      * Title.
@@ -46,7 +64,7 @@ public class BookFactory {
      * @param ISBN the isbn
      */
     public BookFactory ISBN(Long ISBN) {
-        thisBook.setISBN(ISBN);
+        thisBook.setIsbn(ISBN);
         bookMap.put("isbn", ISBN);
         return this;
     }
@@ -54,11 +72,12 @@ public class BookFactory {
     /**
      * Photo url.
      *
-     * @param photoURL the photo url
+     * @param coverImage the photo url
      */
-    public BookFactory PhotoURL(String photoURL) {
-        thisBook.setPhotoURL(photoURL);
-        bookMap.put("photoURL", photoURL);
+
+    public BookFactory CoverImage(String coverImage) {
+        thisBook.setCoverImage(coverImage);
+        bookMap.put("coverImage", coverImage);
         return this;
     }
 
@@ -68,7 +87,7 @@ public class BookFactory {
      * @param status the status
      */
     public BookFactory Status(Book.BookStatus status) {
-        thisBook.setStatus(status);
+        thisBook.setStatus(status.toString());
         bookMap.put("status", status);
         return this;
     }
@@ -105,13 +124,17 @@ public class BookFactory {
     /**
      * Instantiates a new Book factory.
      *
-     * @param bookReference the firebase book collection reference
+     * @param collectionPath the firebase book collection reference
      */
-    BookFactory(CollectionReference bookReference)
+    BookFactory(String collectionPath)
     {
         thisBook = new Book();
         bookMap = new HashMap<>();
-        bookCollectionReference = bookReference;
+        db = FirebaseFirestore.getInstance();
+        bookCollectionReference=db.collection(collectionPath);
+        bookMap.put("description", "");
+        bookMap.put("coverImage", "");
+
     }
 
     /**
@@ -127,29 +150,46 @@ public class BookFactory {
     /**
      * Gets a book from Firebase, given the book ID.
      *
-     * @param bookID the book id
      * @return the book
      */
-    Book get(final String bookID){
+    Book get(final DocumentSnapshot bookDoc){
+
         final Book res = new Book();
-        bookCollectionReference.document(bookID).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot bookDoc = task.getResult();
-                            res.setBookID(bookID);
-                            res.setTitle(bookDoc.get("title").toString());
-                            res.setOwnerUsername(bookDoc.get("owner").toString());
-                            res.setTitle(bookDoc.get("title").toString());
-                            // TODO : rest of fields here
-                        }
-                        else {
-                            // TODO: throw exception
-                        }
-                    }
-                });
+        final String isbnString;
+        Long isbn = 0L;
+
+            res.setBookID(bookDoc.getId());
+            if(bookDoc.getData().get("isbn") != null) {
+                isbnString = bookDoc.getData().get("isbn").toString().replace("-", "");
+                isbn = Long.parseLong(isbnString);
+                res.setBookID(bookDoc.getId());
+            }
+            if(bookDoc.getData().get("title") != null) {
+                res.setTitle(bookDoc.get("title").toString());
+            }
+            if(bookDoc.getData().get("ownerUsername") != null) {
+                res.setOwnerUsername(bookDoc.get("ownerUsername").toString());
+            }
+            if(bookDoc.getData().get("author") != null) {
+                res.setAuthor(bookDoc.get("author").toString());
+                res.setIsbn(isbn);
+            }
+            if(bookDoc.getData().get("coverImage") != null) {
+                res.setCoverImage(bookDoc.get("coverImage").toString());
+            }
+            if(bookDoc.getData().get("description") != null) {
+                res.setDescription(bookDoc.get("description").toString());
+            }
+            if(bookDoc.get("status") != null){
+            res.setStatus(bookDoc.get("status").toString());}
+
+            if(bookDoc.getData().get("status") != null) {
+                res.setStatus(Book.BookStatus.valueOf(bookDoc.get("status").toString()));
+            }
+
+
         return res;
+
     }
 
     /**
@@ -159,19 +199,26 @@ public class BookFactory {
      * @return the book
      */
     Book build(){
+        FirebaseHelper helper = new FirebaseHelper();
         // get time of book creation
         // this is used to calculate the unique book ID
-        long now = new Date().getTime();
-        String id = String.format("%x", Objects.hash(now, thisBook.getTitle()));
+        String id = helper.add("books", bookMap);
         // add id to book and bookMap
         thisBook.setBookID(id);
-        bookMap.put("bookID", id);
-        // push to firebase
-        bookCollectionReference
-                .document(id)
-                .set(thisBook);
         // return built book
         return thisBook;
+    }
+    Book edit(String id){
+        bookCollectionReference
+                .document(id)
+                .update(bookMap);
+        thisBook.setBookID(id);
+        return thisBook;
+    }
+    void delete(String id){
+        bookCollectionReference
+                .document(id)
+                .delete();
     }
 
 
