@@ -154,6 +154,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+
+        //  Spinner menu to filter
         spinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener(){
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -188,6 +190,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                 else if(i==2){
                     bookAdapter.clear();
                     OwnerRequestedBooks();
+                    // Add button turned off
                     addBookButton.setVisibility(View.INVISIBLE);
                     //Long Press to delete
                     bookList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -203,6 +206,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                     bookAdapter.clear();
                     getUserOwnedBooks("Accepted");
                     addBookButton.setVisibility(View.INVISIBLE);
+                    // Do not show delete option
                     bookList.setOnItemLongClickListener(null);
                 }
                 else if(i==4){
@@ -292,19 +296,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
     }
 
 
-
-    public class SpinnerActivity extends Activity implements AdapterView.OnItemSelectedListener {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view,
-                                   int pos, long id) {
-            // An item was selected. You can retrieve the selected item using
-            // parent.getItemAtPosition(pos)
-        }
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-            // Another interface callback
-        }
-    }
+    // Get all user owned books by given status, or grab all
     private void getUserOwnedBooks(final String status) {
         // Extract books from the owner username and send to bookAdapter
         bookDataList.clear();
@@ -327,6 +319,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                                                 }
                                             }});}}}});
     }
+
+    // Get all user borrowed books accepted or borrowed
     private void UserBorrowedBooks(final String status){
         bookDataList.clear();
         notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -348,6 +342,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             }
         });
     }
+
+    // Gets all user requested books
     private void UserRequestedBooks(final String status){
         bookDataList.clear();
         notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -369,6 +365,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             }
         });
     }
+
+    //  Books of user that have been requested
     private void OwnerRequestedBooks(){
         bookDataList.clear();
         notificationsCollection.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -390,6 +388,8 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
             }
         });
     }
+
+    //  Creates a book and adds to firebase for add functionality
     @Override
     public void onOkPressed(final Book book, final String author, final String des, final String isbn, final String title,final String photoURL, final Boolean edit) {
 
@@ -420,6 +420,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
                 });
     }
 
+    //  Creates object of books
     @Override
     public void getBook(Book book,String status, Boolean own) {
         if(status.equals("All")){
@@ -442,7 +443,7 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
 
     }
     }
-
+    // Delete on long press
     public void deleteLongPress(Integer position){
         final Book deletedBook = bookDataList.get(position);
         bookFactory.delete(deletedBook.getBookID());
@@ -456,14 +457,14 @@ public class UserBooksActivity extends AppCompatActivity implements DeleteConfir
         bookDataList.remove(deletedBook);
         bookAdapter.notifyDataSetChanged();
     }
-
+    // Book view upon press
     public void openBookDescription(String id) {
         Intent intent = new Intent(this, BookActivity.class);
         // we want the message to be the book ID corresponding to the selected book
         intent.putExtra(EXTRA_MESSAGE, id);
         startActivityForResult(intent, 2);
     }
-
+    //  Open all owned books when activity enters
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
